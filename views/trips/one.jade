@@ -1,0 +1,69 @@
+extends ../layout
+
+block content
+
+	a(href="/trips") trips go
+	
+	br
+	br
+	br
+	
+	b created_at 
+	| #{trip.created_at}	
+	br
+	b updated_at 
+	| #{trip.updated_at}	
+	br
+	| #{trip.description}	
+	
+	br
+	br
+	br
+	
+	h4 Comments
+	
+	each comment in trip.comments
+		| #{comment.uid} #{comment.created_at}
+		br
+		| #{comment.message}
+		hr
+		
+	
+	form(method="POST", action="/trips/comments/add")
+		input#pid(type="hidden", name="pid")
+		input(type="hidden", name="trip_id", value="#{trip.id}")
+		
+		label
+			| Message:
+			br
+			textarea(name="message")
+	
+		br
+		br
+		
+		button Submit
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

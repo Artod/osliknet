@@ -1,0 +1,37 @@
+extends ../layout
+block content
+
+	table(border="1px")
+		tr
+			th Who
+			th Trip
+			th Date
+			th Act
+
+		if orders
+			each order in orders
+				tr
+					td
+						=order.uid
+					td
+						=order.trip_id
+
+					td
+						=order.created_at
+
+
+					td						
+
+						a(href='/orders/#{order.id}') show
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

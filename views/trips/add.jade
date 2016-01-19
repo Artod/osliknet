@@ -1,0 +1,79 @@
+extends ../layout
+
+block content
+
+	a(href="/trips") trips go
+	
+	form(method="POST", action="#{trip ? '/trips/edit/' + trip.id : ''}")
+		div
+			label
+				| When:
+				input(name="when", type="date", value="#{trip ? trip.when : ''}")
+				
+		br
+		br
+
+		label
+			| From: 
+			if trip
+				| #{trip.from}
+			else
+				input#from-input(style="width:500px", name="from", value="#{trip ? trip.from : ''}")
+				input#from-place-id(type="hidden", name="from_id")
+			
+		br
+		br
+		
+		label
+			| To: 
+			if trip
+				| #{trip.to}
+			else
+				input#to-input(style="width:500px", name="to", value="#{trip ? trip.to : ''}")
+				input#to-place-id(type="hidden", name="to_id")
+	
+		br
+		br
+		
+		label
+			| Description:
+			br
+			br
+			| #{trip ? trip.description : ''}
+			hr
+			textarea(name="description")
+	
+		br
+		br
+		
+		button Submit
+		
+	script.
+		function googleMapCallback() {
+			initMap( document.getElementById('from-input'), document.getElementById('from-place-id') );
+			initMap( document.getElementById('to-input'), document.getElementById('to-place-id') );		
+		} 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

@@ -1,0 +1,39 @@
+extends ../layout
+block content
+
+
+	table(border="1px")
+		a(href="/trips/#{order.trip_id}") go to Trip #{order.trip_id}
+		br
+		br
+		
+		| Order #{order.id}
+		
+		br
+		br
+		
+		a(href="/orders") go to Orders
+		br
+		br
+		
+		if order.messages
+			each message in order.messages
+				=message.uid =message.date
+				br
+				=message.message
+				br
+				hr
+		
+		form(method="post", action="/orders/messages/add")
+			input(type="hidden", name="order_id", value="#{order.id}")
+			textarea(name="messages[message]")
+			input(type="submit")
+		
+		
+		
+		
+		
+		
+		
+		
+		

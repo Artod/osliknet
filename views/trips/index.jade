@@ -1,0 +1,148 @@
+extends ../layout
+block content
+	a(href="/users/logout") logout
+	br
+	br
+	| Message: #{message}
+	br
+	br
+	br
+	
+
+	h2 Find
+	form(method="get")
+		label
+			| From:
+
+			input#from-input(style="width:500px", value="")
+			input#from-place-id(type="hidden", name="from_id")
+			
+		br
+		br
+		
+		label
+			| To:
+
+			input#to-input(style="width:500px", value="")
+			input#to-place-id(type="hidden", name="to_id")
+
+		br
+		br
+		
+		button Find
+		
+		
+	
+	br
+	br
+	br
+
+	h2 Sign Up
+	form(action="/users/signup", method="post")
+		| Username:
+		input(type="text" name="username")
+
+		| Email:
+		input(type="text" name="email")
+
+		button Get token
+	br
+	br
+	br
+
+	h2 Sign In
+	form(action="/users/sendtoken", method="post")
+		| Email:
+		input(type="text" name="email")
+
+		button Get token
+	br
+	br
+	br
+	br
+	table(border="1px")
+		tr
+			th Who
+			th From
+			th When
+			th To
+			th created_at
+			th updated_at
+			th Desc
+			th is_removed
+			th Edit
+			th order
+
+		if trips
+			each trip in trips
+				tr
+					td
+						| who
+						| rating
+
+					td
+						=trip.from
+						=trip.from_id
+
+					//td
+						- var when = new Date(trip.when)
+
+						=when.getDate().toString().replace(/^([0-9])$/, '0$1')
+						| -
+						=when.getMonth() + 1
+						| -
+						=when.getFullYear()
+
+					td
+						=trip.when
+
+					td
+						=trip.to
+						=trip.to_id
+
+					td
+						=trip.created_at
+
+					td
+						=trip.updated_at
+
+					td
+						=trip.description
+
+					td
+						=trip.is_removed
+
+					td
+						a(href='/trips/edit/#{trip.id}') edit
+
+						br
+
+						a(href='/trips/del/#{trip.id}') remove
+						
+						br
+
+						a(href='/trips/#{trip.id}') show
+					
+					td		
+						form(method="post", action="/orders/add")
+							input(type="hidden", name="trip_id", value="#{trip.id}")
+							textarea(name="messages[message]")
+							input(type="submit")
+						
+	script.
+		function googleMapCallback() {
+			initMap( document.getElementById('from-input'), document.getElementById('from-place-id') );
+			initMap( document.getElementById('to-input'), document.getElementById('to-place-id') );		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
