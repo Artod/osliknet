@@ -1,14 +1,16 @@
-<h2>Find</h2>
+<h2>Find travelers</h2>
 
-<form method="get">
-	<label>From:
-		<input #fromInput id="from-input" style="width:500px" value="" />
-		<input #fromPlaceId id="from-id" type="hidden" name="from_id"/>
-	</label><br/><br/>
-	<label>To:
-		<input #toInput id="to-input" style="width:500px" value=""/>
-		<input #toPlaceId id="to-place-id" type="hidden" name="to_id"/>
-	</label><br/><br/>
-	<button>Find</button>
+<form method="get" (ngSubmit)="onSubmit()" #form="ngForm">
+
+	<label for="to_id">From:</label>
+	<gm-autocomplite [class]="''" [name]="'from_id'"></gm-autocomplite>
+	
+	<br/><br/>
+	
+	<label for="to_id">To</label>
+	<gm-autocomplite [class]="''" [name]="'to_id'"></gm-autocomplite>
+	
+	<br/><br/>
+
+	<button type="submit" [disabled]="!form.form.valid">Find</button>
 </form>
-
