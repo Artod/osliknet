@@ -1,23 +1,20 @@
 doctype html
 html
 	head
-		title= title
+		base(href="/")
+		
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		link(rel='stylesheet' href='/modules/bootstrap/css/bootstrap.min.css')
 		
-		script(src='/modules/angular2/angular2-polyfills.js')
 		script(src='/modules/angular2/angular2-polyfills.js')
 		script(src='/modules/systemjs/system.src.js')
 		script(src='/modules/rxjs/Rx.js')
 		script(src='/modules/angular2/angular2.dev.js')
 		script(src='/modules/angular2/router.dev.js')
-		// script(src='/app/services/maps-api-loader/maps-api-loader.js')
-		// script(src='/app/services/maps-api-loader/lazy-maps-api-loader.js')
-		
-		//script(src='/scripts/src/app.js')
-		//script(src='/scripts/src/boot.js')
 		
 	body
+	
+		a(href="/heroes")
 	
 		app Loading...	
 
@@ -39,108 +36,3 @@ html
 			
 			System.import('/app/boot')
 				.then(null, console.error.bind(console));		
-
-
-				
-
-
-
-			
-			function googleMapCallback111() {
-
-				initMap( document.getElementById('from-input'), document.getElementById('from-place-id') );
-				initMap( document.getElementById('to-input'), document.getElementById('to-place-id') );		
-			}				
-				
-			function initMap1111(input, place_id) {
-				var options = {
-					types: ['(cities)']
-				};
-
-				var autocomplete = new google.maps.places.Autocomplete(input, options);
-			  
-				google.maps.event.addListener(autocomplete, 'place_changed', function() {			
-					var place = this.getPlace();
-					
-					var components = place.address_components,
-						city='=';
-						
-					// console.dir(components);
-					
-					/*if (components) {
-						for (var c = 0; c < components.length; ++c) {
-							//console.log(components[c].types.join('|'));
-							
-							city += components[c].long_name + '+';
-						}
-						
-						
-						for (var c=0;c<components.length;++c) {
-							console.log(components[c].types.join('|'));
-							
-							if (components[c].types.indexOf('locality')>-1 && components[c].types.indexOf('political')>-1) {
-								city=components[c].long_name;
-								break;
-							}
-						}
-					}*/
-					  
-					/* alert(city, place.place_id); */
-					// console.log(place.place_id);
-					place_id.value = place.place_id;	
-					
-					// alert(place.geometry.location.lat());
-					// alert(place.geometry.location.lng());
-				});				
-				
-				/*
-				  autocomplete.addListener('place_changed', function() {
-					infowindow.close();
-					var place = autocomplete.getPlace();
-					if (!place.geometry) {
-					  return;
-					}
-
-					if (place.geometry.viewport) {
-					  map.fitBounds(place.geometry.viewport);
-					} else {
-					  map.setCenter(place.geometry.location);
-					  map.setZoom(17);
-					}
-
-					// Set the position of the marker using the place ID and location.
-					marker.setPlace({
-					  placeId: place.place_id,
-					  location: place.geometry.location
-					});
-					marker.setVisible(true);
-
-					infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
-						'Place ID: ' + place.place_id + '<br>' +
-						place.formatted_address);
-					infowindow.open(map, marker);
-				  });
-				  
-				*/
-			}
-
-//<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ&libraries=places&signed_in=true&language=en&callback=googleMapCallback' async='' defer=''></script>
-		
-		
-		
-
-		// a(href="/") Main page		
-		
-		// br
-		// br
-		// a(href="/users/logout") logout
-		// br
-		// br
-		
-		
-		// br
-		// br
-		
-		// block content
-		
-		

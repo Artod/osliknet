@@ -1,16 +1,21 @@
 <h2>Find travelers</h2>
-
-<form method="get" (ngSubmit)="onSubmit()" #form="ngForm">
+<!-- 
+<form method="get" #form="ngForm" (submit)="onSubmit(form.value)"> -->
+<form method="get" [ngFormModel]="searchForm" (submit)="onSubmit(searchForm.value)">
 
 	<label for="to_id">From:</label>
-	<gm-autocomplite [class]="''" [name]="'from_id'"></gm-autocomplite>
-	
-	<br/><br/>
-	
-	<label for="to_id">To</label>
-	<gm-autocomplite [class]="''" [name]="'to_id'"></gm-autocomplite>
+	<gm-autocomplite [class]="'hgh'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="model"></gm-autocomplite>
 	
 	<br/><br/>
 
-	<button type="submit" [disabled]="!form.form.valid">Find</button>
+	<label for="to_id">To</label>
+	<gm-autocomplite [class]="'hgh'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="model"></gm-autocomplite>
+	
+	<br/><br/>
+	
+	<!-- 
+	<input type="text" required [(ngModel)]="model.test" /> [disabled]="!form.form.valid" -->
+
+	<button type="submit">Find</button>
+	
 </form>

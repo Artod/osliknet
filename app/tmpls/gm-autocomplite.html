@@ -1,4 +1,2 @@
-<input class="{{class}}" type="text" required />
-<input name="{{name}}" type="hidden" />
-
- <!-- [(ngModel)]="model[name]" ngControl="name" #name="ngForm" -->
+<input name="{{name_place}}" type="text" class="{{class}}" [(ngModel)]="model[name_place]" [ngFormControl]="form.controls[name_place]" (change)="onChange(place.value)" (blur)="onBlur(place.value)" #place />
+<input name="{{name_id}}" type="hidden" [(ngModel)]="model[name_id]" [ngFormControl]="form.controls[name_id]" value="" />

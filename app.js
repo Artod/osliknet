@@ -180,7 +180,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.static(path.join(__dirname, 'node_modules')));
 // app.use(express.static(path.join(__dirname, 'scripts')));
-app.use('/modules/bootstrap/css', express.static(__dirname + '/node_modules/bootstrap/dist/'));
+app.use('/modules/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist/'));
 app.use('/modules/angular2', express.static(__dirname + '/node_modules/angular2/bundles'));
 app.use('/modules/systemjs', express.static(__dirname + '/node_modules/systemjs/dist'));
 app.use('/modules/rxjs', express.static(__dirname + '/node_modules/rxjs/bundles'));

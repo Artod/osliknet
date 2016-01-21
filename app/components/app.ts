@@ -10,6 +10,7 @@ import {MainPageComponent} from './main-page.component';
 })
 
 
+
 @RouteConfig([
 	{path:'/', name: 'MainPage', component: MainPageComponent}
 ])
