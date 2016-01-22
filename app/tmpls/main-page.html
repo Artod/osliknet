@@ -1,15 +1,15 @@
-<h2>Find travelers</h2>
+<h2>Find a Trip</h2>
 <!-- 
 <form method="get" #form="ngForm" (submit)="onSubmit(form.value)"> -->
 <form method="get" [ngFormModel]="searchForm" (submit)="onSubmit(searchForm.value)">
 
 	<label for="to_id">From:</label>
-	<gm-autocomplite [class]="'hgh'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="model"></gm-autocomplite>
+	<gm-autocomplite [class]="'hgh'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="searchModel"></gm-autocomplite>
 	
 	<br/><br/>
 
 	<label for="to_id">To</label>
-	<gm-autocomplite [class]="'hgh'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="model"></gm-autocomplite>
+	<gm-autocomplite [class]="'hgh'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="searchModel"></gm-autocomplite>
 	
 	<br/><br/>
 	
@@ -19,3 +19,17 @@
 	<button type="submit">Find</button>
 	
 </form>
+
+<ul>
+	<li *ngFor="#trip of trips; #idx = index">
+		<b>{{ trip.from }}</b> -> <b>{{ trip.to }}</b>
+		
+		<br />
+		
+		<i>{{ trip.when | date }}</i>
+		
+		<p>
+			{{ trip.description  }}
+		</p>
+	</li>
+</ul>

@@ -1,5 +1,6 @@
-import {Component, Input, OnInit, ElementRef} from 'angular2/core';
+import {Component, Input, OnInit, ElementRef, NgZone} from 'angular2/core';
 import {LazyMapsAPILoader} from '../services/maps-api-loader/lazy-maps-api-loader';
+import {ControlGroup} from 'angular2/common';
 
 declare var google: any;
 
@@ -10,18 +11,19 @@ declare var google: any;
 })
 
 export class GmAutocompliteComponent implements OnInit {
-	@Input() name_place: String;	
-	@Input() name_id: String;	
-	@Input() class: String;	
+	@Input() name_place: string;	
+	@Input() name_id: string;	
+	@Input() class: string;	
 	@Input() form: ControlGroup;
 	@Input() model;
-	public isInvalid: Boolean = false;
-	private _currentCity: String = '';
-	private _place: String = '';
+	public isInvalid: boolean = false;
+	private _currentCity: string = '';
+	private _place: string = '';
 	
 	constructor(
 		private _loader: LazyMapsAPILoader,
-		private _el: ElementRef
+		private _el: ElementRef,
+		private _zone: NgZone
 	) {		
 		
 	}
@@ -44,13 +46,15 @@ export class GmAutocompliteComponent implements OnInit {
 	  
 		var that = this;
 		
-		google.maps.event.addListener(autocomplete, 'place_changed', function() {			
-			let place = this.getPlace();				
-			// $place_id.value = place.place_id;
-			
-			that.model[that.name_id] = place.place_id;
+		google.maps.event.addListener(autocomplete, 'place_changed', function() {		
+			var place = this.getPlace();
 			
 			that._currentCity = $place.value;
+			
+			that._zone.run(() => {
+				that.model[that.name_place] = that._currentCity;
+				that.model[that.name_id] = place.place_id;
+			});
 		});
 	}
 	
@@ -64,10 +68,7 @@ export class GmAutocompliteComponent implements OnInit {
 	}
 	
 	onBlur(value: String): void {
-		if ( value && !this.model[this.name_id] ) {
-			this.model[this.name_place] = '';
-			console.log('clear');
-		}
+	 
 	}
 }
 

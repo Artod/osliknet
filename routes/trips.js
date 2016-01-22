@@ -13,6 +13,7 @@ router.get('/', function(req, res, next) {
 		from_id: req.query.from_id,
 		to_id: req.query.to_id
 	}, function (err, trips) {
+
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -21,10 +22,10 @@ router.get('/', function(req, res, next) {
 			return;
 		}
 		
-		// res.type('json')
-			// .json({trips: trips});
+		res.type('json')
+			.json(trips);
 			
-		res.render('trips/index', { trips: trips });
+		// res.render('trips/index', { trips: trips });
 			
 	  // console.log('%s --- %s.', trips.name, trips.from)
 	  // res.render('index', { title:trips[1].to + trips[0].from });
