@@ -6,11 +6,13 @@
 <form method="get" [ngFormModel]="searchForm" (submit)="onSubmit(searchForm.value)">
 
 	<label for="to_id">From:</label>
+	
 	<gm-autocomplite [class]="'hgh'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="searchModel"></gm-autocomplite>
 	
 	<br/><br/>
 
 	<label for="to_id">To</label>
+	
 	<gm-autocomplite [class]="'hgh'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="searchModel"></gm-autocomplite>
 	
 	<br/><br/>

@@ -180,6 +180,8 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.static(path.join(__dirname, 'node_modules')));
 // app.use(express.static(path.join(__dirname, 'scripts')));
+app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));
+app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
 app.use('/modules/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist/'));
 app.use('/modules/angular2', express.static(__dirname + '/node_modules/angular2/bundles'));
 app.use('/modules/systemjs', express.static(__dirname + '/node_modules/systemjs/dist'));

@@ -1,3 +1,39 @@
-
-
 <h2>Add a Trip</h2>
+
+<form action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+	<label for="">
+		From:
+		
+		<gm-autocomplite [name_place]="'from'" [name_id]="'from_id'" [form]="form" [model]="formModel"></gm-autocomplite>
+	</label>
+	
+	<br />
+	
+	<label for="">
+		When:		
+	
+		<my-date-picker [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
+		
+		<input type="hidden" [(ngModel)]="formModel.when" [ngFormControl]="form.controls.when" />
+	</label>
+
+	<br />
+	
+	<label for="">
+		To:
+
+		<gm-autocomplite [name_place]="'to'" [name_id]="'to_id'" [form]="form" [model]="formModel"></gm-autocomplite>
+	</label>
+	
+	<br />
+	
+	<label for="">
+		Description:
+
+		<textarea name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description"></textarea>
+	</label>
+	
+	<br />
+	
+	<button>Add</button>
+</form>

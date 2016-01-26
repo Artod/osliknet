@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var whenValidator = function(value) {
   // `this` is the mongoose document
-  console.dir(this)
+  console.log(value)
   
 	if (!this.isNew) {
 		return true;

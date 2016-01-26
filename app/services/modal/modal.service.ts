@@ -15,10 +15,14 @@ export class ModalService {
 	) {
 		
     }
-
-    public open(Component, bindings: ResolvedProvider[]) {        
+// , bindings: ResolvedProvider[]
+    public open(Component) {
 		let elementRef: ElementRef = this.appRef['_rootComponents'][0].location;
-		this.componentLoader.loadNextToLocation(ModalComponent, elementRef).then( modalComponentRef => this._bind(Component, modalComponentRef) );		
+		return this.componentLoader.loadNextToLocation(ModalComponent, elementRef).then( modalComponentRef => this._bind(Component, modalComponentRef) );		
+    }
+
+    public close() {
+		// modalComponentRef
     }
 
     private _bind(Component, modalComponentRef) {

@@ -6,6 +6,7 @@ html
 		link(rel='stylesheet' href='/modules/bootstrap/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		link(rel='stylesheet', href='/stylesheets/splash.css')
+		link(rel='stylesheet', href='/stylesheets/mydatepicker.css')
 		
 		script(src='/modules/angular2/angular2-polyfills.js')
 		script(src='/modules/systemjs/system.src.js')
@@ -13,46 +14,25 @@ html
 		script(src='/modules/angular2/angular2.dev.js')
 		script(src='/modules/angular2/router.dev.js')
 		script(src='/modules/angular2/http.dev.js')
+
+		//script(src='/modules/ng2-datepicker/ng2-datepicker.js')		
+		//script(src='/modules/moment/moment.js')		
 		
-		
-		
-	body(class="modal-open")
+	body(class="modal-open1")
 	
-
-
-
-				
-		br 
-		|11
-		br 
-		|11
-		br 
-		|11
-		br 
-		|11
-		br 
-		|11br 
-		|11brbr 
-		|11br 
-		|11brbr 
-		|11
-		br 
-		|11
-		br 
-		|11
-		br 
-		|11
-		br 
-		|11br 
-		|11br 
-		|11br 
-		|11br 
-		|11br 
-		|11br 
-		|11
-		a(href="/heroes")
+		ul
+			li
+				a(href="/trips/add") Add Trip
 	
-		app Loading...	
+		app Loading...
+
+		<br />
+		<br />
+		<br />
+		<br />
+		
+		
+		block content
 
 
 		script.
@@ -61,14 +41,49 @@ html
 			System.config({
 				baseURL: '/',
 				// transpiler: 'typescript', 
-				packages: {        
+				packages: {
 					app: {
 						format: 'register',
 						defaultExtension: 'js'
 					}
+				},
+				map: {
+				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
+				  "moment": "modules/moment/moment.js"
 				}
 			});
 			
 			
 			System.import('/app/boot')
-				.then(null, console.error.bind(console));		
+				.then(null, console.error.bind(console));
+
+
+
+
+			/*transpiler: 'typescript',
+				baseURL: "/dist",
+				typescriptOptions: {
+					emitDecoratorMetadata: true,
+					module: "commonjs",
+					experimentalDecorators: true
+				},
+				map: {
+					app: 'src',
+					typescript: 'node_modules/typescript/lib/typescript.js',
+					angular2: 'node_modules/angular2',
+					rxjs: 'node_modules/rxjs'
+				},
+				packages: {
+					app: {
+						defaultExtension: 'ts',
+						main: 'app.ts'
+					},
+					angular2: {
+						defaultExtension: 'js'
+					},
+					rxjs: {
+						defaultExtension: 'js'
+					}
+				}
+			});*/
+				

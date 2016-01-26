@@ -5,7 +5,7 @@ var gulp = require('gulp'),
 var tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('scripts', function() {
-	var tsResult = gulp.src('app/**/*.ts')
+	var tsResult = gulp.src('app/**/**/*.ts')
 		.pipe(ts(tsProject));
 	
 	return tsResult.js.pipe( gulp.dest('app') ).pipe( livereload() );
@@ -13,5 +13,5 @@ gulp.task('scripts', function() {
 
 gulp.task('watch', ['scripts'], function() {
 	livereload.listen();
-    gulp.watch('app/**/*.ts', ['scripts']);
+    gulp.watch('app/**/**/*.ts', ['scripts']);
 });

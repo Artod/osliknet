@@ -6,16 +6,17 @@ import {MainPageComponent} from './main-page.component';
 import {TripAddComponent} from './trip-add.component';
 import {TripService}  from '../services/trip/trip.service';
 import {ModalService} from '../services/modal/modal.service';
-
+   
 @Component({
     selector: 'app',
 	templateUrl: '/app/tmpls/app.html',
 	directives: [ROUTER_DIRECTIVES],
 	providers: [HTTP_PROVIDERS, TripService, ModalService]
 })
-
+  
 @RouteConfig([
-	{path:'/', name: 'MainPage', component: MainPageComponent}
+	{path:'/', name: 'MainPage', component: MainPageComponent},
+	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent}
 ])
 
 export class AppComponent {

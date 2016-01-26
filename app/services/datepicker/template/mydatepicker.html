@@ -1,0 +1,42 @@
+<div class="mydp" [ngStyle]="{'height': height, 'width': width}">
+    <div class="selectiongroup">
+        <span class="selection" [ngStyle]="{'height': height, 'line-height': height}" (click)="openBtnClicked()">{{selectionDayTxt}}</span>
+        <span class="selbtngroup" [style.height]="height">
+            <button type="button" class="btnclear" *ngIf="selectionDayTxt.length>0" (click)="removeBtnClicked()"><span class="icon icon-cross"></span></button>
+            <button type="button" class="btnpicker" (click)="openBtnClicked()"><span class="icon icon-calendar"></span></button>
+        </span>
+    </div>
+    <div class="selector" *ngIf="showSelector">
+        <table class="header">
+            <tr>
+                <td>
+                    <div style="float:left">
+                        <div class="headerbtn" (click)="prevMonth()"><span class="icon icon-left"></span></div>
+                        <div class="headermonthtxt">{{visibleMonth.monthTxt}}</div>
+                        <div class="headerbtn" (click)="nextMonth()"><span class="icon icon-right"></span></div>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="headertodaybtn" (click)="todayClicked()">{{todayBtnTxt}}</button>
+                </td>
+                <td>
+                    <div style="float:right">
+                        <div class="headerbtn" (click)="prevYear()"><span class="icon icon-left"></span></div>
+                        <div class="headeryeartxt">{{visibleMonth.year}}</div>
+                        <div class="headerbtn" (click)="nextYear()"><span class="icon icon-right"></span></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <table class="caltable">
+            <thead><tr><th *ngFor="#d of weekDays">{{d}}</th></tr></thead>
+            <tbody>
+                <tr *ngFor="#w of dates">
+                    <td *ngFor="#d of w" [ngClass]="{'disabled': d.isOutOfRange, 'currmonth':d.cmo===CURR_MONTH, 'currday':d.currDay, 'selectedday':selectedDate.day===d.day && selectedDate.month===d.month && selectedDate.year===d.year && d.cmo===CURR_MONTH}" (click)="cellClicked(d)">
+                        <div style="background-color:inherit" [ngClass]="{'prevmonth':d.cmo===PREV_MONTH,'currmonth':d.cmo===CURR_MONTH,'nextmonth':d.cmo===NEXT_MONTH,'sunday':d.sun && d.cmo===CURR_MONTH && sunHighlight}">{{d.day}}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

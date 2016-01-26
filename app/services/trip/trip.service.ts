@@ -1,6 +1,6 @@
 import {Injectable} from 'angular2/core';
 // import {HTTP_PROVIDERS, Http, Request, RequestMethod} from 'angular2/http';
-import {Http, URLSearchParams} from 'angular2/http';
+import {Http, URLSearchParams, Headers} from 'angular2/http';
 // import {Trip} from './trip';
 
 // import {HEROES} from './mock-heroes';
@@ -21,8 +21,21 @@ export class TripService {
 		return this.http.get('/trips', {
 			search: search			
 		});
-	}	
+	}
+	
+	addTrips(data) {
+		/*let search: URLSearchParams = new URLSearchParams();
 
+		search.set('from_id', data.from_id);
+		search.set('to_id', data.to_id);*/
+		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+	
+		return this.http.post('/trips/add', JSON.stringify(data), {			
+			headers: headers
+		});
+	}
 }
 
 

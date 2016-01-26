@@ -33,6 +33,58 @@ router.get('/', function(req, res, next) {
   
 });
 
+router.get('/add', function(req, res, next) {
+	res.render('trips/add');
+});
+
+router.post('/add', function(req, res, next) {
+	// console.log(111111111111111111111111111111111111111111111111111)
+	// console.log(req.body.when instanceof Number)
+	// console.log(req.body.when instanceof String)
+	// console.log(new Date(req.body.when))
+	
+	// res.render('index', { title: req });
+	// return
+	// console.dir(req.body);
+	
+	/*if (req.body.when) {
+		req.body.when += ' 23:59:59'		
+	}*/
+	
+	req.body.is_removed = false;	
+	req.body.uid = req.session.uid;
+	
+	var trip = new Trip(req.body);	
+	
+	trip.save(function (err, trip) {
+		if (err) {
+			res.status(err.name == 'ValidationError' ? 400 : 500)				
+			
+			res.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		 res.type('json')
+				.json({trip: trip}); 
+		
+		/*Trip.find(function (err, trips) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+			}
+			
+			res.type('json')
+				.json({trips: trips});
+				
+		  // console.log('%s --- %s.', trips.name, trips.from)
+		  // res.render('index', { title:trips[1].to + trips[0].from });
+		});*/
+	});  
+});
+
 router.get('/:id', function(req, res, next) {	
 	Trip.findById(req.params.id, function(err, trip) {
 		if (err) {
@@ -55,55 +107,6 @@ router.get('/:id', function(req, res, next) {
 	  // console.log('%s --- %s.', trips.name, trips.from)
 	  // res.render('index', { title:trips[1].to + trips[0].from });
 	});
-});
-
-router.get('/add', function(req, res, next) {
-	res.render('trips/add');  
-});
-
-router.post('/add', function(req, res, next) {
-	// console.log(111111111111111111111111111111111111111111111111111)
-	// console.dir(req)
-	
-	// res.render('index', { title: req });
-	// return
-	// console.dir(req.body)
-	if (req.body.when) {
-		req.body.when += ' 23:59:59'		
-	}
-	
-	req.body.is_removed = false;	
-	req.body.uid = req.session.uid;
-	
-	var trip = new Trip(req.body);	
-	
-	trip.save(function (err, trip) {
-		if (err) {
-			res.status(err.name == 'ValidationError' ? 400 : 500)				
-			
-			res.type('json')
-				.json({error: err});
-				
-			return;
-		}
-		
-		/* res.type('json')
-				.json({trips: trip}); */
-		
-		Trip.find(function (err, trips) {
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-			}
-			
-			res.type('json')
-				.json({trips: trips});
-				
-		  // console.log('%s --- %s.', trips.name, trips.from)
-		  // res.render('index', { title:trips[1].to + trips[0].from });
-		});
-	});  
 });
 
 router.get('/edit/:id', function(req, res, next) {	

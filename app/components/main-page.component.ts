@@ -7,7 +7,6 @@ import {TripService} from '../services/trip/trip.service';
 
 // import {Router} from 'angular2/router';
 
-
 @Component({
 	templateUrl: '/app/tmpls/main-page.html',
 	directives: [GmAutocompliteComponent, FORM_DIRECTIVES, CORE_DIRECTIVES]	
@@ -34,7 +33,8 @@ export class MainPageComponent {
 
 	onSubmit(value:Object):void {
 		// console.dir(value)
-		console.dir(this.searchModel)
+
+		console.dir(this.searchModel);
 	
 		if (this.searchForm.valid) {
 			this._tripService.getTrips(this.searchModel)			
