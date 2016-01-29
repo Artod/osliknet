@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body, html {
+				padding:0px;
+				margin:0px;
+				background: #000 none repeat scroll 0 0;
+				color: #fff;
+				font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+				font-size: 14px;
+				line-height: 14px;
+				
+				height:100%;
+				width:100%;
+			}
+			
+			p{margin: 15px; padding:15px;}
+			
+			h3{
+				margin: 10px; 
+				padding:10px 10px 15px 10px;
+				
+				font-size: 1.5rem;
+				line-height: 2rem;
+			}
+			
+			a{color:#A9B79F}
+			
+			.homepage-hero-module {
+				border: none;
+				position: relative;
+				height:100%;
+				width:100%;
+			}
+			.no-video .video-container video,
+			.touch .video-container video {
+				display: none;
+			}
+			.no-video .video-container .poster,
+			.touch .video-container .poster {
+				display: block !important;
+			}
+			.video-container {
+				position: relative;
+				bottom: 0%;
+				left: 0%;
+				height: 100%;
+				width: 100%;
+				overflow: hidden;
+				background: #000;
+			}
+			.video-container .poster img {
+				width: 100%;
+				bottom: 0;
+				position: absolute;
+			}
+			.video-container .filter {
+				z-index: 0;
+				position: absolute;
+				background: rgba(0, 0, 0, 0.4);
+				width: 100%;
+			}
+			.video-container video {
+				position: absolute;
+				z-index: 0;
+				bottom: 0;
+			}
+			.video-container video.fillWidth {
+				width: 100%;
+			}
+			
+			.form {
+				
+				width:100%;
+				position:absolute;
+				left: 0px;
+				top: 30%;
+				text-align: center;
+				
+				
+				
+			}
+			
+
+			.form input {
+				background: #fff none repeat scroll 0 0;
+				border: 0 none;
+				border-radius: 5px;
+				color: #333;
+
+				outline: medium none;
+				padding: 12px;
+				resize: none;
+				
+				width:300px;
+				margin-right: 5px;
+font-size: 1rem;
+				line-height: 1.3rem;
+			}
+			
+
+			.button {
+			
+				 padding: 10px 20px 10px 20px;
+				align-items: center;
+				
+				 justify-content: center;
+				  background: #A9B79F none repeat scroll 0 0;
+				
+				border: 1px solid transparent;
+				border-radius: 5px;
+				color: #fff;
+				cursor: pointer;
+				position: relative;
+				font-size: 1rem;
+				line-height: 1.3rem;
+			}
+			
+
+			
+			.button:hover {
+				background: #C9D8C5 none repeat scroll 0 0;
+			}
+			.button:active  {
+				background: #8B8F86 none repeat scroll 0 0;
+			}			
+			.message {
+			display:none;
+			padding-top:20px;
+			
+			}
+			
+			.lc {
+				position:absolute;
+				top:0px;
+				width:100%;
+				text-align: center;
+				color: #fff;
+			}
+			
+		</style>
+		
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+		
+		<script>
+			$(function() {
+				var emailValidator = function(email) {
+					var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+					
+					return re.test(email);
+				};
+				
+				var $input = $('input'),
+					$message = $('.message'),
+					busy = false;
+				
+				$('form').on('submit', function() {
+					if (busy)
+						return false;
+						
+					
+					
+					var email = $input.val();
+					$message.hide();
+					
+					if ( emailValidator(email) ) {
+						busy = true;
+						
+						$.post('/add', {
+							email: $('input').val()
+						}).done(function() {
+							$input.val('');
+							$message.fadeIn().text('Thank you!');
+						}).fail(function(res) {
+							if (res.responseJSON && res.responseJSON.error && res.responseJSON.error.name === 'ValidationError') {
+								$message.fadeIn().text('This email address is already registered.');
+							} else {							
+								$message.fadeIn().text('Oops. Something went wrong. Please try again later.');
+							}
+						}).always(function() {
+							busy = false;
+						});					
+					} else {
+						$message.fadeIn().text('E-mail is not valid.');
+						$input.focus();				
+					}
+					
+					return false;
+				});
+			
+				var $img = $('.video-container .poster img'),
+					$filter = $('.video-container .filter'),
+					$video = $('.video-container video'),
+					$window = $(window),
+					$module = $('.homepage-hero-module'),
+					$form = $('.form'),
+					height,
+					width,
+					videoAspectRatio;
+					
+				/*var img = new Image();
+				img.src = $img.attr('src');
+				img.onload = function() {
+					height = this.height;
+					width = this.width;
+					
+					videoAspectRatio = height/width;
+					
+					start();
+				};*/
+				
+				height = 1080;
+				width = 1920;					
+				videoAspectRatio = height/width;
+				start();
+			
+
+				function start() {
+					$window.on('resize.videoBanner', function() {
+						scaleVideoContainer();
+						scaleBannerVideoSize();
+						$form.css('top', (($window.height() - $form.height()) / 2) + 'px' )
+					}).trigger('resize.videoBanner');				
+				}				
+
+				function scaleVideoContainer() {
+					var height = $window.height() + 5;
+					var unitHeight = parseInt(height) + 'px';
+					$module.css('height', unitHeight);
+				}
+
+				function scaleBannerVideoSize($elements){
+					var windowHeight = $window.height() + 5,
+						windowWidth = $window.width(),						
+						windowRatio = windowHeight / windowWidth,
+						videoWidth,
+						videoHeight;
+
+					//$element.width(windowWidth);
+					
+					
+					
+					
+					if (windowRatio > videoAspectRatio) {
+						videoHeight = windowHeight;
+						videoWidth = videoHeight / videoAspectRatio;
+						
+						
+					} else {
+						videoWidth = windowWidth;
+						videoHeight = videoAspectRatio * videoWidth;
+					}
+	
+					
+					$.each([$img, $filter, $video], function(i, $element){
+						$element.css({'margin-top' : 0, 'margin-left' : -(videoWidth - windowWidth) / 2 + 'px'});
+							
+						$element.width(videoWidth).height(videoHeight);
+					});				
+					
+					$('.homepage-hero-module .video-container video').addClass('fadeIn animated');					
+
+				}
+			});	
+		
+		
+			//jQuery is required to run this code
+
+		</script>
+	</head>
+	<body>
+		<div class="homepage-hero-module">
+		
+			<div class="video-container">
+
+						
+				
+				<div class="poster hidden">
+					<img src="/Home-work.jpg" alt="">
+				</div>
+
+				<video autoplay loop class="fillWidth">
+					<source src="/Home-work.mp4" type="video/mp4" />
+					<source src="/Home-work.webm" type="video/webm" />
+				</video>
+				
+				<div class="filter"></div>
+								
+			</div>
+			
+			<div class="form">
+				<h3><strong>Osliki.net</strong> &mdash; peer to peer delivery service. <br /> Shipping to and from anywhere by your friends.</h4>
+				
+				<p>
+					Subscribe to release announcement:					
+				</p>
+				
+				<form action="/add" method="post">
+					<input type="text" name="email" type="email" placeholder="E-mail" />
+					<button class="button">go</button>
+				</form>	
+				<div class="message">					
+				</div>
+
+			</div>
+			
+			
+			<div class="lc">
+				<p>Watch creation online on  <a href="http://livecoding.tv/artglem/">LiveCoding</a>		</p>
+			</div>
+		</div>	
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-73067507-1', 'auto');
+  ga('send', 'pageview');
+
+</script>		
+	</body>
+</html>
+
