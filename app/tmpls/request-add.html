@@ -1,0 +1,18 @@
+<h2>Add a Request for Delivery</h2>
+
+<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+
+	<input type="hidden" name="trip_id" value="" [(ngModel)]="formModel.trip_id" [ngFormControl]="form.controls.trip_id" />
+	
+	<br />
+	
+	<label for="">
+		Description:
+
+		<textarea name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
+	</label>
+	
+	<br />
+	
+	<button>Send</button>
+</form>

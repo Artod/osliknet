@@ -50,8 +50,14 @@ router.get('/:id', function(req, res, next) {
 
 
 router.post('/add', function(req, res, next) {
-	req.body.messages = req.body.messages || {};	
-	req.body.messages.uid = req.session.uid
+	// req.body.messages = req.body.messages || {};	
+	
+	req.body.messages = [{
+		uid: req.session.uid,
+		message: req.body.message
+	}];
+
+	req.body.messages[0].uid = req.session.uid
 	req.body.uid = req.session.uid;
 	req.body.status = 0;
 	
@@ -66,8 +72,11 @@ router.post('/add', function(req, res, next) {
 				
 			return;
 		}
+		
+		res.type('json')
+			.json({order: order});
 
-		res.redirect('/trips/' + req.body.trip_id);
+		// res.redirect('/trips/' + req.body.trip_id);
 
 	});  
 });

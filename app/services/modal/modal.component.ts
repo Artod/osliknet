@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, ElementRef} from 'angular2/core';
 
 @Component({
 	selector: 'modal',
@@ -8,7 +8,7 @@ import {Component} from 'angular2/core';
 		  <div class="splash-inner">
 			<div class="splash-content text-center">
 				<comp #comp></comp>
-				<button class="btn btn-lg btn-outline">Ok</button>
+				<button class="btn btn-lg btn-outline" (click)="close()">Ok</button>
 			</div>
 		  </div>
 		</section>
@@ -16,7 +16,11 @@ import {Component} from 'angular2/core';
 })
 
 export class ModalComponent {
-	constructor() {
-		
+	constructor(private _ref: ElementRef) {
+		console.dir(this._ref);
+	}
+	
+	public close() {
+		this.ref.dispose();
 	}
 }

@@ -4,16 +4,24 @@ var router = express.Router();
 var Trip = require('../models/trip');
 
 router.get('/', function(req, res, next) {
-	console.dir({
-		from_id: req.query.from_id,
-		to_id: req.query.to_id
-	})
+	var query = {};
 	
-	Trip.find({
-		from_id: req.query.from_id,
-		to_id: req.query.to_id
-	}, function (err, trips) {
-
+	if (req.query.from_id)
+		query.from_id = req.query.from_id;
+	
+	if (req.query.to_id)
+		query.to_id = req.query.to_id;
+	
+	console.dir(query)
+	
+	if (!query.from_id && !query.to_id) {
+		res.type('json')
+			.json([]);
+			
+		return;
+	}
+	
+	Trip.find(query, function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -27,8 +35,8 @@ router.get('/', function(req, res, next) {
 			
 		// res.render('trips/index', { trips: trips });
 			
-	  // console.log('%s --- %s.', trips.name, trips.from)
-	  // res.render('index', { title:trips[1].to + trips[0].from });
+		// console.log('%s --- %s.', trips.name, trips.from)
+		// res.render('index', { title:trips[1].to + trips[0].from });
 	});	
   
 });

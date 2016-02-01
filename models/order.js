@@ -29,7 +29,7 @@ var orderSchema = mongoose.Schema({
 	],
 	status: {
 		type: Number,
-		default: 0 // 0 - wating for traveler, 1 - wating for customer, 2 - canceled, 3 - refused
+		default: 0 // 0 - waiting for traveler, 1 - wating for customer, 2 - canceled, 3 - refused
 	},
 	created_at: { type: Date },
 	updated_at: { type: Date }

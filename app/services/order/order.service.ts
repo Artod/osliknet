@@ -9,33 +9,37 @@ import {Http, URLSearchParams, Headers} from 'angular2/http';
 
 @Injectable()
 
-export class TripService {
-	constructor(public http:Http) { }
+export class OrderService {
+	constructor(public http:Http) {
+		console.log('constructor');
+		
+	}
 
-	getTrips(data) {
+	getOrders(data) {
 		let search: URLSearchParams = new URLSearchParams();
 		
+/*
 		if (data.from_id)
 			search.set('from_id', data.from_id);
 		
 		if (data.to_id)
 			search.set('to_id', data.to_id);
+*/
+		
+		Object.keys(data).forEach(function (key) {
+			search.set(key, data[key]);
+		});
 
-		return this.http.get('/trips', {
+		return this.http.get('/orders', {
 			search: search			
 		});
 	}
 	
-	addTrips(data) {
-		/*let search: URLSearchParams = new URLSearchParams();
-
-		search.set('from_id', data.from_id);
-		search.set('to_id', data.to_id);*/
-		
+	add(data) {		
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
 	
-		return this.http.post('/trips/add', JSON.stringify(data), {			
+		return this.http.post('/orders/add', JSON.stringify(data), {			
 			headers: headers
 		});
 	}

@@ -238,7 +238,16 @@ module.exports = app;
 
 
 /*
-Creating project osliki.net on Node.js:
+
+
+
+Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, jQuery, delivery, p2p, startup, ecmascript 6, MEAN
+
+
+
+Creating project http://osliki.net on Node.js:
+
+http://osliki.net
 
 People who travel frequently can deliver any thing. For example you live in the US you urgently need any medication from Russia or documents. In our application you can find someone who is just about to arrive from Moscow to New York. He can help you for money or for free.
 
@@ -259,7 +268,7 @@ Donate PayPal https://www.twitchalerts.com/donate/artglem (reading a message by 
 
 GitHub:
 
-github.com/artod/osliknet
+https://github.com/artod/osliknet
 
 
 Restream:
