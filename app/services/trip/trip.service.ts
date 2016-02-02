@@ -1,18 +1,14 @@
 import {Injectable} from 'angular2/core';
-// import {HTTP_PROVIDERS, Http, Request, RequestMethod} from 'angular2/http';
-import {Http, URLSearchParams, Headers} from 'angular2/http';
-// import {Trip} from './trip';
+import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
+import {Observable} from 'rxjs/Observable';
 
-// import {HEROES} from './mock-heroes';
-// import {Http, HTTP_PROVIDERS} from 'angular2/http';
-// import {Http, Headers} from 'angular2/http';
 
 @Injectable()
 
 export class TripService {
 	constructor(public http:Http) { }
-
-	getTrips(data) {
+	
+	public search(data) {
 		let search: URLSearchParams = new URLSearchParams();
 		
 		if (data.from_id)
@@ -25,8 +21,18 @@ export class TripService {
 			search: search			
 		});
 	}
+
+	public getMy() {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-	addTrips(data) {
+		return this.http.get('/trips/my', {			
+			headers: headers
+		}).map(res => <any[]> res.json().trips)
+			.catch(this.handleError);;
+	}
+	
+	public addTrips(data) {
 		/*let search: URLSearchParams = new URLSearchParams();
 
 		search.set('from_id', data.from_id);
@@ -34,10 +40,16 @@ export class TripService {
 		
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
+		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
 		return this.http.post('/trips/add', JSON.stringify(data), {			
 			headers: headers
 		});
+	}
+	
+	private handleError (error: Response) {
+		console.error(error);
+		return Observable.throw(error.json().error || 'Server error');
 	}
 }
 

@@ -1,1 +1,14 @@
 <h2>Requests</h2>
+
+<table>
+	<tr>
+		<th>Trip</th>
+		<th>UID</th>
+		<th>Status</th>
+	</tr>
+	<tr *ngFor="#trip of trips; #idx = index">
+		<td>{{ trip._id }}</td>
+		<td>{{ trip.orders.uid }}</td>
+		<td>{{ trip.orders.status }}</td>
+	</tr>
+</table>

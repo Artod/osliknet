@@ -1,29 +1,36 @@
-import {Component, ElementRef, Injector, provide, Renderer} from 'angular2/core';
-import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
-import {GmAutocompliteComponent} from '../components/gm-autocomplite.component';
+import {Component} from 'angular2/core';
 
-import {Trip} from '../services/trip/trip';
-import {TripService} from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
-import {RequestAddComponent} from './request-add.component';
 
-
-// import {Router} from 'angular2/router';
+// import {Order} from '../services/order/order';
 
 @Component({
 	templateUrl: '/app/tmpls/requests.html'
 })
 
 export class RequestsComponent {
-	public trips: Trip[];
+	public trips: any[];
 
 	constructor(
-
-	) {		
-
+		private orderService: OrderService
+	) {
+		this.orderService.getMy()
+			.subscribe(trips => {
+				this.trips = trips;
+				// console.dir(orders)
+			}, error => {
+				console.dir(error);
+			}, () => {
+				console.log('done')
+			});
 	}
 }
+
+/*.subscribe(
+                       heroes => this.heroes = heroes,
+                       error =>  this.errorMessage = <any>error);
+  }*/
 
 
 

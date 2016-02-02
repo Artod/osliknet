@@ -4,6 +4,10 @@ import {APP_BASE_HREF, ROUTER_PROVIDERS} from 'angular2/router';
 import {provide} from 'angular2/core';
 import {Http} from 'angular2/http';
 
+import 'rxjs/Rx' 
+// import 'rxjs/add/operator/map';
+// import 'rxjs/add/operator/catch';
+
 import {LazyMapsAPILoader, LazyMapsAPILoaderConfig} from './services/maps-api-loader/lazy-maps-api-loader';
 
 bootstrap(AppComponent, [

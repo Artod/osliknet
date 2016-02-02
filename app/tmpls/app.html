@@ -1,11 +1,12 @@
 <button (click)="openModal()">open test modal</button>
 
+<h1 class="title">Osliki.net</h1>
 
-
-<h1 class="title">Component Router</h1>
 <nav>
   <a [routerLink]="['MainPage']">Home</a> 
-  <a [routerLink]="['TripAdd']">Add Trip</a> 
-  <a [routerLink]="['Requests']">Requests</a> 
+  <a [routerLink]="['TripAdd']">Add Trip</a>
+  <a [routerLink]="['TripsMy']">My Trips</a>
+  <a [routerLink]="['Requests']">My Requests</a> 
 </nav>
+
 <router-outlet></router-outlet>

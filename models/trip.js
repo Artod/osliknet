@@ -1,4 +1,6 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
+	orderSchema = require('./orderSchema');
 
 var whenValidator = function(value) {
   // `this` is the mongoose document
@@ -30,6 +32,11 @@ var dateFormat = function(when, needTime) {
 };
 
 var tripSchema = mongoose.Schema({
+	uid: {
+		type: Schema.Types.ObjectId,
+		required: true,
+		ref: 'User'
+	},
     when: {
 		type: Date,		
 		required: true,
@@ -63,6 +70,7 @@ var tripSchema = mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	orders: [orderSchema],
 	comments: [{
 		uid: {
 			type: String,

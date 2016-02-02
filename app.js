@@ -1,3 +1,26 @@
+/*
+
+TODO:
+
+- xhr header 
+
+- router.post('/add'
+	- send email to traveler
+	- inc order counter
+	
+- joins
+
+- check auth (session.uid)
+
+- iptables
+
+- beforeRouterFilter !req.xhr ? res.render('index')
+
+*/
+
+
+
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -107,7 +130,12 @@ passwordless.init(new MongoStorePasswordless(pathToMongoDb, {
 passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
 	var link = host + 'users/logged_in?token=' + tokenToSend + '&uid=' + encodeURIComponent(uidToSend);
 	
+	console.log(link);
+	
+	return;
+	
 	var email = new sendgrid.Email();
+	
 	email.addTo(recipient);
 	email.subject = 'Token for ' + host;
 	email.from = yourEmail;
@@ -241,7 +269,7 @@ module.exports = app;
 
 
 
-Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, jQuery, delivery, p2p, startup, ecmascript 6, MEAN
+Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, jQuery, delivery, p2p, startup, ecmascript 6, MEAN, mongoose
 
 
 
@@ -306,4 +334,22 @@ Benefits:
 - Low shipping costs in some cases (for example a bicycle from Boston to Montreal).
 */
 
+
+
+
+
+/*
+
+orders
+	messages
+	
+trips (soc net comments)
+
+users
+	reviews
+		|trip_id
+		|message
+
+
+*/
 

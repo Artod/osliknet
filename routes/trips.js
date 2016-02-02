@@ -41,6 +41,34 @@ router.get('/', function(req, res, next) {
   
 });
 
+router.get('/my', function(req, res, next) {
+	if (!req.xhr) {		
+		res.render('index');
+		return;
+	}
+	
+	Trip.find({
+		uid: req.session.uid		
+	}).populate('orders')
+	.exec(function (err, trips) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		res.type('json')
+			.json({trips: trips});
+			
+		// res.render('trips/index', { trips: trips });
+			
+		// console.log('%s --- %s.', trips.name, trips.from)
+		// res.render('index', { title:trips[1].to + trips[0].from });
+	});
+});
+
 router.get('/add', function(req, res, next) {
 	res.render('trips/add');
 });

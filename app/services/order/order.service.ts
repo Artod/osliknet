@@ -1,7 +1,10 @@
 import {Injectable} from 'angular2/core';
 // import {HTTP_PROVIDERS, Http, Request, RequestMethod} from 'angular2/http';
-import {Http, URLSearchParams, Headers} from 'angular2/http';
-// import {Trip} from './trip';
+import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
+import {Observable} from 'rxjs/Observable';
+
+
+import {Order} from './order';
 
 // import {HEROES} from './mock-heroes';
 // import {Http, HTTP_PROVIDERS} from 'angular2/http';
@@ -11,39 +14,45 @@ import {Http, URLSearchParams, Headers} from 'angular2/http';
 
 export class OrderService {
 	constructor(public http:Http) {
-		console.log('constructor');
-		
+		console.log('OrderService constructor');
 	}
 
-	getOrders(data) {
-		let search: URLSearchParams = new URLSearchParams();
+	public getMy() {
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-/*
-		if (data.from_id)
-			search.set('from_id', data.from_id);
-		
-		if (data.to_id)
-			search.set('to_id', data.to_id);
-*/
-		
-		Object.keys(data).forEach(function (key) {
-			search.set(key, data[key]);
-		});
-
-		return this.http.get('/orders', {
-			search: search			
-		});
+		return this.http.get('/orders/my', {			
+			headers: headers
+		}).map(res => <Order[]> res.json().orders)
+			.catch(this.handleError);
 	}
 	
-	add(data) {		
+	public add(data) {		
 		let headers = new Headers();
+		
 		headers.append('Content-Type', 'application/json');
 	
 		return this.http.post('/orders/add', JSON.stringify(data), {			
 			headers: headers
 		});
 	}
+	
+	private handleError (error: Response) {
+		// in a real world app, we may send the server to some remote logging infrastructure
+		// instead of just logging it to the console
+		console.error(error);
+		return Observable.throw(error.json().error || 'Server error');
+	}
 }
+
+
+/*
+	public getMy() {
+		return this.http.get('/orders/my')
+			.map(res => <Order[]> res.json().orders)
+			.catch(this.handleError);
+	}
+*/
 
 
 	/**/
@@ -63,3 +72,32 @@ export class OrderService {
 		/* return new Promise<Trip[]>(resolve =>
 			resolve(res)
 		); */
+		
+		
+		
+		
+/*
+		
+
+		if (data.from_id)
+			search.set('from_id', data.from_id);
+		
+		if (data.to_id)
+			search.set('to_id', data.to_id);
+
+		
+		Object.keys(data).forEach(function (key) {
+			search.set(key, data[key]);
+		});
+
+		return this.http.get('/orders', {
+			search: search			
+		});
+*/
+		
+		
+		
+		
+		
+		
+		

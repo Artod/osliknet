@@ -1,0 +1,19 @@
+<h2>My Trips</h2>
+
+<table>
+	<tr>
+		<th>Trip</th>
+		<th>When</th>
+		<th>UID</th>
+		<th></th>
+	</tr>
+	<tr *ngFor="#trip of trips; #idx = index">
+		<td>{{ trip.trip_id }}
+			<br />
+			{{ trip.from }} -> {{ trip.to }}
+		</td>
+		<td>{{ trip.when | date: 'longDate' }}</td>
+		<td>{{ trip.uid }}</td>
+		<td>{{ trip.status }}</td>
+	</tr>
+</table>

@@ -49,7 +49,7 @@ from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"
 		// console.dir(this.searchModel);
 
 		if (this.searchForm.valid) {
-			this._tripService.getTrips(this.searchModel)
+			this._tripService.search(this.searchModel)
 				.subscribe(res => {
 					let trips = res.json();
 
