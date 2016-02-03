@@ -16,6 +16,8 @@ TODO:
 
 - beforeRouterFilter !req.xhr ? res.render('index')
 
+- unauth middleware
+
 */
 
 
@@ -222,6 +224,18 @@ app.use(passwordless.sessionSupport());
 // app.use(passwordless.acceptToken({ successRedirect: '/successRedirect', failureRedirect: '/errorredir' }));
 
 
+app.use(function (req, res, next) {
+	res.locals = {
+		user: {
+			id: req.session.uid,
+			name: req.session.name
+		}
+	};
+   
+   next();
+});
+
+
 app.use('/', routes);
 app.use('/users', users);
 app.use('/trips', trips);
@@ -267,10 +281,7 @@ module.exports = app;
 
 /*
 
-
-
 Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, jQuery, delivery, p2p, startup, ecmascript 6, MEAN, mongoose
-
 
 
 Creating project http://osliki.net on Node.js:

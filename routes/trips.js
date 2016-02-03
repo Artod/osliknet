@@ -3,6 +3,8 @@ var router = express.Router();
 
 var Trip = require('../models/trip');
 
+var ObjectId = require('mongoose').Types.ObjectId;
+
 router.get('/', function(req, res, next) {
 	var query = {};
 	
@@ -21,7 +23,9 @@ router.get('/', function(req, res, next) {
 		return;
 	}
 	
-	Trip.find(query, function (err, trips) {
+	query.when = { $gt: ( new Date() ).getTime() - 1000*60*60*24 },
+	
+	Trip.find(query).sort({created_at: -1}).exec(function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -47,10 +51,15 @@ router.get('/my', function(req, res, next) {
 		return;
 	}
 	
+	if (!req.session.uid) {
+		res.status(401);
+
+		return;
+	}
+	
 	Trip.find({
-		uid: req.session.uid		
-	}).populate('orders')
-	.exec(function (err, trips) {
+		user: ObjectId(req.session.uid)
+	}).populate('orders.user').exec(function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -88,7 +97,7 @@ router.post('/add', function(req, res, next) {
 	}*/
 	
 	req.body.is_removed = false;	
-	req.body.uid = req.session.uid;
+	req.body.user = req.session.uid;
 	
 	var trip = new Trip(req.body);	
 	
@@ -311,7 +320,7 @@ router.get('/del/:id', function(req, res, next) {
 });
 
 router.post('/comments/add', function(req, res, next) {		
-	req.body.uid = req.session.uid;
+	req.body.user = req.session.uid;
 
 	console.dir(req.body);
 	

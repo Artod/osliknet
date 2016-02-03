@@ -15,7 +15,6 @@
 	
 	<gm-autocomplite [class]="'hgh'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="searchModel"></gm-autocomplite>
 	
-	
 	<br/><br/>
 	<!-- 
 	<input type="text" required [(ngModel)]="model.test" /> [disabled]="!form.form.valid" -->
@@ -34,7 +33,7 @@
 		<i>{{ trip.when | date: 'longDate' }}</i>
 		
 
-		<button (click)="onRequest(trip)">Request Delivery</button>
+		<button *ngIf="trip.user != configUser.id" (click)="onRequest(trip)">Request Delivery</button>
 
 		<p>
 			{{ trip.description  }}

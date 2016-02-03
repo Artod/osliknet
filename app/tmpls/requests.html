@@ -2,13 +2,24 @@
 
 <table>
 	<tr>
+		<th>User</th>
 		<th>Trip</th>
 		<th>UID</th>
 		<th>Status</th>
 	</tr>
 	<tr *ngFor="#trip of trips; #idx = index">
-		<td>{{ trip._id }}</td>
-		<td>{{ trip.orders.uid }}</td>
+		<td>
+			Trip by <a href="/users/{{ trip.user._id }}">{{ trip.user.name }}</a>
+		</td>
+		<td>
+			{{ trip.from }} -> {{ trip.to }}
+			<br />
+			{{ trip.when | date: 'longDate' }}
+		</td>
+		
+		<td>
+			<a [routerLink]="['OrdersId', {id: trip.orders._id}]">Chat</a>
+		</td>
 		<td>{{ trip.orders.status }}</td>
 	</tr>
 </table>

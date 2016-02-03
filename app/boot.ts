@@ -10,6 +10,8 @@ import 'rxjs/Rx'
 
 import {LazyMapsAPILoader, LazyMapsAPILoaderConfig} from './services/maps-api-loader/lazy-maps-api-loader';
 
+declare var window: any;
+
 bootstrap(AppComponent, [
 	ROUTER_PROVIDERS,
 	provide(APP_BASE_HREF, {useValue: '/'}),
@@ -21,6 +23,12 @@ bootstrap(AppComponent, [
 			apiVersion: 3,
 			params: '&libraries=places&signed_in=true&language=en'
 		};
-	}}),	
+	}}),
+	provide('config.user', {useFactory: () => {
+		return {
+			id: window.user.id,
+			name: window.user.name
+		};
+	}}),
 	LazyMapsAPILoader
 ]);

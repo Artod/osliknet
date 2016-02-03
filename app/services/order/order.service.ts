@@ -4,7 +4,7 @@ import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 
 
-import {Order} from './order';
+// import {Order} from './order';
 
 // import {HEROES} from './mock-heroes';
 // import {Http, HTTP_PROVIDERS} from 'angular2/http';
@@ -23,7 +23,8 @@ export class OrderService {
 		
 		return this.http.get('/orders/my', {			
 			headers: headers
-		}).map(res => <Order[]> res.json().orders)
+		// }).map(res => <Order[]> res.json().orders)
+		}).map(res => <any[]> res.json().trips)
 			.catch(this.handleError);
 	}
 	

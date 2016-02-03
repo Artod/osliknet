@@ -32,7 +32,7 @@ var dateFormat = function(when, needTime) {
 };
 
 var tripSchema = mongoose.Schema({
-	uid: {
+	user: {
 		type: Schema.Types.ObjectId,
 		required: true,
 		ref: 'User'
@@ -71,7 +71,7 @@ var tripSchema = mongoose.Schema({
 		default: false
 	},
 	orders: [orderSchema],
-	comments: [{
+	/*comments: [{
 		uid: {
 			type: String,
 			required: true
@@ -89,7 +89,7 @@ var tripSchema = mongoose.Schema({
 			type: Date,
 			default: Date.now
 		}
-	}],
+	}],*/
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });

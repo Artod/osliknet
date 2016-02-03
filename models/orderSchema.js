@@ -2,18 +2,22 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 	
 var orderSchema = mongoose.Schema({
-	trip_id: {
+	/*trip_id: {
 		type: Schema.Types.ObjectId,
 		required: true,
 		ref: 'Trip'
-	},
-	uid: {
+	},*/
+	user: {
 		type: Schema.Types.ObjectId,
 		required: true,
 		ref: 'User'
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!required: true
 	},
-	messages: [
+	message: {
+		type: String,
+		required: true,
+		trim: true
+	},
+	/*messages: [
 		{
 			uid: {
 				type: String,
@@ -29,7 +33,7 @@ var orderSchema = mongoose.Schema({
 				default: Date.now
 			}
 		}
-	],
+	],*/
 	status: {
 		type: Number,
 		default: 0 // 0 - waiting for traveler, 1 - wating for customer, 2 - canceled, 3 - refused
@@ -39,6 +43,8 @@ var orderSchema = mongoose.Schema({
 });
 
 orderSchema.pre('save', function(next) {
+	
+	console.log('savesavesavesavesavesave');
 	var now = new Date();
 	
 	this.updated_at = now;

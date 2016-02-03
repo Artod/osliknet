@@ -7,6 +7,8 @@ import {MainPageComponent} from './main-page.component';
 import {TripAddComponent} from './trip-add.component';
 import {TripsMyComponent} from './trips-my.component';
 import {RequestsComponent} from './requests.component';
+import {OrdersIdComponent} from './orders-id.component';
+
 import {TripService}  from '../services/trip/trip.service';
 import {OrderService}  from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
@@ -22,6 +24,7 @@ import {ModalService} from '../services/modal/modal.service';
 	{path:'/', name: 'MainPage', component: MainPageComponent},
 	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent},
 	{path:'/trips/my', name: 'TripsMy', component: TripsMyComponent},
+	{path:'/orders/:id', name: 'OrdersId', component: OrdersIdComponent},
 	{path:'/requests', name: 'Requests', component: RequestsComponent}
 ])
 

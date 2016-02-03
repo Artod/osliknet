@@ -1,11 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var async = require('async');
 
 var Trip = require('../models/trip');
-var Order = require('../models/order');
+var Message = require('../models/message');
+// var Order = require('../models/order');
 
-var mongoose = require('mongoose');
-
+var ObjectId = require('mongoose').Types.ObjectId;
 
 /* GET home page. 
 router.get('/', function(req, res, next) {	
@@ -31,48 +32,63 @@ router.get('/', function(req, res, next) {
 	});  
 });*/
 
-
-
-
-
 router.get('/my', function(req, res, next) {
 	if (!req.xhr) {
 		res.render('index');
+
 		return;
 	}
-	/*.find({
-		'orders.uid': mongoose.Types.ObjectId(req.session.uid)
-	}).select({'orders.$': 1}).populate('uid')*/
 	
-/*aggregate([
+	if (!req.session.uid) {
+		res.status(401);
+
+		return;
+	}
+
+	/*
+	.find({
+		'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+	}).select({'orders.$': 1}).populate('uid')
+	*/
+
+	/*
+	aggregate([
 	{
 		$match: {
             'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
 			'orders': { 
                '$elemMatch': { 
                    "uid": req.session.uid
-               }
+				}
 			}
         }
 	}, {
 		$unwind: "$orders"
-	}]).*/
-	
+	}]).
+	*/
+
 	Trip.aggregate([{
 		$match: {
-            'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+            'orders.user': ObjectId(req.session.uid)
         }
 	}, {
 		$unwind: "$orders"
 	}, {
 		$match: {
-            'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+            'orders.user': ObjectId(req.session.uid)
         }
+	}, {
+		$sort : {
+			'orders.status': 1,
+			'orders.created_at' : -1
+		}
 	}]).exec(function(err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
 				.json({error: err});
+				
+			return;
 		}
 		
 		// var res = {}
@@ -85,8 +101,21 @@ router.get('/my', function(req, res, next) {
 			};			
 		});*/
 		
-		res.type('json')
-			.json({orders: trips});		
+		Trip.populate(trips, {path: 'user'}, function(err, trips) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			res.type('json')
+				.json({trips: trips});
+		});
+		
+		// res.type('json')
+			// .json({trips: trips});
 		
 		// res.render('orders/index', {
 			// orders:orders,
@@ -99,7 +128,69 @@ router.get('/my', function(req, res, next) {
 });
 
 router.get('/:id', function(req, res, next) {	
-	Order.findOne({
+	if (!req.xhr) {
+		res.render('index');
+
+		return;
+	}
+	
+	async.parallel({
+		trip: function(callback) {	
+			Trip.aggregate([{
+				$match: {
+					'orders._id': ObjectId(req.params.id)
+				}
+			}, {
+				$unwind: "$orders"
+			}, {
+				$match: {
+					'orders._id': ObjectId(req.params.id)
+				}
+			}]).exec(function(err, trips) {
+				if (err) {
+					callback(err, trips);
+					
+					return;
+				}
+				
+				Trip.populate(trips, {path: 'user orders.user'}, function(err, trips) {
+					if (err) {
+						callback(err, trips);
+						
+						return;
+					}
+
+					callback(err, trips[0]);
+				});
+			});			
+		},
+		messages: function(callback){
+			Message.find({order: req.params.id})
+				.sort({created_at: -1})
+				.populate('user')
+				.exec(function (err, messages) {
+					callback(err, messages);
+				});
+		},                    
+	}, function(err, asyncRes){
+		// can use res.team and res.games as you wish
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+		res.type('json').json(asyncRes);		
+	});
+	
+
+	
+	
+	
+
+	/*Order.findOne({
 		_id: req.params.id
 	}, function(err, order) {
 		if (err) {
@@ -115,7 +206,7 @@ router.get('/:id', function(req, res, next) {
 			session: JSON.stringify(req.session)
 		});
 		
-	});  
+	});  */
 });
 
 
@@ -131,15 +222,17 @@ router.post('/add', function(req, res, next) {
 
 	
 	var order = {
-		uid: req.session.uid,
+		user: req.session.uid,
 		status: 0,
+		message: req.body.message,
+		created_at: new Date(),
+		updated_at: new Date()
+		/*
 		messages: [{
-			uid: req.session.uid,
+			user: req.session.uid,
 			message: req.body.message
-		}]
-	};
-
-	
+		}]*/
+	};	
 	
 	Trip.findByIdAndUpdate(
         req.body.trip_id, {

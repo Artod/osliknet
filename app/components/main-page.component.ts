@@ -1,6 +1,7 @@
-import {Component, ElementRef, Injector, provide, Renderer} from 'angular2/core';
+import {Component, ElementRef, Injector, Inject, provide, Renderer} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 import {GmAutocompliteComponent} from '../components/gm-autocomplite.component';
+import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
@@ -13,7 +14,7 @@ import {RequestAddComponent} from './request-add.component';
 
 @Component({
 	templateUrl: '/app/tmpls/main-page.html',
-	directives: [GmAutocompliteComponent]
+	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES]
 })
 
 export class MainPageComponent {
@@ -32,8 +33,8 @@ from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"
 		private _tripService: TripService,
 		private _orderService: OrderService,
 		private _modalService: ModalService,
-		private _renderer: Renderer
-		
+		private _renderer: Renderer,
+		@Inject('config.user') public configUser
 	) {		
 		this.searchForm = _fb.group({
 			from: '', //['', Validators.required],

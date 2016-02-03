@@ -36,6 +36,14 @@ html
 		script.
 			// System.import('bootstrap');
 			
+			window.user = {
+				id: '#{user.id}',
+				name: '#{user.name}'
+			};
+			
+			console.dir(window.user);
+
+			
 			System.config({
 				baseURL: '/',
 				// transpiler: 'typescript', 

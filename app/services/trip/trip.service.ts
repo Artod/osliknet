@@ -2,7 +2,6 @@ import {Injectable} from 'angular2/core';
 import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 
-
 @Injectable()
 
 export class TripService {
@@ -30,6 +29,15 @@ export class TripService {
 			headers: headers
 		}).map(res => <any[]> res.json().trips)
 			.catch(this.handleError);;
+	}
+	
+	public getOrder(id) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.get('/orders/' + id, {
+			headers: headers
+		}).map(res => <any[]> res.json()).catch(this.handleError);;
 	}
 	
 	public addTrips(data) {
