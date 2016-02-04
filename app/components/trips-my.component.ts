@@ -10,18 +10,25 @@ import {TripService} from '../services/trip/trip.service';
 
 export class TripsMyComponent {
 	public trips: any[];
+	public ordersByTrip: any = {};
 
 	constructor(
 		private tripService: TripService
 	) {
 		this.tripService.getMy()
-			.subscribe(trips => {
-				this.trips = trips.map(trip => {
+			.subscribe(res => {
+				this.trips = res.trips.map(trip => {
 					trip.when = new Date(trip.when);
 
 					return trip;
+				}); 
+				
+				res.orders.forEach( (order, i, arr) => {
+					order.creted_at = new Date(order.creted_at);
+					
+					this.ordersByTrip[order.trip] = this.ordersByTrip[order.trip] || [];
+					this.ordersByTrip[order.trip].push(order);
 				});
-
 			}, error => {
 				console.dir(error);
 			}, () => {

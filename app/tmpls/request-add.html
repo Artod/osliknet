@@ -2,7 +2,7 @@
 
 <form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
 
-	<input type="hidden" name="trip_id" value="" [(ngModel)]="formModel.trip_id" [ngFormControl]="form.controls.trip_id" />
+	<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
 	
 	<br />
 	

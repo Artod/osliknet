@@ -5,7 +5,7 @@ var messageSchema = mongoose.Schema({
 	order: {
 		type: Schema.Types.ObjectId,
 		required: true,
-		ref: 'Trip.orders'
+		ref: 'Order'
 	},
 	user: {
 		type: Schema.Types.ObjectId,
@@ -14,7 +14,6 @@ var messageSchema = mongoose.Schema({
 	},
 	message: {
 		type: String,
-		default: '',
 		required: true,
 		trim: true
 	},

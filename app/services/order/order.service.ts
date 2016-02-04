@@ -3,7 +3,6 @@ import {Injectable} from 'angular2/core';
 import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 
-
 // import {Order} from './order';
 
 // import {HEROES} from './mock-heroes';
@@ -16,12 +15,23 @@ export class OrderService {
 	constructor(public http:Http) {
 		console.log('OrderService constructor');
 	}
+	
+	public get() {
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
+		return this.http.get('/requests', {
+			headers: headers
+		// }).map(res => <Order[]> res.json().orders)
+		}).map(res => <any[]> res.json().orders)
+			.catch(this.handleError);
+	}
 
 	public getMy() {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/orders/my', {			
+		return this.http.get('/requests/my', {			
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
 		}).map(res => <any[]> res.json().trips)
@@ -33,7 +43,7 @@ export class OrderService {
 		
 		headers.append('Content-Type', 'application/json');
 	
-		return this.http.post('/orders/add', JSON.stringify(data), {			
+		return this.http.post('/requests/add', JSON.stringify(data), {			
 			headers: headers
 		});
 	}

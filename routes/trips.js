@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var Trip = require('../models/trip');
+var Order = require('../models/order');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -51,15 +52,15 @@ router.get('/my', function(req, res, next) {
 		return;
 	}
 	
-	if (!req.session.uid) {
-		res.status(401);
+if (!req.session.uid) {
+	res.status(401);
 
-		return;
-	}
+	return;
+}
 	
 	Trip.find({
 		user: ObjectId(req.session.uid)
-	}).populate('orders.user').exec(function (err, trips) {
+	}).exec(function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -68,8 +69,29 @@ router.get('/my', function(req, res, next) {
 			return;
 		}
 		
-		res.type('json')
-			.json({trips: trips});
+		var tids = trips.map(function(trip) {
+			return ObjectId(trip._id);
+		});
+		
+		Order.find({
+			trip: {$in: tids}
+		}).exec(function (err, orders) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			res.type('json')
+				.json({
+					trips: trips,
+					orders: orders
+				});	
+		});
+		
+
 			
 		// res.render('trips/index', { trips: trips });
 			
@@ -112,21 +134,7 @@ router.post('/add', function(req, res, next) {
 		}
 		
 		 res.type('json')
-				.json({trip: trip}); 
-		
-		/*Trip.find(function (err, trips) {
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-			}
-			
-			res.type('json')
-				.json({trips: trips});
-				
-		  // console.log('%s --- %s.', trips.name, trips.from)
-		  // res.render('index', { title:trips[1].to + trips[0].from });
-		});*/
+				.json({trip: trip});
 	});  
 });
 

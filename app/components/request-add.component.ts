@@ -33,11 +33,11 @@ export class RequestAddComponent {
 		// console.dir(trip);
 	
 		this.form = _fb.group({  
-			trip_id: ['', Validators.required],
+			trip: ['', Validators.required],
 			message: ['', Validators.required]
 		});
 		
-		this.formModel.trip_id = trip._id;
+		this.formModel.trip = trip._id;
 	}
 	
 	onSubmit(value:Object):void {

@@ -38,6 +38,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var trips = require('./routes/trips');
 var orders = require('./routes/orders');
+var messages = require('./routes/messages');
 
 var app = express();
 
@@ -239,7 +240,8 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/trips', trips);
-app.use('/orders', orders);
+app.use('/requests', orders);
+app.use('/messages', messages);
 
 
 // catch 404 and forward to error handler
@@ -308,7 +310,6 @@ Donate PayPal https://www.twitchalerts.com/donate/artglem (reading a message by 
 GitHub:
 
 https://github.com/artod/osliknet
-
 
 Restream:
 

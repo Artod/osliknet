@@ -11,16 +11,18 @@ export class OrdersIdComponent {
 	public trip: any = {
 		user: {}
 	};
+	
 	public order: any = {
 		user: {}
 	};
+	
 	public messages: any[];
 	
 	private orderId: number;
 
 	constructor(
 		private tripService: TripService,
-		private routeParams:RouteParams,
+		private routeParams: RouteParams
 	) {		
 		this.orderId = this.routeParams.get('id');
 		

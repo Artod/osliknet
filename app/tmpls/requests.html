@@ -2,6 +2,30 @@
 
 <table>
 	<tr>
+		<td>
+			<ul>
+				<li *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)">
+					<b>{{ order.status }}</b>
+					<br />
+					
+					{{ order.trip.from }} -> {{ order.trip.to }}
+					<br />
+					
+					{{ order.trip.when | toDate | date: 'longDate' }}
+					<br />
+					
+					<i>{{ order.user.name }}</i>				
+				</li>
+			</ul>
+		</td>
+		<td>
+			<chat *ngIf="orderId" [orderId]="orderId"></chat>
+		</td>
+	</tr>
+</table>
+
+<!-- <table>
+	<tr>
 		<th>User</th>
 		<th>Trip</th>
 		<th>UID</th>
@@ -18,8 +42,8 @@
 		</td>
 		
 		<td>
-			<a [routerLink]="['OrdersId', {id: trip.orders._id}]">Chat</a>
+			<a [routerLink]="['RequestsId', {id: trip.orders._id}]">Chat</a>
 		</td>
 		<td>{{ trip.orders.status }}</td>
 	</tr>
-</table>
+</table> -->

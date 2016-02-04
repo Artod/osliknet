@@ -1,0 +1,20 @@
+<ul>
+	<li *ngFor="#message of messages; #idx = index">
+		<b>{{ message.user.name }}</b>
+		<br />
+		<i>{{ message.created_at | toDate | date: 'longDate' }}</i>
+		<p>
+			{{ message.message }}
+		</p>
+	</li>
+</ul>
+
+<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+	<input name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+	
+	<label for="">
+		<textarea name="message" id="" cols="30" rows="10" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
+	</label>
+	
+	<button >Send</button>
+</form>

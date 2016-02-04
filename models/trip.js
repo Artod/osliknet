@@ -70,8 +70,9 @@ var tripSchema = mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	/*
 	orders: [orderSchema],
-	/*comments: [{
+	comments: [{
 		uid: {
 			type: String,
 			required: true

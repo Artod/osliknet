@@ -1,34 +1,47 @@
 import {Component} from 'angular2/core';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
+import {ChatComponent} from '../components/chat.component';
 
 import {OrderService} from '../services/order/order.service';
-import {ModalService} from '../services/modal/modal.service';
+
+import {ToDatePipe} from '../pipes/to-date.pipe';
+// import {ModalService} from '../services/modal/modal.service';
 
 // import {Order} from '../services/order/order';
 
 @Component({
 	templateUrl: '/app/tmpls/requests.html',
-	directives: [ROUTER_DIRECTIVES]
+	directives: [ROUTER_DIRECTIVES, ChatComponent],
+	pipes: [ToDatePipe]
 })
 
 export class RequestsComponent {
-	public trips: any[];
+	public orders: any[];
+	public orderId: string;
 
 	constructor(
-		private orderService: OrderService
-	) {
-		this.orderService.getMy()
-			.subscribe(trips => {
-				this.trips = trips.map(trip => {
-					trip.when = new Date(trip.when);
+		private orderService: OrderService,
+		private routeParams: RouteParams
+	) {	
+		this.orderId = this.routeParams.get('id');
+		
+		this.orderService.get()
+			.subscribe(orders => {		
+				this.orders = orders;
 
-					return trip;
-				});
+				if (!this.orderId && this.orders.length) {
+					this.orderId = this.orders[0]._id;
+				}
 			}, error => {
 				console.dir(error);
 			}, () => {
 				console.log('done')
 			});
+	}
+	
+	private onClick(orderId) {
+		this.orderId = orderId;
+		console.log('new this.orderId = ', this.orderId);
 	}
 }
 

@@ -4,43 +4,29 @@ import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 
-export class TripService {
+export class MessageService {
 	constructor(public http:Http) { }
 	
-	public search(data) {
-		let search: URLSearchParams = new URLSearchParams();
-		
-		if (data.from_id)
-			search.set('from_id', data.from_id);
-		
-		if (data.to_id)
-			search.set('to_id', data.to_id);
-
-		return this.http.get('/trips', {
-			search: search			
-		});
-	}
-
-	public getMy() {	
+	public getByOrderId(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/trips/my', {			
+		return this.http.get('/messages/order/' + id, {
 			headers: headers
-		}).map(res => <any[]> res.json())
-			.catch(this.handleError);;
+		}).map(res => <any[]> res.json().messages).catch(this.handleError);
 	}
 	
-	public getOrder(id) {	
+	public getLastMessages(lastId) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
-	
-		return this.http.get('/orders/' + id, {
+
+		return this.http.get('/messages/last/' + lastId, {
 			headers: headers
-		}).map(res => <any[]> res.json()).catch(this.handleError);;
+		}).map(res => <any[]> res.json().messages).catch(this.handleError);
 	}
 	
-	public addTrips(data) {
+	
+	public add(data) {
 		/*let search: URLSearchParams = new URLSearchParams();
 
 		search.set('from_id', data.from_id);
@@ -50,9 +36,9 @@ export class TripService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/trips/add', JSON.stringify(data), {			
+		return this.http.post('/messages/add', JSON.stringify(data), {			
 			headers: headers
-		});
+		}).map(res => <any[]> res.json().message).catch(this.handleError);
 	}
 	
 	private handleError (error: Response) {

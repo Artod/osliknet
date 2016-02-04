@@ -4,33 +4,109 @@ var async = require('async');
 
 var Trip = require('../models/trip');
 var Message = require('../models/message');
-// var Order = require('../models/order');
+var Order = require('../models/order');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
-/* GET home page. 
+
 router.get('/', function(req, res, next) {	
-	Order.find({
-		
-	}, function (err, orders) {
+	if (!req.xhr) {
+		res.render('index');
+
+		return;
+	}
+	
+if (!req.session.uid) {
+	res.status(401);
+
+	return;
+}
+
+
+
+	async.parallel({
+		orders: function(callback) {	
+			Trip.find({
+				user: ObjectId(req.session.uid),
+				is_removed: false
+			}).select({ _id: 1}).exec(function (err, trips) {
+				if (err) {
+					callback(err, trips);
+						
+					return;
+				}
+				
+				var tids = trips.map(function(trip) {
+					return ObjectId(trip._id);
+				});
+				
+				Order.find({
+					trip: {$in: tids}
+				})/*.sort({status: 1}).populate('user')*/.exec(function (err, orders) {
+					if (err) {
+						callback(err, trips);
+							
+						return;
+					}
+					
+					callback(err, orders);
+				});
+			});		
+		},
+		myOrders: function(callback){
+			Order.find({
+				user: ObjectId(req.session.uid)
+			}, function (err, orders) {
+				if (err) {
+					callback(err, orders);
+					
+					return;
+				}
+				
+				callback(err, orders);
+			});
+		}
+	}, function(err, asyncRes){
+		// can use res.team and res.games as you wish
 		if (err) {
 			res.status(500)
 				.type('json')
 				.json({error: err});
+				
+			return
 		}
 		
-		res.render('orders/index', {
-			orders: orders,
-			session: JSON.stringify(req.session)
-		});
+		var orders = asyncRes.orders.concat(asyncRes.myOrders);
 		
-		// res.type('json')
-			// .json({trips: trips});
+		Order.populate(orders, {path: 'user trip'}, function(err, orders) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
 			
-		// console.log('%s --- %s.', trips.name, trips.from)
-		// res.render('index', { title:trips[1].to + trips[0].from });
-	});  
-});*/
+			res.type('json').json({
+				orders: orders
+			});
+		});	
+	});
+	
+	
+	
+
+
+	
+	
+
+	
+	
+	
+	
+	
+	
+});
 
 router.get('/my', function(req, res, next) {
 	if (!req.xhr) {
@@ -66,6 +142,10 @@ router.get('/my', function(req, res, next) {
 		$unwind: "$orders"
 	}]).
 	*/
+	
+	
+	
+	
 
 	Trip.aggregate([{
 		$match: {
@@ -209,32 +289,39 @@ router.get('/:id', function(req, res, next) {
 	});  */
 });
 
-
 router.post('/add', function(req, res, next) {
 	/**
 		TODO:
 		- send email to traveler
 		- inc order counter
 	*/
-	
-	
+
 	// req.body.messages = req.body.messages || {};	
 
-	
-	var order = {
+	var order = new Order({
 		user: req.session.uid,
+		trip: req.body.trip,
 		status: 0,
-		message: req.body.message,
-		created_at: new Date(),
-		updated_at: new Date()
-		/*
-		messages: [{
-			user: req.session.uid,
-			message: req.body.message
-		}]*/
-	};	
+		message: req.body.message
+	});
+
+	order.save(function(err, order) {
+		if (err) {
+			res.status(err.name === 'ValidationError' ? 400 : 500);
+			
+			res.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		res.type('json')
+			.json({order: order});
+
+		// res.redirect('/trips/' + req.body.trip_id);
+	});	
 	
-	Trip.findByIdAndUpdate(
+	/*Trip.findByIdAndUpdate(
         req.body.trip_id, {
 			$push: {
 				orders: order
@@ -256,7 +343,7 @@ router.post('/add', function(req, res, next) {
         }
     );
 	
-	/*
+	
 	Trip.find({
 		uid: req.body.trip_id
 	}).exec(function (err, order) {
@@ -276,24 +363,7 @@ router.post('/add', function(req, res, next) {
 
 	});
 	
-	var order = new Order(req.body);	
-	
-	order.save(function (err, order) {
-		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500);
-			
-			res.type('json')
-				.json({error: err});
-				
-			return;
-		}
-		
-		res.type('json')
-			.json({order: order});
-
-		// res.redirect('/trips/' + req.body.trip_id);
-
-	});  */
+	  */
 });
 
 

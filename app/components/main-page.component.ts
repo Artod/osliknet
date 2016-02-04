@@ -22,7 +22,7 @@ export class MainPageComponent {
 	// public trips: any[];
 	public searchModel = {
 		from: "Montreal, QC, Canada",
-from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"
+		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"
 		
 	};
 	public searchForm: ControlGroup;

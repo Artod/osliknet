@@ -15,9 +15,9 @@
 		<td>{{ trip.when | date: 'longDate' }}</td>
 		<td>
 			<ul>
-				<li *ngFor="#order of trip.orders; #orderIdx = index">
+				<li *ngFor="#order of ordersByTrip[trip._id]; #orderIdx = index">
 					Request by <a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>
-					<p><a [routerLink]="['OrdersId', {id:order._id}]">Chat</a></p>
+					<p><a [routerLink]="['RequestsId', {id:order._id}]">Chat</a></p>
 					<p>
 						{{ order.message }}
 					</p>
