@@ -1,41 +1,56 @@
 import {Component, ElementRef, Injector, Inject, provide, Renderer} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
-import {GmAutocompliteComponent} from '../components/gm-autocomplite.component';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
+
+import {TripCardComponent} from './trip-card.component';
 
 import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
+
+import {GmAutocompliteComponent} from './gm-autocomplite.component';
 import {RequestAddComponent} from './request-add.component';
 
+import {ToDatePipe} from '../pipes/to-date.pipe';
 
 // import {Router} from 'angular2/router';
 
 @Component({
-	templateUrl: '/app/tmpls/main-page.html',
-	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES]
+	templateUrl: '/app/tmpls/trips.html',
+	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES, TripCardComponent],
+	pipes: [ToDatePipe]
 })
 
-export class MainPageComponent {
+export class TripsComponent {
 	public trips: Trip[];
+	
 	// public trips: any[];
+	
 	public searchModel = {
 		from: "Montreal, QC, Canada",
-		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"
-		
+		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"		
 	};
+	
 	public searchForm: ControlGroup;
 
 	constructor(
-	// private _router: Router,
+		// private _router: Router,
 		private _fb: FormBuilder,
 		private _tripService: TripService,
 		private _orderService: OrderService,
 		private _modalService: ModalService,
 		private _renderer: Renderer,
+		private routeParams: RouteParams,
 		@Inject('config.user') public configUser
-	) {		
+	) {
+		this.searchModel = {
+			from: this.routeParams.get('from') ? decodeURIComponent( this.routeParams.get('from') ) : this.searchModel.from,
+			from_id: this.routeParams.get('from_id') || this.searchModel.from_id,
+			to: this.routeParams.get('to') ? decodeURIComponent( this.routeParams.get('to') ) : this.searchModel.to,
+			to_id: this.routeParams.get('to_id') || this.searchModel.to_id
+		}
+
 		this.searchForm = _fb.group({
 			from: '', //['', Validators.required],
 			from_id: '', //['', Validators.required],
@@ -45,20 +60,18 @@ export class MainPageComponent {
 	}
 
 	onSubmit(value:Object):void {
-		// console.dir(value)
-
-		// console.dir(this.searchModel);
-
 		if (this.searchForm.valid) {
 			this._tripService.search(this.searchModel)
 				.subscribe(res => {
-					let trips = res.json();
+					this.trips = res.json();
+					
+					/* let trips = res.json();
 
 					this.trips = trips.map(trip => {
 						trip.when = new Date(trip.when);
 
 						return trip;
-					});
+					}); */
 
 					// console.dir( this.trips );
 				}, err => {

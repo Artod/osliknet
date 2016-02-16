@@ -6,16 +6,24 @@ var Order = require('../models/order');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
+
 router.get('/', function(req, res, next) {
+	console.log('sdsd')
+	if (!req.xhr) {
+		res.render('index');
+
+		return;
+	}
+	
 	var query = {};
 	
-	if (req.query.from_id)
+	if (req.query.from_id) {		
 		query.from_id = req.query.from_id;
+	}
 	
-	if (req.query.to_id)
-		query.to_id = req.query.to_id;
-	
-	console.dir(query)
+	if (req.query.to_id) {
+		query.to_id = req.query.to_id;		
+	}
 	
 	if (!query.from_id && !query.to_id) {
 		res.type('json')
@@ -24,9 +32,11 @@ router.get('/', function(req, res, next) {
 		return;
 	}
 	
-	query.when = { $gt: ( new Date() ).getTime() - 1000*60*60*24 },
+	query.when = { $gt: ( new Date() ).getTime() - 1000*60*60*24 };
 	
-	Trip.find(query).sort({created_at: -1}).exec(function (err, trips) {
+	query.is_removed = false;
+	
+	Trip.find(query).sort({created_at: -1}).populate('user').exec(function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -52,11 +62,11 @@ router.get('/my', function(req, res, next) {
 		return;
 	}
 	
-if (!req.session.uid) {
-	res.status(401);
+	if (!req.session.uid) {
+		res.status(401).json({error: 'Unauthorized'});
 
-	return;
-}
+		return;
+	}
 	
 	Trip.find({
 		user: ObjectId(req.session.uid)
@@ -75,7 +85,7 @@ if (!req.session.uid) {
 		
 		Order.find({
 			trip: {$in: tids}
-		}).exec(function (err, orders) {
+		}).populate('user').exec(function (err, orders) {
 			if (err) {
 				res.status(500)
 					.type('json')

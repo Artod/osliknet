@@ -1,20 +1,68 @@
-<ul>
-	<li *ngFor="#message of messages; #idx = index">
-		<b>{{ message.user.name }}</b>
-		<br />
-		<i>{{ message.created_at | toDate | date: 'longDate' }}</i>
-		<p>
-			{{ message.message }}
-		</p>
-	</li>
-</ul>
+<h2>Request</h2>
 
-<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
-	<input name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+<div *ngIf="order.trip">
+
+	<table class="table">
+		<tr>
+			<td class="col-xs-8">
+		<!-- 		<img src="http://gravatar.com/avatar/{{ order.user.gravatar_hash }}?d=retro" alt="{{ order.user.name }}" />
+				<a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>	
+ -->
+ 
+				<order-card [order]="order" [user]="order.user"></order-card>
+
+			</td>
+			<td class="col-xs-4">
+				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
+				<!-- {{ order.trip.from }}
+				<span class="glyphicon glyphicon-arrow-right"></span>
+				{{ order.trip.to }}
+				
+				<br />
+				
+				<small class="text-muted">{{ order.trip.when | toDate | date: 'longDate' }}</small> -->
+			</td>
+		</tr>
+	</table>
 	
-	<label for="">
-		<textarea name="message" id="" cols="30" rows="10" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
-	</label>
-	
-	<button >Send</button>
-</form>
+<!-- 	<p>
+		<small class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</small>
+		<br />
+		{{ order.message }}
+	</p> -->
+</div>
+
+<div class="chat-list">
+	<ul>
+		<li *ngFor="#message of messages; #idx = index">
+			<div class="chat-avatar">
+				<img src="http://gravatar.com/avatar/{{ message.user.gravatar_hash }}?d=retro" alt="{{ message.user.name }}" width="40px" height="40px" />
+			</div>
+			<div class="chat-message">
+				<small>
+					<b>{{ message.user.name }}</b>
+					<br />
+					<small class="text-muted">{{ message.created_at | toDate | date: 'mm:HH d MMM y' }}</small>
+				</small>
+
+				<p>
+					{{ message.message }}
+				</p>
+			</div>
+			
+			<div class="clearfix"></div>
+		</li>
+	</ul>
+</div>
+
+<div class="chat-textarea">
+	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+		<input name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+		
+		<div class="form-group">			
+			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
+		</div>
+		
+		<button type="submit" class="btn btn-warning input-lg">Send</button>
+	</form>
+</div>

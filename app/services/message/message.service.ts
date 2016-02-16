@@ -13,9 +13,9 @@ export class MessageService {
 	
 		return this.http.get('/messages/order/' + id, {
 			headers: headers
-		}).map(res => <any[]> res.json().messages).catch(this.handleError);
+		}).map(res => <any[]> res.json()).catch(this.handleError);
 	}
-	
+	 
 	public getLastMessages(lastId) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');

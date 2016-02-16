@@ -1,6 +1,9 @@
-import {Component} from 'angular2/core';
+import {Component, Inject} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
-import {ChatComponent} from '../components/chat.component';
+
+// import {ChatComponent} from './chat.component';
+import {TripCardComponent} from './trip-card.component';
+import {OrderCardComponent} from './order-card.component';
 
 import {OrderService} from '../services/order/order.service';
 
@@ -11,38 +14,39 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/requests.html',
-	directives: [ROUTER_DIRECTIVES, ChatComponent],
+	directives: [ROUTER_DIRECTIVES, /*ChatComponent, */TripCardComponent, OrderCardComponent],
 	pipes: [ToDatePipe]
 })
 
 export class RequestsComponent {
 	public orders: any[];
-	public orderId: string;
+	// public orderId: string;
 
 	constructor(
 		private orderService: OrderService,
-		private routeParams: RouteParams
+		private routeParams: RouteParams,
+		@Inject('config.orderStatus') public configOrderStatus
 	) {	
-		this.orderId = this.routeParams.get('id');
+		//this.orderId = this.routeParams.get('id');
 		
 		this.orderService.get()
-			.subscribe(orders => {		
+			.subscribe(orders => {
 				this.orders = orders;
 
-				if (!this.orderId && this.orders.length) {
+				/*if (!this.orderId && this.orders.length) {
 					this.orderId = this.orders[0]._id;
-				}
+				}*/
 			}, error => {
 				console.dir(error);
 			}, () => {
-				console.log('done')
+				console.log('done');
 			});
 	}
 	
-	private onClick(orderId) {
+	/*private onClick(orderId) {
 		this.orderId = orderId;
-		console.log('new this.orderId = ', this.orderId);
-	}
+		//console.log('new this.orderId = ', this.orderId);
+	}*/
 }
 
 /*.subscribe(

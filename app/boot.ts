@@ -30,5 +30,13 @@ bootstrap(AppComponent, [
 			name: window.user.name
 		};
 	}}),
+	provide('config.orderStatus', {useFactory: () => {
+		return {
+			0: 'Pending',
+			1: 'Processing',
+			2: 'Refused',
+			3: 'Finished'
+		};
+	}}),
 	LazyMapsAPILoader
 ]);

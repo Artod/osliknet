@@ -1,0 +1,16 @@
+<div>
+	<a href="">
+		{{ trip.from }}
+		<span class="glyphicon glyphicon-arrow-right"></span>
+		{{ trip.to }}
+	</a>
+</div>
+
+<div>
+	<span class="text-muted small1">{{ trip.when | toDate | date: 'longDate' }}</span>
+</div>
+
+<div class="user" *ngIf="user && user.name">
+	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=retro" alt="{{ user.name }}" height="40" weight="40" />
+	<a href="/users/{{ user._id }}">{{ user.name }}</a>
+</div>

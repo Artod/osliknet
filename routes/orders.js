@@ -5,22 +5,24 @@ var async = require('async');
 var Trip = require('../models/trip');
 var Message = require('../models/message');
 var Order = require('../models/order');
+var User = require('../models/user');
 
 var ObjectId = require('mongoose').Types.ObjectId;
-
+ 
 
 router.get('/', function(req, res, next) {	
+
 	if (!req.xhr) {
 		res.render('index');
 
 		return;
 	}
 	
-if (!req.session.uid) {
-	res.status(401);
+	if (!req.session.uid) {
+		res.status(401).json({error: 'Unauthorized'});
 
-	return;
-}
+		return;
+	}
 
 
 
@@ -42,7 +44,9 @@ if (!req.session.uid) {
 				
 				Order.find({
 					trip: {$in: tids}
-				})/*.sort({status: 1}).populate('user')*/.exec(function (err, orders) {
+				}).sort({
+					created_at: -1
+				})/*.populate('user')*/.exec(function (err, orders) {
 					if (err) {
 						callback(err, trips);
 							
@@ -87,8 +91,44 @@ if (!req.session.uid) {
 				return;
 			}
 			
+			/*
 			res.type('json').json({
 				orders: orders
+			});return;
+			*/
+			
+			var tripUids = orders.map(function(order) {
+				return ObjectId(order.trip.user);
+			});
+			
+			
+// console.log('tripUidstripUidstripUidstripUidstripUids');
+// console.dir(tripUids);
+			
+			User.find({
+				_id: {$in: tripUids}
+			}).exec(function (err, users) {
+				if (err) {
+					res.status(500)
+						.type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				var usersIndex = {};
+				
+				users.forEach(function(user) {					
+					usersIndex[user._id] = user
+				});
+
+				orders.forEach(function(order) {
+					order.trip.user = usersIndex[order.trip.user];
+				});
+				
+				res.type('json').json({
+					orders: orders
+				});
 			});
 		});	
 	});
@@ -116,7 +156,7 @@ router.get('/my', function(req, res, next) {
 	}
 	
 	if (!req.session.uid) {
-		res.status(401);
+		res.status(401).json({error: 'Unauthorized'});
 
 		return;
 	}

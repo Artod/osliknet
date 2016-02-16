@@ -1,12 +1,20 @@
 doctype html
 html
 	head
+		title Osliki.Net
+
+		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+		
+		meta(http-equiv="X-UA-Compatible", content="IE=edge")
+		meta(charset="utf-8") 
+		
 		base(href="/")
+
 		
 		link(rel='stylesheet' href='/modules/bootstrap/css/bootstrap.min.css')
-		link(rel='stylesheet', href='/stylesheets/style.css')
 		link(rel='stylesheet', href='/stylesheets/splash.css')
 		link(rel='stylesheet', href='/stylesheets/mydatepicker.css')
+		link(rel='stylesheet', href='/stylesheets/style.css')
 		
 		script(src='/modules/angular2/angular2-polyfills.js')
 		script(src='/modules/systemjs/system.src.js')
@@ -19,20 +27,87 @@ html
 		//script(src='/modules/moment/moment.js')		
 		
 	body(class="modal-open1")
-	
+		
 
-	
-		app Loading...
+			
+			
+		app
+			block content
 
-		<br />
-		<br />
-		<br />
-		<br />
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+		// a(href="/users/logout") logout
+		
+		// br
+		// h2 Sign Up
+		// form(action="/users/signup", method="post")
+			// | Username:
+			// input(type="text" name="username")
+			// br
+			// br
+			// | Email:
+			// input(type="text" name="email")
+			
+			// button Get token
+			
+		// br
 		
 		
-		block content
-
-
+		
+	
+		h2 Sign In
+		form(action="/users/login", method="post")
+			| Email:
+			input(type="text" name="email")
+			
+			button Get token
+		
+		br				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 		script.
 			// System.import('bootstrap');
 			
@@ -40,9 +115,6 @@ html
 				id: '#{user.id}',
 				name: '#{user.name}'
 			};
-			
-			console.dir(window.user);
-
 			
 			System.config({
 				baseURL: '/',
@@ -52,11 +124,11 @@ html
 						format: 'register',
 						defaultExtension: 'js'
 					}
-				},
+				}/*,
 				map: {
 				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
 				  "moment": "modules/moment/moment.js"
-				}
+				}*/
 			});
 			
 			

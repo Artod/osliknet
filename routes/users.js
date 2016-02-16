@@ -4,6 +4,9 @@ var express = require('express');
 var router = express.Router();
 
 var passwordless = require('passwordless');
+var crypto = require('crypto');
+
+
 
 
 var User = require('../models/user');
@@ -12,18 +15,32 @@ var Token = require('../models/token');
 
 
 
-
-
-
-
-
-
-
-
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
+
+
+
+
+/*
+User.find().exec(function(err, users) {	
+	users.forEach(function(user) {
+		user.gravatar_hash = crypto.createHash('md5').update(user.email).digest('hex');
+		user.save();
+	});
+})*/
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -112,10 +129,13 @@ router.post('/signup', function(req, res, next) {
 		res.status(400)	
 			.type('json')
 			.json({error: 'Email is registered already.'});
-	} else {	
+	} else {
+		req.body.email = req.body.email.trim().toLowerCase();
+		
 		var user = new User({
 			name: req.body.username,
-			email: req.body.email		
+			email: req.body.email,
+			gravatar_hash: require('crypto').createHash('md5').update(req.body.email).digest('hex')
 		});
 		
 		user.save(function(err, user) {
@@ -155,7 +175,7 @@ function loggedInAlready(req, res, next) {
 
 
 /* POST login details. */
-router.post('/login', loggedInAlready, proceedEmail(function(user, req, res, next) {
+router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res, next) {
 	if (user) {
 		req.userId = user.id;
 		next();
@@ -224,7 +244,8 @@ router.get('/logged_in', loggedInAlready, passwordless.acceptToken({
 			
 			return;
 		}
-		
+console.log('req.session.passwordless');
+console.log(req.session.passwordless);
 		User.findById(req.session.passwordless, function(err, user) {
 			if (err) {
 				res.status(500)
@@ -253,7 +274,8 @@ console.log('save for approve');
 					}*/
 				});
 			}	
-
+console.log('Welcommen')
+console.dir(req.session)
 			res.render('index', {message: 'Welcommen', session: JSON.stringify(req.session)});				
 			
 			return;
@@ -261,6 +283,7 @@ console.log('save for approve');
 
 		return;
 	} else {
+console.log('Возможно токен протух')
 		res.render('index', {message: 'Возможно токен протух', session: JSON.stringify(req.session)});		
 	}
 });

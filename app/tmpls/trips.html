@@ -1,0 +1,65 @@
+<div class="page-header">
+	<h2>Find a Trip</h2>
+</div>
+
+<form class="text-center1 form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit(searchForm.value)">
+	<!-- <label class="control-label input-lg">Trip</label> -->
+	
+	<div class="form-group">
+		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="searchModel" placeholder="From"></gm-autocomplite>
+	</div>
+	
+	<div class="form-group">
+		<span class="glyphicon glyphicon-arrow-right"></span>
+	</div>
+
+	<div class="form-group">	
+		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="searchModel" placeholder="To"></gm-autocomplite>
+	</div>
+
+	<!-- <input type="text" required [(ngModel)]="model.test" /> [disabled]="!form.form.valid" -->
+
+	<button type="submit" class="btn btn-warning btn-lg">Find</button>
+</form>
+
+<br />
+<br />
+
+
+	<table class="table">
+		<tr *ngFor="#trip of trips; #idx = index">
+			<td>
+				<trip-card [trip]="trip" [user]="trip.user"></trip-card>
+				<br />
+				<p>
+					{{ trip.description }}
+				</p>
+				<p class="text-right" *ngIf="trip.user._id != configUser.id">
+					<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request Delivery</button>
+				</p>
+			</td>
+
+			
+			<!-- <td>
+				<img src="http://gravatar.com/avatar/{{ trip.user.gravatar_hash }}?d=retro" alt="{{ trip.user.name }}" />
+				{{ trip.user.name }}
+			</td>
+			<td>
+				<b>{{ trip.from }}</b>
+				<span class="glyphicon glyphicon-arrow-right"></span>
+				<b>{{ trip.to }}</b>
+				
+				<br />
+				
+				<i>{{ trip.when | toDate | date: 'longDate' }}</i>
+				
+				<p>
+					{{ trip.description }}
+				</p>	
+			</td> 
+			
+			<td>
+				
+			</td>-->
+		</tr>
+	</table>

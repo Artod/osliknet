@@ -1,39 +1,44 @@
-<h2>Add a Trip</h2>
+<div class="page-header">
+	<h2>Add a Trip</h2>
+</div>
 
-<form action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
-	<label for="">
-		From:
-		
-		<gm-autocomplite [name_place]="'from'" [name_id]="'from_id'" [form]="form" [model]="formModel"></gm-autocomplite>
-	</label>
+<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
 	
-	<br />
+	<div class="form-group">
+		<label>Trip:</label>
+
+		<div class="form-inline">		
+
+			
+			<div class="form-group">
+				<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="form" [model]="formModel" placeholder="From"></gm-autocomplite>
+			</div>
+			
+			<div class="form-group">
+				<span class="glyphicon glyphicon-arrow-right"></span>
+			</div>
+
+			<div class="form-group">	
+				<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="form" [model]="formModel" placeholder="To"></gm-autocomplite>
+			</div>	
+		</div>
+	</div>
 	
-	<label for="">
-		When:		
-	
+	<div class="form-group">	
+		<label>When:</label>
+		<br />
 		<my-date-picker [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
 		
 		<input type="hidden" [(ngModel)]="formModel.when" [ngFormControl]="form.controls.when" />
-	</label>
+	</div>
 
-	<br />
-	
-	<label for="">
-		To:
-
-		<gm-autocomplite [name_place]="'to'" [name_id]="'to_id'" [form]="form" [model]="formModel"></gm-autocomplite>
-	</label>
-	
-	<br />
-	
-	<label for="">
-		Description:
-
-		<textarea name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description"></textarea>
-	</label>
+	<div class="form-group">	
+		<label>Description:</label>
+		
+		<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description"></textarea>
+	</div>
 	
 	<br />
 	
-	<button>Add</button>
+	<button type="submit" class="btn btn-warning input-lg">Add</button>
 </form>

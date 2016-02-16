@@ -1,11 +1,26 @@
-<div class="mydp" [ngStyle]="{'height': height, 'width': width}">
-    <div class="selectiongroup">
-        <span class="selection" [ngStyle]="{'height': height, 'line-height': height}" (click)="openBtnClicked()">{{selectionDayTxt}}</span>
-        <span class="selbtngroup" [style.height]="height">
+<div class="mydp">
+	<!-- [ngStyle]="{'height': height, 'width': width}" -->
+	<div class="input-group">
+		<input readonly class="form-control input-lg" type="text" value="{{selectionDayTxt}}" (click)="openBtnClicked()" />
+		
+		<div class="input-group-btn">
+			<button type="button" class="btn btn-default input-lg" *ngIf="selectionDayTxt.length>0" (click)="removeBtnClicked()">
+				<span class="glyphicon glyphicon-remove"></span>
+			</button>
+			<button type="button" class="btn btn-default input-lg" (click)="openBtnClicked()">
+				<span class="glyphicon glyphicon-calendar"></span>
+			</button>
+		</div>		
+	</div>
+
+    <!-- <div class="selectiongroup">		
+        <span class="selection" [ngStyle]="{'height': height, 'line-height': height}" (click)="openBtnClicked()">{{selectionDayTxt}}</span> 
+		<span class="selbtngroup" [style.height]="height">
             <button type="button" class="btnclear" *ngIf="selectionDayTxt.length>0" (click)="removeBtnClicked()"><span class="icon icon-cross"></span></button>
             <button type="button" class="btnpicker" (click)="openBtnClicked()"><span class="icon icon-calendar"></span></button>
-        </span>
-    </div>
+        </span>		
+    </div>-->
+	
     <div class="selector" *ngIf="showSelector">
         <table class="header">
             <tr>
@@ -17,7 +32,7 @@
                     </div>
                 </td>
                 <td>
-                    <button type="button" class="headertodaybtn" (click)="todayClicked()">{{todayBtnTxt}}</button>
+                    <!-- <button type="button" class="headertodaybtn" (click)="todayClicked()">{{todayBtnTxt}}</button> -->
                 </td>
                 <td>
                     <div style="float:right">

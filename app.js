@@ -18,6 +18,10 @@ TODO:
 
 - unauth middleware
 
+- pre('save' created_at переделать
+
+- logged in already убрать 
+
 */
 
 
@@ -41,8 +45,6 @@ var orders = require('./routes/orders');
 var messages = require('./routes/messages');
 
 var app = express();
-
-
 
 var mongoose = require('mongoose');
 // TODO: MongoDB setup (given default can be used)
@@ -213,7 +215,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.static(path.join(__dirname, 'scripts')));
 app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));
 app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
-app.use('/modules/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist/'));
+app.use('/modules/bootstrap', express.static(__dirname + '/node_modules/bootstrap/dist'));
 app.use('/modules/angular2', express.static(__dirname + '/node_modules/angular2/bundles'));
 app.use('/modules/systemjs', express.static(__dirname + '/node_modules/systemjs/dist'));
 app.use('/modules/rxjs', express.static(__dirname + '/node_modules/rxjs/bundles'));
@@ -283,7 +285,7 @@ module.exports = app;
 
 /*
 
-Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, jQuery, delivery, p2p, startup, ecmascript 6, MEAN, mongoose
+Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, Bootstrap, Jade, jQuery, delivery, p2p, startup, ecmascript 6, MEAN, mongoose
 
 
 Creating project http://osliki.net on Node.js:

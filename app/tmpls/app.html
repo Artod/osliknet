@@ -1,12 +1,21 @@
-<button (click)="openModal()">open test modal</button>
+<!-- <button (click)="openModal()">open test modal</button> -->
+<div class="container">
+	<nav class="navbar navbar-default">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Osliki.Net</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li><a [routerLink]="['Trips']">Trips</a></li>
+				<li><a [routerLink]="['TripAdd']">Add Trip</a></li>
+				<li><a [routerLink]="['TripsMy']">My Trips</a></li>
+				<li><a [routerLink]="['Requests']">Requests</a></li>
+			</ul>
+		</div>
+	</nav>
+</div>
 
-<h1 class="title">Osliki.net</h1>
+<div class="container">
+	<router-outlet></router-outlet>
+</div>
 
-<nav>
-  <a [routerLink]="['MainPage']">Home</a> 
-  <a [routerLink]="['TripAdd']">Add Trip</a>
-  <a [routerLink]="['TripsMy']">My Trips</a>
-  <a [routerLink]="['Requests']">Requests</a> 
-</nav>
-
-<router-outlet></router-outlet>

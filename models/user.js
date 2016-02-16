@@ -16,8 +16,12 @@ var userSchema = mongoose.Schema({
 		type: String,		
 		required: true,
 		validate: [emailValidator, 'Invalid email'],
-		unique: true,
-		set: function(v) { return v.toLowerCase(); }
+		unique: true/*,
+		set: function(v) { return v.toLowerCase(); }*/
+	},
+	gravatar_hash: {
+		type: String,		
+		required: true
 	},
 	about: {
 		type: String,

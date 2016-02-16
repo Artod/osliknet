@@ -1,8 +1,169 @@
 body {
-  padding: 50px;
+  /* padding: 50px; */
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
+/* a {
   color: #00B7FF;
+} */
+
+.navbar-default {
+	background-color: #f8f8f8;
+    border-color: #e7e7e7;
 }
+
+.text-center {
+	text-align:center;	
+}
+
+.mydp input[readonly] {
+    background-color: white;
+}
+
+.trips-add-form {
+	max-width: 410px;
+}
+
+.mydp input[readonly] {
+    background-color: white;
+}
+
+input.input-lg {
+	font-size: inherit;
+}
+
+.chat-list {
+	overflow-y: auto;
+	height: 500px;
+}
+	.chat-list ul {
+		/* position:relative; */
+		margin: 0px 0px 0px 0px;
+		padding: 0px 0px 0px 0px;
+		list-style: none;
+	}
+		.chat-list li {
+			position:relative;
+			margin: 0px 0px 0px 0px;
+			padding: 0px 0px 0px 0px;
+			list-style: none;clear: both;
+		}
+
+.chat-avatar {
+	width:40px;
+	margin: 0px 10px 10px 0px;
+}
+
+.chat-message {
+	position:absolute;
+	top: 0px;
+	left: 0px;
+	padding: 0px 0px 0px 50px;
+}
+
+.user {
+	/*height: 40px;
+	line-height: 40px; 
+	vertical-align: middle;*/
+}
+
+trip-card span {
+	color:#333;	
+}
+
+trip-card .user {
+	padding:8px 0px 0px 0px;
+}
+
+
+.order-info {
+	padding:8px 0px 0px 0px;
+}
+
+.order-message {
+	
+}
+
+.trips-my-requests {
+	/*margin-left: 20px;*/
+}
+
+
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
+  }
+}
+
+/*
+.requests-chat-wrap {
+	height: 500px;
+}
+		
+	.requests-wrap {
+		height: 100%;
+		overflow-y: auto;
+	}
+	
+		.requests-list {
+			margin: 0px 0px 0px 0px;
+			padding: 0px 0px 0px 0px;
+			list-style: none;
+		}
+
+			.requests-list li {
+				cursor: pointer;
+				padding: 5px 5px 5px 5px;
+				margin: 0px 0px 0px 0px;
+				list-style: none;
+			}
+
+			.requests-list li:hover {
+				background-color: #f8f8f8;
+			}
+			
+	.chat-wrap {
+		height: 100%;
+		overflow-y: hidden;
+		
+	}
+
+		.chat-list {
+			height: 100%;
+			overflow-y: auto;
+			padding: 0px 0px 200px 0px;
+			margin: 0px 0px 10px 0px;
+			list-style: none;
+		}
+		
+		.chat-textarea {
+			position:relative;
+			top: -200px;
+		}
+
+.current-chat {
+	border-right: 2px solid #EBEEE9;
+}
+*/
+
+
+
+
+
+
+
+/*
+.btn-default {
+	background: #EBEEE9 none repeat scroll 0 0;
+}
+
+.btn-default:hover, .btn-default:focus {
+	background: #D2DACC none repeat scroll 0 0;
+}
+
+.btn-default:active:hover, .btn-default:active:focus, .btn-default:active  {
+	background: #ABB8A1 none repeat scroll 0 0;
+}
+
+.glyphicon:before{font-family:'Glyphicons Halflings';font-style:normal;font-weight:400;line-height:1;-webkit-font-smoothing:antialiased}
+*/

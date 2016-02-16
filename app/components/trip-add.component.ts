@@ -1,12 +1,12 @@
 import {Component, ElementRef} from 'angular2/core';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FormBuilder, ControlGroup, Validators} from 'angular2/common';
-import {GmAutocompliteComponent} from '../components/gm-autocomplite.component';
 
 // import {DatePicker} from 'ng2-datepicker';
 import {MyDatePicker} from '../services/datepicker/mydatepicker';
-
 import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
+
+import {GmAutocompliteComponent} from './gm-autocomplite.component';
 
 @Component({
 	templateUrl: '/app/tmpls/trip-add.html',
@@ -16,23 +16,22 @@ import {TripService} from '../services/trip/trip.service';
 export class TripAddComponent {
 	public trips: Trip[];
 	public formModel = {
-from: "Montreal, QC, Canada",
+/*from: "Montreal, QC, Canada",
 from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU",
 to:	"Montreal East, QC, Canada",
 to_id:	"ChIJndvyLgHiyEwREdLOpOC4H6k",
 when:	1453957200000,
-description:"cvcv"
-		
+description:""*/		
 	};	
 	public form: ControlGroup;
 	
     public myDatePickerOptions = {
-		todayBtnTxt: 'Today',
+		/*todayBtnTxt: 'Today',*/
 		dateFormat: 'dd.mm.yyyy',
 		firstDayOfWeek: 'mo',
 		sunHighlight: true,
-		height: '34px',
-		width: '260px',
+		/*height: '34px',
+		width: '260px',*/
 		minDate: new Date()
 	};
 	

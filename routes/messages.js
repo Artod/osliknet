@@ -8,7 +8,6 @@ var Order = require('../models/order');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
-
 router.get('/last/:lastMid', function(req, res, next) {	
 	if (!req.xhr) {
 		res.render('index');
@@ -74,13 +73,52 @@ router.get('/last/:lastMid', function(req, res, next) {
 
 });
 
-
 router.get('/order/:id', function(req, res, next) {	
 	if (!req.xhr) {
 		res.render('index');
 
 		return;
 	}
+	
+	async.parallel({
+		order: function(callback) {
+			Order.findById(req.params.id)
+				.populate('user trip')
+				.exec(function (err, order) {
+					Trip.populate(order.trip, {path: 'user'}, function(err, trip) {
+						if (err) {
+							callback(err, order);
+							
+							return;
+						}
+
+						callback(err, order);
+					});
+					// callback(err, order);
+				});		
+		},
+		messages: function(callback){
+			Message.find({order: req.params.id})
+				.sort({created_at: 1})
+				.populate('user')
+				.exec(function (err, messages) {
+					callback(err, messages);
+				});
+		},                    
+	}, function(err, asyncRes) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+		res.type('json').json(asyncRes);		
+	});
+	
+	
+	return;
 	
 	Message.find({order: req.params.id})
 		.sort({created_at: 1})

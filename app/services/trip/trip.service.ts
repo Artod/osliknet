@@ -8,6 +8,9 @@ export class TripService {
 	constructor(public http:Http) { }
 	
 	public search(data) {
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
 		let search: URLSearchParams = new URLSearchParams();
 		
 		if (data.from_id)
@@ -17,6 +20,7 @@ export class TripService {
 			search.set('to_id', data.to_id);
 
 		return this.http.get('/trips', {
+			headers: headers,
 			search: search			
 		});
 	}

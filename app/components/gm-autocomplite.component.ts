@@ -14,6 +14,7 @@ export class GmAutocompliteComponent implements OnInit {
 	@Input() name_place: string;	
 	@Input() name_id: string;	
 	@Input() class: string;	
+	@Input() placeholder: string;
 	@Input() form: ControlGroup;
 	@Input() model;
 	public isInvalid: boolean = false;

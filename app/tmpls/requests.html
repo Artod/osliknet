@@ -1,28 +1,83 @@
 <h2>Requests</h2>
 
-<table>
-	<tr>
-		<td>
-			<ul>
-				<li *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)">
-					<b>{{ order.status }}</b>
-					<br />
-					
-					{{ order.trip.from }} -> {{ order.trip.to }}
-					<br />
-					
-					{{ order.trip.when | toDate | date: 'longDate' }}
-					<br />
-					
-					<i>{{ order.user.name }}</i>				
-				</li>
-			</ul>
-		</td>
-		<td>
-			<chat *ngIf="orderId" [orderId]="orderId"></chat>
-		</td>
-	</tr>
+<p *ngIf="orders && !orders.length">There are no requests.</p>
+
+<table class="table">
+	<!-- <thead>
+		<tr>
+			<th></th>
+			<th></th>
+			<th>Status</th>
+		</tr>
+	</thead> -->
+	<tbody>	
+		<tr *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)" class="{{ orderId  === order._id ? 'current-chat' : ''}}">
+			<td class="col-xs-8">
+				<order-card [order]="order" [user]="order.user"></order-card>
+				
+				<p class="text-right">
+					<a class="btn btn-default btn-lg1" [routerLink]="['Chat', {id:order._id}]">Chat</a>
+				</p>
+			</td>
+			<td class="col-xs-4">
+				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
+				
+				<!-- {{ order.trip.from }}
+				<span class="glyphicon glyphicon-arrow-right"></span>
+				{{ order.trip.to }}
+				
+				<br />
+				
+				<i>{{ order.trip.when | toDate | date: 'longDate' }}</i> -->
+			</td>
+		</tr>
+	</tbody>
 </table>
+
+
+
+<!-- 
+<div class="row requests-chat-wrap">
+	<div class="col-xs-5 requests-wrap">
+		<ul class="requests-list">
+			<li *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)" class="{{ orderId  === order._id ? 'current-chat' : ''}}">				
+				{{ order.created_at | toDate | date: 'longDate' }} | 
+				Status: <b>{{ configOrderStatus[order.status] }}</b>
+				
+				<table class="table">
+					<tr>
+						<td>
+							<img src="http://gravatar.com/avatar/{{ order.user.gravatar_hash }}?d=retro" alt="{{ order.user.name }}" width="40px" height="40px" />
+							<a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>	
+<br />
+							<div>
+								{{ order.trip.from }}
+								<span class="glyphicon glyphicon-arrow-right"></span>
+								{{ order.trip.to }}
+								
+								<br />
+								
+								<i>{{ order.trip.when | toDate | date: 'longDate' }}</i>
+							</div>							
+						</td>
+					</tr>
+				</table>
+
+			</li>			
+		</ul>
+	</div>
+	<div class="col-xs-7 chat-wrap">
+		<chat *ngIf="orderId" [orderId]="orderId"></chat>
+	</div>
+</div> -->
+
+			
+			
+			
+			
+
+			
+			
 
 <!-- <table>
 	<tr>
