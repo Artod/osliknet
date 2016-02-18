@@ -15,6 +15,10 @@
 			<td class="col-xs-8">
 				<order-card [order]="order" [user]="order.user"></order-card>
 				
+				<p class="order-message">
+					{{ order.message }}
+				</p>
+				
 				<p class="text-right">
 					<a class="btn btn-default btn-lg1" [routerLink]="['Chat', {id:order._id}]">Chat</a>
 				</p>

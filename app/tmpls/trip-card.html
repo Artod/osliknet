@@ -11,6 +11,6 @@
 </div>
 
 <div class="user" *ngIf="user && user.name">
-	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=retro" alt="{{ user.name }}" height="40" weight="40" />
+	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=40" alt="{{ user.name }}" />
 	<a href="/users/{{ user._id }}">{{ user.name }}</a>
 </div>

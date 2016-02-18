@@ -1,5 +1,5 @@
 <div>
-	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=retro" alt="{{ user.name }}" width="40px" height="40px" />
+	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=40" alt="{{ user.name }}" />
 	<a href="/users/{{ user._id }}">{{ user.name }}</a>	
 </div>
 
@@ -7,7 +7,3 @@
 	<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }} | 
 	Order status: <b>{{configOrderStatus[order.status]}}</b></span>
 </div>
-
-<p class="order-message">
-	{{ order.message }}
-</p>

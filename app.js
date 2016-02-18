@@ -200,17 +200,31 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(session({
+
+/*** Session */
+var sessionParam = {
 	secret: '42secret!!!!!!!!!!!!!!!!!!!!!',
+	cookie: {
+		maxAge: 1000 * 60 * 60 * 24 * 30
+	},
 	store: new MongoStoreSession({
 		mongooseConnection: db,
 		touchAfter: 24 * 3600 // time period in seconds. To be updated only one time in a period of 24 hours	
 	}),
 	saveUninitialized: false,
 	resave: false
-}));
+}
 
-app.use(express.static(path.join(__dirname, 'public')));
+if (app.get('env') === 'production') {
+	// app.set('trust proxy', 1) // trust first proxy
+	// sessionParam.cookie.secure = true // serve secure cookies
+}
+
+app.use( session(sessionParam) );
+/* Session ***/
+
+
+app.use( express.static( path.join(__dirname, 'public') ) );
 // app.use(express.static(path.join(__dirname, 'node_modules')));
 // app.use(express.static(path.join(__dirname, 'scripts')));
 app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));

@@ -3,7 +3,7 @@ import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 import {HTTP_PROVIDERS} from 'angular2/http';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FORM_PROVIDERS} from 'angular2/common';
 
-import {TripsComponent} from './trips.component';
+import {TripsComponent}    from './trips.component';
 import {TripAddComponent}  from './trip-add.component';
 import {TripsMyComponent}  from './trips-my.component';
 import {RequestsComponent} from './requests.component';
@@ -27,7 +27,7 @@ import {MessageService} from '../services/message/message.service';
 	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent},
 	{path:'/trips/my', name: 'TripsMy', component: TripsMyComponent},
 	// {path:'/orders/:id', name: 'OrdersId', component: OrdersIdComponent},
-	//{path:'/requests/:id', name: 'RequestsId', component: RequestsComponent},
+	// {path:'/requests/:id', name: 'RequestsId', component: RequestsComponent},
 	{path:'/requests', name: 'Requests', component: RequestsComponent},
 	{path:'/messages/request/:id', name: 'Chat', component: ChatComponent}
 ])

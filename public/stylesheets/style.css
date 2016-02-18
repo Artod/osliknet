@@ -34,10 +34,20 @@ input.input-lg {
 
 .chat-list {
 	overflow-y: auto;
-	height: 500px;
+	max-height: 200px;
 }
-	.chat-list ul {
-		/* position:relative; */
+	
+	
+	.chat-list .table {
+		margin-bottom: 0px;
+	}
+	
+	.chat-list .table td {
+		border: 0px;
+	}
+	
+	/* .chat-list ul {
+		position:relative;
 		margin: 0px 0px 0px 0px;
 		padding: 0px 0px 0px 0px;
 		list-style: none;
@@ -47,19 +57,41 @@ input.input-lg {
 			margin: 0px 0px 0px 0px;
 			padding: 0px 0px 0px 0px;
 			list-style: none;clear: both;
+		} */
+
+		.chat-avatar {
+			 width:40px;
+			/*margin: 0px 10px 10px 0px; */
+			
 		}
+			.chat-message-user-name {
+				/*line-height:1;*/
+				
+			}
+			
 
-.chat-avatar {
-	width:40px;
-	margin: 0px 10px 10px 0px;
-}
-
-.chat-message {
-	position:absolute;
-	top: 0px;
-	left: 0px;
-	padding: 0px 0px 0px 50px;
-}
+		.chat-message-info {
+			display: inline-block;
+			vertical-align: top;
+			line-height: 1;
+			
+			/* line-height:1;
+			position:absolute;
+			top: 0px;
+			left: 0px;
+			padding: 0px 0px 0px 50px; */
+			
+		}
+		
+	.chat-message-my {
+		
+	}
+	
+		.chat-message-my .chat-avatar {
+			width:116px;
+			text-align:right;
+		}
+		
 
 .user {
 	/*height: 40px;
