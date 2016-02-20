@@ -44,7 +44,7 @@ var orderSchema = mongoose.Schema({
 
 orderSchema.pre('save', function(next) {
 	
-	console.log('savesavesavesavesavesave');
+	console.log('presavepresavepresavepresavesaprevesave');
 	var now = new Date();
 	
 	this.updated_at = now;

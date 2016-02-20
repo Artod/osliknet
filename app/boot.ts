@@ -17,6 +17,8 @@ bootstrap(AppComponent, [
 	provide(APP_BASE_HREF, {useValue: '/'}),
 	// HTTP_PROVIDERS,
 	Http,
+	// provide(window, {useValue: window}),
+	provide(window, {useValue: window}),
 	provide(LazyMapsAPILoaderConfig, {useFactory: () => {
 		return {
 			apiKey: 'AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ',
@@ -25,10 +27,7 @@ bootstrap(AppComponent, [
 		};
 	}}),
 	provide('config.user', {useFactory: () => {
-		return {
-			id: window.user.id,
-			name: window.user.name
-		};
+		return window.user;
 	}}),
 	provide('config.orderStatus', {useFactory: () => {
 		return {

@@ -5,22 +5,13 @@
 	<table class="table">
 		<tr>
 			<td class="col-xs-8">
-		<!-- 		<img src="http://gravatar.com/avatar/{{ order.user.gravatar_hash }}?d=retro" alt="{{ order.user.name }}" />
-				<a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>	
- -->
- 
+
 				<order-card [order]="order" [user]="order.user"></order-card>
 
 			</td>
 			<td class="col-xs-4">
 				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
-				<!-- {{ order.trip.from }}
-				<span class="glyphicon glyphicon-arrow-right"></span>
-				{{ order.trip.to }}
-				
-				<br />
-				
-				<small class="text-muted">{{ order.trip.when | toDate | date: 'longDate' }}</small> -->
+
 			</td>
 		</tr>
 		<tr>
@@ -32,37 +23,14 @@
 		</tr>
 	</table>
 	
-<!-- 	<p>
-		<small class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</small>
-		<br />
-		{{ order.message }}
-	</p> -->
 </div>
 
-<div class="chat-list" (window:resize)="expand()"> <!-- [scrollTop]="scrollHeight" [style.maxHeight]="height"  [style.maxHeight]="maxHeight"-->
-	<!-- <ul>
-		<li *ngFor="#message of messages; #idx = index;"> !-- (messagesChanged)="scrollDown(); expand()" --
-			<div class="chat-avatar">
-				<img src="http://gravatar.com/avatar/{{ message.user.gravatar_hash }}?d=retro" alt="{{ message.user.name }}" width="40px" height="40px" />
-			</div>
-			
-			<div class="chat-message">
-				<small>
-					<b>{{ message.user.name }}</b>
-					<br />
-					<small class="text-muted">{{ message.created_at | toDate | date: 'mm:HH d MMM y' }}</small>
-				</small>
 
-				<p>
-					{{ message.message }}
-				</p>
-			</div>
-			
-			<div class="clearfix"></div>
-		</li>
-	</ul> -->
+
+
+<div class="chat-list" (window:resize)="expand()"> <!-- [scrollTop]="scrollHeight" [style.maxHeight]="height"  [style.maxHeight]="maxHeight"postRender="scrollDown()"-->
 	
-	<table class="table {{ message.user._id === configUser.id ? 'chat-message-my' : '' }}" *ngFor="#message of messages; #idx = index;">
+	<table class="table {{ message.user._id === configUser.id ? 'chat-message-my' : '' }}" *ngFor="#message of messages; #idx = index;" >
 		<tr>
 			<td class="chat-avatar">
 				<img src="http://gravatar.com/avatar/{{ message.user.gravatar_hash }}?d=monsterid" alt="{{ message.user.name }}" width="40px" height="40px" />
@@ -82,6 +50,11 @@
 		</tr>
 	</table>
 </div>
+
+
+
+
+
 
 <div class="chat-textarea">
 	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">

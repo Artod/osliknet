@@ -5,72 +5,71 @@ var async = require('async');
 var Trip = require('../models/trip');
 var Message = require('../models/message');
 var Order = require('../models/order');
+var User = require('../models/user');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
-router.get('/last/:lastMid', function(req, res, next) {	
-	if (!req.xhr) {
-		res.render('index');
+router.get('/last/:orderId/:lastId', function(req, res, next) {	
 
-		return;
-	}
-	
 
-	console.log('req.params.lastMid = ', req.params.lastMid);
-	
-	Message.findById(req.params.lastMid).populate('order').exec(function(err, message) {			
+
+	//?????????????????????????? populate vs paralell
+	Order.findById(req.params.orderId)./*populate('trip').*/exec(function(err, order) {			
 		if (err) {
 			res.status(500)
 				.type('json')
 				.json({error: err});
-				
+			//{"error":{"message":"Cast to ObjectId failed for value \"33\" at path \"_id\"","name":"CastError","kind":"ObjectId","value":"33","path":"_id"}}
 			return
-		}
+		}		
 		
-		Trip.findById(message.order.trip).exec(function(err, trip) {
+		async.parallel({
+			trip: function(callback) {
+				Trip.findById(order.trip).exec(function(err, trip) {
+					callback(err, trip);
+				});			
+			},
+			messages: function(callback){
+				var conds = {
+					order: order._id
+				};
+				
+				if (req.params.lastId != 0) {
+					conds._id = { $gt: req.params.lastId }
+				}
+				
+				Message.find(conds).sort({
+					created_at: 1
+				}).populate({
+					path: 'user',
+					select: 'name gravatar_hash'
+				}).exec(function (err, messages) {	
+					callback(err, messages);
+				});
+			},                    
+		}, function(err, asyncRes) {
 			if (err) {
 				res.status(500)
 					.type('json')
 					.json({error: err});
 					
-				return;
-			}			
+				return
+			}
 			
-			if (message.order.user.toString() !== req.session.uid && trip.user.toString() !== req.session.uid) {
+			if (req.session.uid !== order.user.toString() && req.session.uid !== asyncRes.trip.user.toString()) {
 				res.status(401)
 					.type('json')
 					.json({error: 'Unauthorized'});
 					
 				return;
 			}
-			
-			Message.find({
-				_id: { $gt: ObjectId(req.params.lastMid) },
-				order: ObjectId(message.order._id)
-			}).sort({
-				created_at: 1
-			}).populate('user').exec(function (err, messages) {			
-				if (err) {
-					res.status(500)
-						.type('json')
-						.json({error: err});
-						
-					return
-				}
-				
-				res.type('json').json({messages: messages});
-			});
 
+			User.setMessagesReaded(req.session.uid, order.id);
+
+			res.type('json').json({messages: asyncRes.messages});			
 		});
-
-		// Message.populate(message, {path: 'order.trip'}, )
 		
 	});
-	
-	return;
-
-	
-
 });
 
 router.get('/order/:id', function(req, res, next) {	
@@ -79,32 +78,46 @@ router.get('/order/:id', function(req, res, next) {
 
 		return;
 	}
-	
+
 	async.parallel({
 		order: function(callback) {
-			Order.findById(req.params.id)
-				.populate('user trip')
-				.exec(function (err, order) {
-					Trip.populate(order.trip, {path: 'user'}, function(err, trip) {
-						if (err) {
-							callback(err, order);
-							
-							return;
-						}
-
+			Order.findById(req.params.id).populate({
+					path: 'trip',
+					populate: {
+						path: 'user',
+						model: 'User',
+						select: 'name gravatar_hash'
+					}
+				}).populate({
+					path: 'user',
+					select: 'name gravatar_hash'
+				}).exec(function (err, order) {
+					if (err) {
 						callback(err, order);
-					});
-					// callback(err, order);
+						
+						return;
+					}
+					
+					callback(err, order);
+					
+					/*Trip.populate(order.trip, {
+						path: 'user',
+						select: 'name gravatar_hash'
+					}).exec(function(err, trip) {
+						callback(err, order);
+					});*/
 				});		
 		},
 		messages: function(callback){
 			Message.find({order: req.params.id})
 				.sort({created_at: 1})
-				.populate('user')
-				.exec(function (err, messages) {
+				.populate({
+					path: 'user',
+					select: 'name gravatar_hash'
+				}).exec(function(err, messages) {
 					callback(err, messages);
 				});
-		},                    
+		},
 	}, function(err, asyncRes) {
 		if (err) {
 			res.status(500)
@@ -112,17 +125,30 @@ router.get('/order/:id', function(req, res, next) {
 				.json({error: err});
 				
 			return
-		}
+		} 
+		
+// console.log('asyncRes.order.trip = ', asyncRes.order.trip);
+console.log('asyncRes.order.trip.user = ', asyncRes.order.trip.user);
+
+		if ( req.session.uid !== asyncRes.order.user.id && req.session.uid !== asyncRes.order.trip.user.id ) {
+			res.status(401)
+				.type('json')
+				.json({error: 'Unauthorized'});
+				
+			return;
+		}	
+
+		User.setMessagesReaded(req.session.uid, asyncRes.order.id);
 		
 		res.type('json').json(asyncRes);		
 	});
 	
-	
+	/*
 	return;
 	
 	Message.find({order: req.params.id})
 		.sort({created_at: 1})
-		.populate('user')
+		.populate('user', 'name gravatar_hash')
 		.exec(function (err, messages) {
 
 			
@@ -194,7 +220,7 @@ router.get('/order/:id', function(req, res, next) {
 
 	
 	
-	
+	*/
 
 	/*Order.findOne({
 		_id: req.params.id
@@ -231,28 +257,49 @@ if (!req.session.uid) {
 	
 	req.body.user = req.session.uid;
 	
-	var message = new Message(req.body);	
 	
-	message.save(function(err, message) {
+	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 		if (err) {
-			res.status(err.name == 'ValidationError' ? 400 : 500)				
-			
-			res.type('json')
+			res.status(500)
+				.type('json')
 				.json({error: err});
 				
 			return;
 		}
 		
-		res.type('json')
-			.json({message: message});
+		if ( req.session.uid !== order.user.toString() && req.session.uid !== order.trip.user.toString() ) {
+			res.status(401)
+				.type('json')
+				.json({error: 'Unauthorized'});
+			
+			return;
+		}
+		
+		var message = new Message(req.body);		
+		
+		message.save(function(err, message) {
+			if (err) {
+				res.status(err.name == 'ValidationError' ? 400 : 500)				
+				
+				res.type('json')
+					.json({error: err});
+					
+				return;
+			}
+console.log('order.id = ', order.id)
+			User.setMessagesUnreaded(req.session.uid !== order.user.toString() ? order.user : order.trip.user, order.id);
+			
+			res.type('json')
+				.json({message: message});
+		});
 	});
+	
+	
+	
+
 });
 
-
-
 module.exports = router;
-
-
 
 /*
 {"error":{"name":"MongoError","message":"exception: bad query: BadValue unknown top level operator: $orders

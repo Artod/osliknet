@@ -8,10 +8,10 @@ var Order = require('../models/order');
 var User = require('../models/user');
 
 var ObjectId = require('mongoose').Types.ObjectId;
- 
 
-router.get('/', function(req, res, next) {	
-
+router.get('/', function(req, res, next) {
+console.dir(req.session);
+	
 	if (!req.xhr) {
 		res.render('index');
 
@@ -23,15 +23,107 @@ router.get('/', function(req, res, next) {
 
 		return;
 	}
+	
+	Trip.find({
+		user: ObjectId(req.session.uid)/*,
+		is_removed: false*/
+	}).select({ _id: 1}).exec(function(err, trips) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		var tids = trips.map(function(trip) {
+			return trip.id;
+		});
+		
+		Order.find({
+			$or: [{
+				trip: {$in: tids}
+			}, {
+				user: ObjectId(req.session.uid)
+			}]			
+		}).sort({
+			status: 1,
+			created_at: -1
+		}).populate('user trip').exec(function(err, orders) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			var tripUids = [];
+			
+			orders.forEach(function(order) {
+				var uid = order.trip.user.toString();
+				
+				if (tripUids.indexOf(uid) === -1) {
+					tripUids.push(uid);
+				}
+			});
+			
+			// console.log(tripUids.length);
+			// console.dir(tripUids);
+			
+			/*
+			var _tripUids = [];
+			var tripUids = orders.filter(function(order) {
+				_tripUids.push( order.trip.user.toString() );
+				return order.trip.user;
+				// return ObjectId(order.trip.user);
+				
+				blockedTile.indexOf("118") != -1
+			});*/
 
+			
+			User.find({
+				_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
+			}).select('name gravatar_hash').exec(function(err, users) {
+				if (err) {
+					res.status(500)
+						.type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				var usersIndex = {};
+				
+				users.forEach(function(user) {				
+					usersIndex[user.id] = user
+				});
 
+				orders.forEach(function(order) {
+					if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
+						order.trip.user = usersIndex[ order.trip.user.toString() ];
+					}
+				});
+				
+				User.setOrderReaded(req.session.uid);
+				
+				res.type('json').json({
+					orders: orders
+				});
+			});
+		});
+	});
+
+	
+	return;
+	
 
 	async.parallel({
 		orders: function(callback) {	
 			Trip.find({
 				user: ObjectId(req.session.uid),
 				is_removed: false
-			}).select({ _id: 1}).exec(function (err, trips) {
+			}).select({ _id: 1}).exec(function(err, trips) {
 				if (err) {
 					callback(err, trips);
 						
@@ -39,14 +131,14 @@ router.get('/', function(req, res, next) {
 				}
 				
 				var tids = trips.map(function(trip) {
-					return ObjectId(trip._id);
+					return trip._id;
 				});
 				
 				Order.find({
 					trip: {$in: tids}
 				}).sort({
 					created_at: -1
-				})/*.populate('user')*/.exec(function (err, orders) {
+				})/*.populate('user')*/.exec(function(err, orders) {
 					if (err) {
 						callback(err, trips);
 							
@@ -354,6 +446,10 @@ router.post('/add', function(req, res, next) {
 				
 			return;
 		}
+		
+		Trip.findById(req.body.trip).select('user').exec(function(error, trip) {
+			User.setOrderUnreaded(trip.user, order.id);
+		});
 		
 		res.type('json')
 			.json({order: order});

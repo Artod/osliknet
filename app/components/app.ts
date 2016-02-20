@@ -14,12 +14,13 @@ import {TripService}    from '../services/trip/trip.service';
 import {OrderService}   from '../services/order/order.service';
 import {ModalService}   from '../services/modal/modal.service';
 import {MessageService} from '../services/message/message.service';
+import {NotificationService} from '../services/notification/notification.service';
 
 @Component({
     selector: 'app',
 	templateUrl: '/app/tmpls/app.html',
 	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES],
-	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, TripService, OrderService, ModalService, MessageService]
+	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, TripService, OrderService, ModalService, MessageService, NotificationService]
 })
 
 @RouteConfig([
@@ -34,12 +35,14 @@ import {MessageService} from '../services/message/message.service';
 
 export class AppComponent {
 	constructor(
-		private _modalService: ModalService
+		// private _modalService: ModalService,
+		private _notificationService: NotificationService
 	) {
-		
+console.log('constructor AppComponent ')
 	}
+	/*
 	
 	public openModal() {
 		this._modalService.open();
-	}
+	}*/
 }

@@ -15,9 +15,28 @@ var Token = require('../models/token');
 
 
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+
+
+
+router.get('/notifications', function(req, res, next) {
+
+	User.findById(req.session.uid).select('newMessages newOrders').exec(function(err, user) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+console.log(user)
+		
+		res.type('json')
+			.json({
+				newMessages: user.newMessages,
+				newOrders: user.newOrders				
+			});
+	});
 });
 
 

@@ -16,11 +16,11 @@ export class MessageService {
 		}).map(res => <any[]> res.json()).catch(this.handleError);
 	}
 	 
-	public getLastMessages(lastId) {	
+	public getLastMessages(orderId, lastId) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 
-		return this.http.get('/messages/last/' + lastId, {
+		return this.http.get('/messages/last/' + orderId + '/' + lastId, {
 			headers: headers
 		}).map(res => <any[]> res.json().messages).catch(this.handleError);
 	}
