@@ -1,42 +1,43 @@
 var express = require('express');
 
-
 var router = express.Router();
 
 var passwordless = require('passwordless');
 var crypto = require('crypto');
 
-
-
-
 var User = require('../models/user');
 var Token = require('../models/token');
 
-
-
-
-
-
-
 router.get('/notifications', function(req, res, next) {
+	User.findById(req.session.uid)
+		.select('needEmailNotification newMessages newOrders updated_at')
+		.exec(function(err, user) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return
+			}
+			
+			if (user.needEmailNotification) {
+				user.needEmailNotification = false;
+				console.log('needEmailNotification false save');
+				user.save(function(err, user) {
+					//log errors
+					console.log('needEmailNotification false save done');
+				});
+			}
+			
+			res.type('json')
+				.json({
+					newMessages: user.newMessages,
+					newOrders: user.newOrders,
+					updated_at: user.updated_at
+				});
+		});
 
-	User.findById(req.session.uid).select('newMessages newOrders').exec(function(err, user) {
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-		
-console.log(user)
-		
-		res.type('json')
-			.json({
-				newMessages: user.newMessages,
-				newOrders: user.newOrders				
-			});
-	});
+	
 });
 
 

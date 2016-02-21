@@ -57,7 +57,7 @@
 
 
 <div class="chat-textarea">
-	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)"> <!--  -->
 		<input name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
 		
 		<div class="form-group">			

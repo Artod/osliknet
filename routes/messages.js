@@ -9,10 +9,7 @@ var User = require('../models/user');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
-router.get('/last/:orderId/:lastId', function(req, res, next) {	
-
-
-
+router.get('/last/:orderId/:lastId', function(req, res, next) {
 	//?????????????????????????? populate vs paralell
 	Order.findById(req.params.orderId)./*populate('trip').*/exec(function(err, order) {			
 		if (err) {
@@ -20,7 +17,7 @@ router.get('/last/:orderId/:lastId', function(req, res, next) {
 				.type('json')
 				.json({error: err});
 			//{"error":{"message":"Cast to ObjectId failed for value \"33\" at path \"_id\"","name":"CastError","kind":"ObjectId","value":"33","path":"_id"}}
-			return
+			return;
 		}		
 		
 		async.parallel({

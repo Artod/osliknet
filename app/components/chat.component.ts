@@ -1,18 +1,20 @@
 import {Component, Input, Directive, 
 	AfterViewChecked,
+	OnDestroy,
 	/*DoCheck, 
 	OnInit, 
 	OnChanges, 
-	OnDestroy, 
 	AfterContentInit, 
 	AfterContentChecked, 
 	AfterViewInit, 
-	SimpleChange, */Inject, Query, QueryList, ElementRef} from 'angular2/core';
+	SimpleChange, */
+	Inject, Query, QueryList, ElementRef} from 'angular2/core';
 	
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 
 import {MessageService} from '../services/message/message.service';
+import {NotificationService} from '../services/notification/notification.service';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
@@ -60,34 +62,38 @@ console.log('setpostRender')
 })
 
 export class ChatComponent implements
-	AfterViewChecked/*,
-	AfterViewInit
+	AfterViewChecked,
+	OnDestroy
+	/*,AfterViewInit
 	DoCheck, 
 	OnInit,
-	OnChanges,
-	OnDestroy, 
+	OnChanges,	 
 	AfterContentInit, 
-	AfterContentChecked,		
-	*/
+	AfterContentChecked,*/
 {
-	public orderId: string;
+	public orderId : string;
 	
-	public messages: any[] = [];
-	public order: any = {};//trip: {}, user: {}
-	public lastId: string = '0';
+	public messages : any[] = [];
+	public order : any = {};//trip: {}, user: {}
+	public lastId : string = '0';
 	
-	public formModel: any = {};
-	public form: ControlGroup;
+	public formModel : any = {};
+	public form : ControlGroup;
 	
-	private _prevChatHeight: number = 0;
-	public FORM_HEIGHT: number = 135;
+	private _prevChatHeight : number = 0;
+	public FORM_HEIGHT : number = 135;
+	
+	public elChatList;
+	
+	private _notifSub;
 	
 	constructor (
-		private _messageService: MessageService,
-		private _fb: FormBuilder,
-		private _el: ElementRef,
+		private _messageService : MessageService,
+		private _notificationService : NotificationService,
+		private _fb : FormBuilder,
+		private _el : ElementRef,
 		// private zone: NgZone,
-		private _routeParams: RouteParams,
+		private _routeParams : RouteParams,
 		@Inject('config.orderStatus') public configOrderStatus,
 		@Inject('config.user') public configUser
 	) {
@@ -103,7 +109,24 @@ export class ChatComponent implements
 		
 		this.elChatList = this._el.nativeElement.querySelector('.chat-list');
 		
-		// this.onResize();
+		this._notifSub = this._notificationService.start(3000).subscribe(data => {
+			if (data.newMessages[this.orderId]) {
+				//console.log('getLastMessages = ', data.newMessages[orderId]);
+				this.getLastMessages();
+			}
+		});
+	}
+	
+	public ngAfterViewChecked() : void {
+		if ( this._canScrollDown() ) {
+			this.scrollDown();
+			this.expand()
+		}		
+	}
+	
+	public ngOnDestroy() : void {
+		this._notificationService.changeTimeout();
+		this._notifSub.unsubscribe();
 	}
 	
 	private _canScrollDown(): boolean {
@@ -130,22 +153,11 @@ console.log('expand');
 	public onResize(): void {
 		this.expand();
 	}
-/*
-	public ngAfterViewInit(): void {
-		this.scrollDown();
-	}
-	*/
-	
-	public ngAfterViewChecked(): void {
-		if ( this._canScrollDown() ) {
-			this.scrollDown();
-			this.expand()
-		}		
-	}
 	
 
 	
-	public getMessages(): void {
+	
+	public getMessages() : void {
 		this.formModel.order = this.orderId;
 		
 		this._messageService.getByOrderId(this.orderId)
@@ -165,7 +177,7 @@ console.log('expand');
 			});
 	}
 	 
-	public getLastMessages(): void {
+	public getLastMessages() : void {
 		this._messageService.getLastMessages(this.orderId, this.lastId)
 			.subscribe(messages => {		
 				// this.messages = messages;
@@ -186,7 +198,8 @@ console.log('expand');
 			});
 	}	
 	
-	public onSubmit(value:Object): void {
+	public onSubmit(value) : void {
+// console.log('onSubmitonSubmitonSubmitonSubmitonSubmitonSubmit', this.form.valid)
 		if (this.form.valid) {
 			this._messageService.add(this.formModel)			
 				.subscribe(message => {

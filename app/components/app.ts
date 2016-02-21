@@ -8,7 +8,7 @@ import {TripAddComponent}  from './trip-add.component';
 import {TripsMyComponent}  from './trips-my.component';
 import {RequestsComponent} from './requests.component';
 import {ChatComponent}     from './chat.component';
-// import {OrdersIdComponent} from './orders-id.component';
+import {NotificationsComponent} from './notifications.component';
 
 import {TripService}    from '../services/trip/trip.service';
 import {OrderService}   from '../services/order/order.service';
@@ -19,7 +19,7 @@ import {NotificationService} from '../services/notification/notification.service
 @Component({
     selector: 'app',
 	templateUrl: '/app/tmpls/app.html',
-	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES],
+	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES, NotificationsComponent],
 	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, TripService, OrderService, ModalService, MessageService, NotificationService]
 })
 
@@ -38,7 +38,7 @@ export class AppComponent {
 		// private _modalService: ModalService,
 		private _notificationService: NotificationService
 	) {
-console.log('constructor AppComponent ')
+
 	}
 	/*
 	

@@ -18,7 +18,7 @@ export class OrdersIdComponent {
 	
 	public messages: any[];
 	
-	private orderId: number;
+	private orderId: string;
 
 	constructor(
 		private tripService: TripService,

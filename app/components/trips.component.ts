@@ -27,9 +27,9 @@ export class TripsComponent {
 	
 	// public trips: any[];
 	
-	public searchModel = {
-		//from: "Montreal, QC, Canada",
-		//from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"		
+	public searchModel: any = {
+		from: "Montreal, QC, Canada",
+		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"		
 	};
 	
 	public searchForm: ControlGroup;

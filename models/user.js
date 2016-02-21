@@ -44,7 +44,7 @@ var schema = mongoose.Schema({
 		type: {},
 		default: {}
 	},
-	needNotification: {
+	needEmailNotification: {
 		type: Boolean,		
 		default: false
 	},
@@ -66,11 +66,9 @@ schema.pre('save', function(next) {
 });
 
 schema.statics.setOrderUnreaded = function(uid, oid, cb) {
-	oid = oid.toString();
-	
-	this.findById(uid).select('newOrders needNotification').exec(function(err, user) {
+	this.findById(uid).select('newOrders needEmailNotification').exec(function(err, user) {
 		user.newOrders.push(oid);
-		user.needNotification = true;
+		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
 			//log errors
@@ -80,29 +78,29 @@ schema.statics.setOrderUnreaded = function(uid, oid, cb) {
 };
 
 schema.statics.setOrderReaded = function(uid, oid, cb) {
-	this.findById(uid).select('newOrders needNotification').exec(function(err, user) {
+	this.findById(uid).select('newOrders needEmailNotification').exec(function(err, user) {
 		if (err) {
 			cb && cb(err, user);
 			return;
 		}
 		
-		if (!user.newOrders.length && !user.needNotification) {
+		var indexOf = user.newOrders.indexOf(oid); // if length == 0 or undefined oid then -1 
+		
+		if (indexOf === -1 && !user.needEmailNotification) {
 			cb && cb(err, user);
 			
 			return;
-		}
-		
-		if (oid) {
-			oid = oid.toString();
-			
-			user.newOrders = user.newOrders.filter(function(newOrder) {
-				return newOrder !== oid;
-			});
-		} else {
-			user.newOrders = [];
 		}		
 		
-		user.needNotification = false;
+		if (oid) {
+			if (indexOf > -1) {
+				user.newOrders.splice(indexOf, 1);
+			}
+		} else {
+			user.newOrders = [];
+		}
+		
+		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
 			//log errors
@@ -112,14 +110,12 @@ schema.statics.setOrderReaded = function(uid, oid, cb) {
 };
 
 schema.statics.setMessagesUnreaded = function(uid, oid, cb) {
-	this.findById(uid).select('newMessages needNotification').exec(function(err, user) {
-		oid = oid.toString();
-		
+	this.findById(uid).select('newMessages needEmailNotification').exec(function(err, user) {	
 		user.newMessages[oid] = user.newMessages[oid] || 0;
 		user.newMessages[oid]++;		
 		user.markModified('newMessages');
 
-		user.needNotification = true;
+		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
 			//log errors
@@ -129,18 +125,26 @@ schema.statics.setMessagesUnreaded = function(uid, oid, cb) {
 };
 
 schema.statics.setMessagesReaded = function(uid, oid, cb) {
-	this.findById(uid).select('newMessages needNotification').exec(function(err, user) {
+	this.findById(uid).select('newMessages newOrders needEmailNotification').exec(function(err, user) {
 		if (err) {
 			cb && cb(err, user);
 			return;
 		}
-		
-		oid = oid.toString();
-		
-		if (!user.newMessages[oid] && !user.needNotification) {
+
+		var indexOf = user.newOrders.indexOf(oid); // if length == 0 or undefined oid then -1 
+
+		if (!user.newMessages[oid] && indexOf === -1 && !user.needEmailNotification) {
 			cb && cb(err, user);
 			
 			return;
+		}		
+	
+		if (oid) {
+			if (indexOf > -1) {
+				user.newOrders.splice(indexOf, 1);
+			}
+		} else {
+			user.newOrders = [];
 		}
 		
 		if (oid) {
@@ -151,7 +155,7 @@ schema.statics.setMessagesReaded = function(uid, oid, cb) {
 
 		user.markModified('newMessages');
 		
-		user.needNotification = false;
+		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
 			//log errors
@@ -164,17 +168,17 @@ var User = mongoose.model('User', schema);
 
 setInterval(function() {
 	User.find({
-		needNotification: true,
+		needEmailNotification: true,
 		updated_at: { $lt: ( new Date() ).getTime() - 1000*/*60**/5 }
 	}).select({
 		name: 1,
 		email: 1,
 		newMessages: 1,
 		newOrders: 1,
-		needNotification: 1
+		needEmailNotification: 1
 	}).exec(function(err, users) {
 		users.forEach(function(user) {
-			user.needNotification = false;
+			user.needEmailNotification = false;
 			user.save(function(err, user) {
 				//log errors
 			});
@@ -214,7 +218,7 @@ setInterval(function() {
 		});			
 		
 	});
-}, 5000);
+}, 1000*60*5);
 
 module.exports = User;
 
