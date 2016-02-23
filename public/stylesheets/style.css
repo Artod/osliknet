@@ -112,13 +112,6 @@ trip-card .user {
 	padding:8px 0px 0px 0px;
 }
 
-.order-message {
-	
-}
-
-.trips-my-requests {
-	/*margin-left: 20px;*/
-}
 
 
 @media (min-width: 1200px) {
@@ -131,9 +124,7 @@ trip-card .user {
 	/*color: #f0ad4e;*/
 }
 
-.navbar-nav > li.notifications {
 
-}
 
 .navbar-nav > li.notifications > a {
 	animation: pulseNotif 1s infinite;
@@ -145,20 +136,63 @@ trip-card .user {
  
 }
 
-	.notifications-list {
-		position:absolute;
-	}
 
 @keyframes pulseNotif {
-
   50% {
     color: #f0ad4e;
 	/*font-size:21px;*/
   }
 }
 
+.popover-my {
+	background-color: rgba(255,255,255,0.85);
+	border-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 0 5px rgba(0,0,0,0.4);
+
+	display: block;
+
+	left: 0px;
+	padding: 7px 10px;
+	position: absolute;
+	top: 45px;
+	width: 220px;
+}
 
 
+	/*.popover-my:before {
+		border-bottom: 7px solid rgba(0,0,0,0.85);
+		border-right: 7px solid transparent;
+		border-left: 7px solid transparent;
+		top: -7px;
+		content: '';
+		display: block;
+		left: 50%;
+		margin-left: -7px;
+		position: absolute;
+	}*/
+	
+	.popover-my ul, .popover-my li {
+		margin: 0px 0px 0px 0px;
+		padding: 0px 0px 0px 0px;
+		list-style: outside none none;
+	}
+	
+	.popover-my li {
+		
+	}
+	
+		.popover-my li a {
+			line-height: 20px;
+
+			display: block;
+			padding: 10px 15px;
+			position: relative;
+		}
+
+.btn-default .badge {
+	background-color: #f0ad4e;
+}
 
 
 /*

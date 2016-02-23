@@ -20,24 +20,28 @@ router.get('/notifications', function(req, res, next) {
 				return
 			}
 			
+			var out = {
+				newMessages: user.newMessages,
+				newOrders: user.newOrders,
+				updated_at: user.updated_at
+			};
+			
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
-				console.log('needEmailNotification false save');
+console.log('needEmailNotification false save');
 				user.save(function(err, user) {
 					//log errors
 					console.log('needEmailNotification false save done');
+					
+					out.updated_at = user.updated_at;					
+					res.type('json')
+						.json(out);
 				});
+			} else {
+				res.type('json')
+					.json(out);
 			}
-			
-			res.type('json')
-				.json({
-					newMessages: user.newMessages,
-					newOrders: user.newOrders,
-					updated_at: user.updated_at
-				});
 		});
-
-	
 });
 
 

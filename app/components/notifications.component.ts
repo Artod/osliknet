@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component, ApplicationRef} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
@@ -18,15 +18,17 @@ export class NotificationsComponent {
 	public isOpened : boolean = false;
 	
 	constructor(
-		private _notificationService : NotificationService
+		private _notificationService : NotificationService,
+		private _appRef: ApplicationRef
 	) {
-
 		this._notificationService.start().subscribe(data => {
 console.log('NotificationsComponent subscribe')
 			this.newOrders = data.newOrders;
 			this.newMessages = data.newMessages;
 			this.newMessagesKeys = this.getNewMessagesKeys();
 console.log('this.newOrders');console.dir(this.newOrders);console.log('this.newMessages');console.dir(this.newMessages);
+			
+			this._appRef.tick();
 		});
 	}
 	

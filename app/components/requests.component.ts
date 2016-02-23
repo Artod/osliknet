@@ -1,4 +1,4 @@
-import {Component, Inject} from 'angular2/core';
+import {Component, Inject, ApplicationRef, OnDestroy} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 
 // import {ChatComponent} from './chat.component';
@@ -6,6 +6,7 @@ import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
 
 import {OrderService} from '../services/order/order.service';
+import {NotificationService} from '../services/notification/notification.service';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 // import {ModalService} from '../services/modal/modal.service';
@@ -18,41 +19,40 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 	pipes: [ToDatePipe]
 })
 
-export class RequestsComponent {
-	public orders: any[];
-	// public orderId: string;
+export class RequestsComponent implements OnDestroy {
+	public orders : any[];
+	public newMessages : any = {};
+	private _notifSub;
 
 	constructor(
-		private orderService: OrderService,
-		private routeParams: RouteParams,
+		private _orderService : OrderService,
+		private _routeParams : RouteParams,
+		private _notificationService : NotificationService,
+		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus
-	) {	
-		//this.orderId = this.routeParams.get('id');
-		
-		this.orderService.get()
-			.subscribe(orders => {
-				this.orders = orders;
+	) {
+		this._orderService.get().subscribe(orders => {
 
-				/*if (!this.orderId && this.orders.length) {
-					this.orderId = this.orders[0]._id;
-				}*/
-			}, error => {
-				console.dir(error);
-			}, () => {
-				console.log('done');
-			});
+			this.orders = orders;
+		}, error => {
+			console.dir(error);
+		}, () => {
+			console.log('done');
+		});
+		
+		this.newMessages = this._notificationService.data.newMessages;
+		
+		this._notifSub = this._notificationService.start().subscribe(data => {
+console.log('RequestsComponent _notifSub subscribeRequestsComponent _notifSub subscribeRequestsComponent _notifSub subscribe');
+			this.newMessages = data.newMessages;
+			this._appRef.tick();
+		});
 	}
 	
-	/*private onClick(orderId) {
-		this.orderId = orderId;
-		//console.log('new this.orderId = ', this.orderId);
-	}*/
+	public ngOnDestroy() : void {
+		this._notifSub.unsubscribe();
+	}
 }
-
-/*.subscribe(
-                       heroes => this.heroes = heroes,
-                       error =>  this.errorMessage = <any>error);
-  }*/
 
 
 

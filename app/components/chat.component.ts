@@ -1,4 +1,4 @@
-import {Component, Input, Directive, 
+import {Component, Input, Directive, ApplicationRef, 
 	AfterViewChecked,
 	OnDestroy,
 	/*DoCheck, 
@@ -94,6 +94,7 @@ export class ChatComponent implements
 		private _el : ElementRef,
 		// private zone: NgZone,
 		private _routeParams : RouteParams,
+		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus,
 		@Inject('config.user') public configUser
 	) {
@@ -154,66 +155,54 @@ console.log('expand');
 		this.expand();
 	}
 	
-
-	
-	
 	public getMessages() : void {
 		this.formModel.order = this.orderId;
 		
-		this._messageService.getByOrderId(this.orderId)
-			.subscribe(res => {			
-				this.messages = res.messages;
-				this.order = res.order;
-				if (res.messages.length) {
-					this.lastId = res.messages[res.messages.length - 1]._id;				
-				} else {
-					this.lastId = '0';
-				}
-// this._canScrollDown = true;
-			}, error => {
-				console.log(error);
-			}, () => {
-				console.log('done');				
-			});
+		this._messageService.getByOrderId(this.orderId).subscribe(res => {			
+			this.messages = res.messages;
+			this.order = res.order;
+			if (res.messages.length) {
+				this.lastId = res.messages[res.messages.length - 1]._id;				
+			} else {
+				this.lastId = '0';
+			}
+		}, error => {
+			console.log(error);
+		}, () => {
+			console.log('done');				
+		});
 	}
 	 
 	public getLastMessages() : void {
-		this._messageService.getLastMessages(this.orderId, this.lastId)
-			.subscribe(messages => {		
-				// this.messages = messages;
-				
-				if (messages.length) {
-					this.lastId = messages[messages.length - 1]._id;				
-				} else {
-					this.lastId = '0';
-				}
-				
-				messages.forEach(message => this.messages.push(message) );				
-
-// this._canScrollDown = true;
-			}, error => {
-				console.dir(error);
-			}, () => {
-				console.log('done')
-			});
+		this._messageService.getLastMessages(this.orderId, this.lastId).subscribe(messages => {	
+			if (messages.length) {
+				this.lastId = messages[messages.length - 1]._id;				
+			} else {
+				this.lastId = '0';
+			}
+			
+			messages.forEach( message => this.messages.push(message) );
+			
+			this._appRef.tick();
+		}, error => {
+			console.dir(error);
+		}, () => {
+			console.log('done')
+		});
 	}	
 	
 	public onSubmit(value) : void {
 // console.log('onSubmitonSubmitonSubmitonSubmitonSubmitonSubmit', this.form.valid)
 		if (this.form.valid) {
-			this._messageService.add(this.formModel)			
-				.subscribe(message => {
-					
-					this.getLastMessages();
-				}, err => {
-					console.dir(err);
-				}, () => {
-					console.log('done')
-				});
+			this._messageService.add(this.formModel).subscribe(message => {				
+				this.getLastMessages();
+			}, err => {
+				console.dir(err);
+			}, () => {
+				console.log('done')
+			});
 		}
 	}
-	
-
 }
 
 

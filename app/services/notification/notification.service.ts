@@ -6,67 +6,53 @@ import {Subject} from 'rxjs/Subject';
 @Injectable()
 
 export class NotificationService {
-	private _headers: Headers;
-	
-	public notif:any = {
+	private _headers: Headers;	
+	public data : any = {
 		newMessages:{},
 		newOrders:[]
 	}
-
-	public updated: number;
-	
-	public subject: Subject;
-	
-	private _pollSub: Observable;
-	
-	private _timeout: number = 5000;
+	public updated: number;	
+	public subject: Subject;	
+	private _pollSub: Observable;	
+	private _defaultTimeout: number = 5000;
+	public currentTimeout: number;
 	 
 	constructor(
 		private _http:Http,
 		@Inject('config.user') public configUser
-	) {
-		/*var that = this;
-			
-		setInterval(function() {
-			that.getNotification();
-		}, 2000);*/
-		
+	) {	
 		this._headers = new Headers();
 		this._headers.append('X-Requested-With', 'XMLHttpRequest');
 		
 		this.subject = new Subject();
 	}
 	
-	/*
-	public subscribe(cb:Function) {
-		this.subject.subscribe(res => {
-			var notifTimestamp = ( new Date(res.updated_at) ).getTime();
-			if (notifTimestamp != this.updated ) {
-				this.notif = res;
-			}			
-		});
-	}*/
-	
 	public changeTimeout(timeout? : number) {
-		this.stop();
-		this.start(timeout || this._timeout);
+		this.start(timeout);
 	}
 
-	public start(timeout? : number) {
-		this.stop();
+	public start(timeout? : number) {		
+		timeout = timeout || this._defaultTimeout;
 		
-		this._pollSub = Observable.timer(0, timeout || this._timeout).switchMap(() => {
+		if (timeout === this.currentTimeout && this._pollSub && !this._pollSub.isUnsubscribed) {
+			return this.subject;
+		}
+		
+		this.currentTimeout = timeout;
+		
+		this.stop();		
+		this._pollSub = Observable.timer(0, this.currentTimeout).switchMap( () => {
 			return this._http.get('/users/notifications', {
 				headers: this._headers
 			});
-		}).map( res => res.json() ).catch(this._handleError).subscribe(res => {
+		} ).map( res => res.json() ).catch(this._handleError).subscribe(res => {
 			var notifTimestamp = ( new Date(res.updated_at) ).getTime();
-
 			if (notifTimestamp !== this.updated ) {
+console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
 				this.updated = notifTimestamp;
-				this.notif = res;
+				this.data = res;
 				
-				this.subject.next(this.notif);
+				this.subject.next(this.data);
 			}			
 		});
 		
@@ -74,25 +60,10 @@ export class NotificationService {
 	}
 	
 	public stop() {
-		if (this._pollSub) {
+		if (this._pollSub && !this._pollSub.isUnsubscribed) {
 			this._pollSub.unsubscribe();
 		}
 	}
-	
-	/*public getNotification() {	
-		let headers = new Headers();
-		headers.append('X-Requested-With', 'XMLHttpRequest');
-	
-		this.http.get('/users/notifications', {
-			headers: headers
-		}).map( res => res.json() ).catch(this._handleError).subscribe(res => {		
-			this.notif = res;
-		}, error => {
-			console.log(error);
-		}, () => {
-			console.log('done');				
-		});
-	}*/
 	
 	private _handleError(error: Response) {
 console.error('Observable error notif');
