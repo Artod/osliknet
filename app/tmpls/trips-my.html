@@ -28,15 +28,15 @@
 			<table class="table trips-my-requests">
 				<tr *ngFor="#order of ordersByTrip[trip._id]; #orderIdx = index">
 					<td>
-						<div>
+						<!-- <div>
 							<img src="http://gravatar.com/avatar/{{ order.user.gravatar_hash }}?d=retro" alt="{{ order.user.name }}" width="40px" height="40px" />
 							<a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>	
-						</div>
-						
-						<div class="order-info">
+						</div> 						<div class="order-info">
 							<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }} | 
 							Order status: <b>{{configOrderStatus[order.status]}}</b></span>
-						</div>
+						</div>-->
+						
+						<order-card [order]="order" [user]="order.user"></order-card>
 						
 						<p class="order-message">
 							{{ order.message }}

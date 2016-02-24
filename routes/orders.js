@@ -10,8 +10,6 @@ var User = require('../models/user');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 router.get('/', function(req, res, next) {
-console.dir(req.session);
-	
 	if (!req.xhr) {
 		res.render('index');
 
@@ -80,7 +78,6 @@ console.dir(req.session);
 				
 				blockedTile.indexOf("118") != -1
 			});*/
-
 			
 			User.find({
 				_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
@@ -433,7 +430,7 @@ router.post('/add', function(req, res, next) {
 	var order = new Order({
 		user: req.session.uid,
 		trip: req.body.trip,
-		status: 0,
+		status: 5,
 		message: req.body.message
 	});
 
@@ -502,6 +499,120 @@ router.post('/add', function(req, res, next) {
 	  */
 });
 
+router.post('/status', function(req, res, next) {
+	var newStatus = Number(req.body.status);
+	
+	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return;
+		}
+
+		if (!order) {
+			res.status(400)
+				.type('json')
+				.json({error: 'Order not found'});
+				
+			return;
+		}
+		
+		if (order.status === newStatus) {
+			res.type('json')
+				.json({order: order});
+				
+			return;
+		}
+		
+		var orderUser = order.user.toString(),
+			tripUser = order.trip.user.toString();
+
+		if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
+
+			return;
+		}
+		
+		var checkAndSave = function(canAfterCurrent) {
+			if (
+				order.status !== canAfterCurrent || 
+				( newStatus === sts.FINISHED && order.trip.when >= ( new Date() ) ) // tring to finish before trip
+			) {
+				res.status(401).type('json').json({error: 'Unauthorized'});
+
+				return;
+			}
+
+			var oldStatus = order.status;
+			order.status = newStatus;
+			order.save(function(err, order) {
+				if (err) {
+					res.status(500).type('json')
+						.json({error: err});
+						
+					return;
+				}
+
+				var message = new Message({
+					order: order.id,
+					user: req.session.uid,
+					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+				});		
+				
+				message.save(function(err, message) {
+					if (err) {
+						// log error							
+						return;
+					}
+
+					User.setMessagesUnreaded(req.session.uid !== orderUser ? orderUser : tripUser, order.id);
+				});				
+				
+				res.type('json')
+					.json({order: order});
+			});
+		};
+		
+		var sts = Order.sts;
+		
+		if (req.session.uid === orderUser) {
+			switch(newStatus) {
+				case sts.NEGOTIATION:
+					checkAndSave(sts.CANCELLED);
+					
+					return;
+				case sts.CANCELLED:
+					checkAndSave(sts.NEGOTIATION);
+				
+					return;
+			}			
+		} else if (req.session.uid === tripUser) {
+			switch(newStatus) {
+				case sts.NEGOTIATION:
+					checkAndSave(sts.REFUSED);
+					
+					return;
+				case sts.PROCESSING:
+					checkAndSave(sts.NEGOTIATION);
+					
+					return;
+				case sts.REFUSED:
+					checkAndSave(sts.NEGOTIATION);
+					
+					return;
+				case sts.FINISHED:
+					checkAndSave(sts.PROCESSING);
+				
+					return;
+			}
+		}
+		
+		res.status(401).json({error: 'Unauthorized'});
+
+	});
+});
 
 router.post('/messages/add', function(req, res, next) {	
 	var messages =  req.body.messages || {};

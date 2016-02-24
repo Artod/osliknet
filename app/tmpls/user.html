@@ -1,0 +1,24 @@
+<h2>Profile {{ user.name }}</h2>
+
+<div class="row" *ngIf="user && user.name">
+	<div class="col-sm-3 col-xs-12">
+		<p>
+			<span class="text-muted small1">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
+		</p>
+		<p>
+			<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=200" alt="{{ user.name }}" width="100%" />
+		</p>
+		<p *ngIf="configUser.id === user._id">
+			<a href="https://gravatar.com" target="blank">Change Gravatar</a>
+		</p>
+	</div>
+	<div class="col-sm-9 col-xs-12">		
+		<p>
+			{{ user.about }}
+		</p>
+		<button class="btn btn-warning" *ngIf="configUser.id === user._id">Edit</button>
+	</div>
+	<div class="col-xs-12">		
+		<h3>Reviews</h3>
+	</div>
+</div>

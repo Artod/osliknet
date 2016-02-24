@@ -15,6 +15,7 @@ import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 
 import {MessageService} from '../services/message/message.service';
 import {NotificationService} from '../services/notification/notification.service';
+import {OrderService} from '../services/order/order.service';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
@@ -22,36 +23,6 @@ import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
 
 declare var window: any;
-
-
-
-
-
-
-
-
-/*
-@Directive({
-  selector: '[postRender]'
-})
-
-export class PostRenderDirective {
-	constructor() {
-		
-		console.log('constructor')
-	}
-	
-	@Input() set postRender(cb) {
-		//cb();
-console.log('setpostRender')
-	}
-}
-*/
-
-
-
-
-
 
 
 @Component({
@@ -64,12 +35,6 @@ console.log('setpostRender')
 export class ChatComponent implements
 	AfterViewChecked,
 	OnDestroy
-	/*,AfterViewInit
-	DoCheck, 
-	OnInit,
-	OnChanges,	 
-	AfterContentInit, 
-	AfterContentChecked,*/
 {
 	public orderId : string;
 	
@@ -86,16 +51,18 @@ export class ChatComponent implements
 	public elChatList;
 	
 	private _notifSub;
+
 	
 	constructor (
 		private _messageService : MessageService,
 		private _notificationService : NotificationService,
+		private _orderService : OrderService,
 		private _fb : FormBuilder,
 		private _el : ElementRef,
-		// private zone: NgZone,
 		private _routeParams : RouteParams,
-		private _appRef: ApplicationRef,
+		private _appRef : ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus,
+		@Inject('config.orderStatusConst') public sts,
 		@Inject('config.user') public configUser
 	) {
 		// console.log(this.FORM_HEIGHT);
@@ -143,7 +110,6 @@ export class ChatComponent implements
 	}
 	
 	public expand(): void {
-console.log('expand');
 		let windowHeight = window.innerHeight || window.document.documentElement.clientHeight || window.document.body.clientHeight;
 		let listTop = this.elChatList.getBoundingClientRect().top;		
 		let height = windowHeight - listTop - this.FORM_HEIGHT;
@@ -174,14 +140,16 @@ console.log('expand');
 	}
 	 
 	public getLastMessages() : void {
-		this._messageService.getLastMessages(this.orderId, this.lastId).subscribe(messages => {	
-			if (messages.length) {
-				this.lastId = messages[messages.length - 1]._id;				
+		this._messageService.getLastMessages(this.orderId, this.lastId).subscribe(data => {	
+			if (data.messages.length) {
+				this.lastId = data.messages[data.messages.length - 1]._id;				
 			} else {
 				this.lastId = '0';
 			}
 			
-			messages.forEach( message => this.messages.push(message) );
+			data.messages.forEach( message => this.messages.push(message) );
+			
+			this.order.status = data.order.status;
 			
 			this._appRef.tick();
 		}, error => {
@@ -203,17 +171,34 @@ console.log('expand');
 			});
 		}
 	}
+	
+	public isTripPassed() : boolean {
+		return ( new Date(this.order.trip.when) ) < ( new Date() )
+	}
+	
+	private _changeStatusBusy : boolean = false;
+	
+	public changeStatus(status) : void {
+		if (this._changeStatusBusy) {
+			return;
+		}
+		
+		this._changeStatusBusy = true;
+		
+		this._orderService.changeStatus(status, this.orderId).subscribe(data => {				
+			this.order.status = data.order.status;
+			this.getLastMessages();
+			this._changeStatusBusy = false;
+		}, err => {
+			console.dir(err);
+			this._changeStatusBusy = false;
+		});
+	}
+	
+	public sendReview() : void {
+		
+	}	
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

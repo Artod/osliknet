@@ -31,8 +31,7 @@ export class TripService {
 	
 		return this.http.get('/trips/my', {			
 			headers: headers
-		}).map(res => <any[]> res.json())
-			.catch(this.handleError);;
+		}).map( res => <any[]> res.json() );
 	}
 	
 	public getOrder(id) {	
@@ -41,7 +40,7 @@ export class TripService {
 	
 		return this.http.get('/orders/' + id, {
 			headers: headers
-		}).map(res => <any[]> res.json()).catch(this.handleError);;
+		}).map( res => <any[]> res.json() );
 	}
 	
 	public addTrips(data) {

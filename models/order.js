@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 	
-var orderSchema = mongoose.Schema({
+var schema = mongoose.Schema({
 	trip: {
 		type: Schema.Types.ObjectId,
 		required: true,
@@ -19,13 +19,13 @@ var orderSchema = mongoose.Schema({
 	},
 	status: {
 		type: Number,
-		default: 0 // 0 - pending waiting for traveler, 1 - wating for customer, 2.5 - processing, 2 - canceled, 3 - refused
+		default: 5
 	},
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
 
-orderSchema.pre('save', function(next) {
+schema.pre('save', function(next) {
 	var now = new Date();
 	
 	this.updated_at = now;
@@ -37,7 +37,23 @@ orderSchema.pre('save', function(next) {
 	next();
 });
 
-var Order = mongoose.model('Order', orderSchema);
+schema.statics.sts = {
+	NEGOTIATION: 5,
+	PROCESSING: 10,			
+	REFUSED: 15,
+	CANCELLED: 20,			
+	FINISHED: 25
+};
+
+var Order = mongoose.model('Order', schema);
+
+/* Order.find(function(err, orders){
+	orders.forEach(function(order){
+		order.status = 5;
+		order.save();
+	});
+}) */
+
 
 module.exports = Order;
 

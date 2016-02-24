@@ -23,30 +23,20 @@ export class TripsMyComponent implements OnDestroy {
 	private _notifSub;
 	
 	constructor(
-		private tripService: TripService,
+		private _tripService: TripService,
 		private _notificationService : NotificationService,
 		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus
 	) {
-		this.tripService.getMy().subscribe(res => {
-			/*this.trips = res.trips.map(trip => {
-				trip.when = new Date(trip.when);
-
-				return trip;
-			});*/
-			
-			this.trips = res.trips;
+		this._tripService.getMy().subscribe(res => {	
+			this.trips = <any[]>res.trips;
 			
 			res.orders.forEach( (order, i, arr) => {
-				//order.creted_at = new Date(order.creted_at);
-				
 				this.ordersByTrip[order.trip] = this.ordersByTrip[order.trip] || [];
 				this.ordersByTrip[order.trip].push(order);
 			});
 		}, error => {
 			console.dir(error);
-		}, () => {
-			console.log('done');
 		});
 		
 		this.newMessages = this._notificationService.data.newMessages;

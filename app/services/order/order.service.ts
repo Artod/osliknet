@@ -3,12 +3,6 @@ import {Injectable} from 'angular2/core';
 import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 
-// import {Order} from './order';
-
-// import {HEROES} from './mock-heroes';
-// import {Http, HTTP_PROVIDERS} from 'angular2/http';
-// import {Http, Headers} from 'angular2/http';
-
 @Injectable()
 
 export class OrderService {
@@ -23,8 +17,7 @@ export class OrderService {
 		return this.http.get('/requests', {
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
-		}).map(res => <any[]> res.json().orders)
-			.catch(this.handleError);
+		}).map(res => <any[]> res.json().orders);
 	}
 
 	public getMy() {
@@ -34,29 +27,42 @@ export class OrderService {
 		return this.http.get('/requests/my', {			
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
-		}).map(res => <any[]> res.json().trips)
-			.catch(this.handleError);
+		}).map(res => <any[]> res.json().trips);
 	}
 	
 	public add(data) {		
 		let headers = new Headers();
-		
+		headers.append('X-Requested-With', 'XMLHttpRequest');
 		headers.append('Content-Type', 'application/json');
 	
 		return this.http.post('/requests/add', JSON.stringify(data), {			
 			headers: headers
-		});
+		}).map( res => <any[]> res.json() );
 	}
 	
-	private handleError (error: Response) {
+	public changeStatus(status, order) {		
+		let headers = new Headers();		
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		headers.append('Content-Type', 'application/json');
+
+		let data = {
+			status: status,
+			order: order
+		};
+	
+		return this.http.post('/requests/status', JSON.stringify(data), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+
+}
+
+	/*private handleError (error: Response) {
 		// in a real world app, we may send the server to some remote logging infrastructure
 		// instead of just logging it to the console
 		console.error(error);
 		return Observable.throw(error.json().error || 'Server error');
-	}
-}
-
-
+	}*/
 /*
 	public getMy() {
 		return this.http.get('/orders/my')

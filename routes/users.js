@@ -8,6 +8,7 @@ var crypto = require('crypto');
 var User = require('../models/user');
 var Token = require('../models/token');
 
+
 router.get('/notifications', function(req, res, next) {
 	User.findById(req.session.uid)
 		.select('needEmailNotification newMessages newOrders updated_at')
@@ -44,9 +45,6 @@ console.log('needEmailNotification false save');
 		});
 });
 
-
-
-
 /*
 User.find().exec(function(err, users) {	
 	users.forEach(function(user) {
@@ -54,21 +52,6 @@ User.find().exec(function(err, users) {
 		user.save();
 	});
 })*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/logout', passwordless.logout(/*{successFlash: 'Hope to see you soon!'}*/), function(req, res) {
 	/*delete req.session.uid;
@@ -315,7 +298,28 @@ console.log('Возможно токен протух')
 
 
 
+router.get('/:id', function(req, res, next) {
+	if (!req.xhr) {
+		res.render('index');
 
+		return;
+	}
+	
+	User.findById(req.params.id)
+		.select('created_at name gravatar_hash about')
+		.exec(function(err, user) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			res.type('json')
+				.json({user: user});
+		});
+});
 
 
 

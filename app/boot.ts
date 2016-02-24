@@ -31,10 +31,20 @@ bootstrap(AppComponent, [
 	}}),
 	provide('config.orderStatus', {useFactory: () => {
 		return {
-			0: 'Pending',
-			1: 'Processing',
-			2: 'Refused',
-			3: 'Finished'
+			5: 'Negotiation',
+			10: 'Processing',			
+			15: 'Refused',
+			20: 'Cancelled',			
+			25: 'Finished'
+		};
+	}}),
+	provide('config.orderStatusConst', {useFactory: () => {
+		return {
+			NEGOTIATION: 5,
+			PROCESSING: 10,			
+			REFUSED: 15,
+			CANCELLED: 20,			
+			FINISHED: 25
 		};
 	}}),
 	LazyMapsAPILoader

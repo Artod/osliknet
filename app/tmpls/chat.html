@@ -1,29 +1,49 @@
 <h2>Request</h2>
 
-<div *ngIf="order.trip">
 
-	<table class="table">
-		<tr>
-			<td class="col-xs-8">
+<table class="table" *ngIf="order.trip">
+	<tr>
+		<td class="col-xs-8">
+			<order-card [order]="order" [user]="order.user"></order-card>
 
-				<order-card [order]="order" [user]="order.user"></order-card>
-
-			</td>
-			<td class="col-xs-4">
-				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
-
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2" border="0">
-				<p class="order-message">
-					{{ order.message }}
+			<div *ngIf="configUser.id === order.user._id" [ngSwitch]="order.status">
+				<p *ngSwitchWhen="sts.NEGOTIATION">
+					<button class="btn btn-default" (click)="changeStatus(sts.CANCELLED)">Cancel request</button>
 				</p>
-			</td>
-		</tr>
-	</table>
-	
-</div>
+				<p *ngSwitchWhen="sts.CANCELLED">
+					<button class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
+				</p>
+				<p *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
+					<button *ngIf="isTripPassed()" class="btn btn-warning" (click)="sendReview()">Review</button>
+				</p>
+			</div>			
+
+		</td>
+		<td class="col-xs-4">
+			<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
+
+			<div *ngIf="configUser.id === order.trip.user._id" [ngSwitch]="order.status">
+				<p *ngSwitchWhen="sts.NEGOTIATION">
+					<button class="btn btn-warning" (click)="changeStatus(sts.PROCESSING)">Accept</button> 
+					<button class="btn btn-default" (click)="changeStatus(sts.REFUSED)">Refuse</button>
+				</p>
+				<p *ngSwitchWhen="sts.PROCESSING">
+					<button *ngIf="isTripPassed()" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
+				</p>
+				<p *ngSwitchWhen="sts.REFUSED">
+					<button class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
+				</p>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" border="0">
+			<p class="order-message">
+				{{ order.message }}
+			</p>
+		</td>
+	</tr>
+</table>
 
 
 
@@ -65,7 +85,7 @@
 		</div>
 		
 		<p class="text-right">
-			<button type="submit" class="btn btn-warning input-lg">Send</button>
+			<button type="submit" class="btn btn-warning btn-lg">Send</button>
 		</p>
 	</form>
 </div>

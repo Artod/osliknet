@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
 
 var whenValidator = function(value) {
   // `this` is the mongoose document
-  console.log(value)
+  console.log('whenValidator', value)
   
 	if (!this.isNew) {
 		return true;
@@ -12,7 +12,7 @@ var whenValidator = function(value) {
 	
 	var now = (new Date()).getTime() - 1000*60*60*24
 
-	return now < value;
+	return now < value.getTime();
 };
 
 var dateFormat = function(when, needTime) {	
@@ -40,10 +40,10 @@ var tripSchema = mongoose.Schema({
     when: {
 		type: Date,		
 		required: true,
-		validate: [whenValidator, 'Date dont must be less than today'],
+		validate: [whenValidator, 'Date dont must be less than today']/*,
 		get: function(when) {
 			return dateFormat(when);
-		}
+		}*/
 	},
 	from: {
 		type: String,

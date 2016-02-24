@@ -62,11 +62,11 @@ router.get('/my', function(req, res, next) {
 		return;
 	}
 	
-	if (!req.session.uid) {
-		res.status(401).json({error: 'Unauthorized'});
+if (!req.session.uid) {
+	res.status(401).json({error: 'Unauthorized'});
 
-		return;
-	}
+	return;
+}
 	
 	Trip.find({
 		user: ObjectId(req.session.uid)
@@ -80,12 +80,16 @@ router.get('/my', function(req, res, next) {
 		}
 		
 		var tids = trips.map(function(trip) {
-			return ObjectId(trip._id);
+			// return ObjectId(trip._id);
+			return trip._id;
 		});
 		
 		Order.find({
 			trip: {$in: tids}
-		}).populate('user').exec(function (err, orders) {
+		}).sort({
+			status: 1,
+			created_at: -1
+		}).populate('user').exec(function(err, orders) {
 			if (err) {
 				res.status(500)
 					.type('json')

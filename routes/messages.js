@@ -16,7 +16,7 @@ router.get('/last/:orderId/:lastId', function(req, res, next) {
 			res.status(500)
 				.type('json')
 				.json({error: err});
-			//{"error":{"message":"Cast to ObjectId failed for value \"33\" at path \"_id\"","name":"CastError","kind":"ObjectId","value":"33","path":"_id"}}
+				/*{"error":{"message":"Cast to ObjectId failed for value \"33\" at path \"_id\"","name":"CastError","kind":"ObjectId","value":"33","path":"_id"}}*/
 			return;
 		}		
 		
@@ -63,7 +63,10 @@ router.get('/last/:orderId/:lastId', function(req, res, next) {
 
 			User.setMessagesReaded(req.session.uid, order.id);
 
-			res.type('json').json({messages: asyncRes.messages});			
+			res.type('json').json({
+				messages: asyncRes.messages,
+				order: order
+			});			
 		});
 		
 	});
@@ -124,9 +127,6 @@ router.get('/order/:id', function(req, res, next) {
 			return
 		} 
 		
-// console.log('asyncRes.order.trip = ', asyncRes.order.trip);
-console.log('asyncRes.order.trip.user = ', asyncRes.order.trip.user);
-
 		if ( req.session.uid !== asyncRes.order.user.id && req.session.uid !== asyncRes.order.trip.user.id ) {
 			res.status(401)
 				.type('json')
@@ -139,108 +139,9 @@ console.log('asyncRes.order.trip.user = ', asyncRes.order.trip.user);
 		
 		res.type('json').json(asyncRes);		
 	});
-	
-	/*
-	return;
-	
-	Message.find({order: req.params.id})
-		.sort({created_at: 1})
-		.populate('user', 'name gravatar_hash')
-		.exec(function (err, messages) {
-
-			
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-					
-				return
-			}
-			
-			res.type('json').json({messages: messages});
-		});
-		
-		
-	return;
-	
-	async.parallel({
-		trip: function(callback) {	
-			Trip.aggregate([{
-				$match: {
-					'orders._id': ObjectId(req.params.id)
-				}
-			}, {
-				$unwind: "$orders"
-			}, {
-				$match: {
-					'orders._id': ObjectId(req.params.id)
-				}
-			}]).exec(function(err, trips) {
-				if (err) {
-					callback(err, trips);
-					
-					return;
-				}
-				
-				Trip.populate(trips, {path: 'user orders.user'}, function(err, trips) {
-					if (err) {
-						callback(err, trips);
-						
-						return;
-					}
-
-					callback(err, trips[0]);
-				});
-			});			
-		},
-		messages: function(callback){
-			Message.find({order: req.params.id})
-				.sort({created_at: 1})
-				.populate('user')
-				.exec(function (err, messages) {
-					callback(err, messages);
-				});
-		},                    
-	}, function(err, asyncRes){
-		// can use res.team and res.games as you wish
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-		
-		res.type('json').json(asyncRes);		
-	});
-	
-
-	
-	
-	*/
-
-	/*Order.findOne({
-		_id: req.params.id
-	}, function(err, order) {
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-
-		res.render('orders/one', {
-			order:order,
-			session: JSON.stringify(req.session)
-		});
-		
-	});  */
 });
 
 router.post('/add', function(req, res, next) {
-	
-	
 	/*
 	todo 
 	
@@ -263,8 +164,10 @@ if (!req.session.uid) {
 				
 			return;
 		}
-		
-		if ( req.session.uid !== order.user.toString() && req.session.uid !== order.trip.user.toString() ) {
+		var orderUser = order.user.toString(),
+			tripUser = order.trip.user.toString();
+			
+		if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
 			res.status(401)
 				.type('json')
 				.json({error: 'Unauthorized'});
@@ -276,23 +179,20 @@ if (!req.session.uid) {
 		
 		message.save(function(err, message) {
 			if (err) {
-				res.status(err.name == 'ValidationError' ? 400 : 500)				
+				res.status(err.name == 'ValidationError' ? 400 : 500);
 				
 				res.type('json')
 					.json({error: err});
 					
 				return;
 			}
-console.log('order.id = ', order.id)
-			User.setMessagesUnreaded(req.session.uid !== order.user.toString() ? order.user : order.trip.user, order.id);
+
+			User.setMessagesUnreaded(req.session.uid !== orderUser ? orderUser : tripUser, order.id);
 			
 			res.type('json')
 				.json({message: message});
 		});
 	});
-	
-	
-	
 
 });
 

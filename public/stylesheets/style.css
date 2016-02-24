@@ -99,20 +99,29 @@ input.input-lg {
 	vertical-align: middle;*/
 }
 
-trip-card span {
-	color:#333;	
+trip-card {
+	display:block;
+	padding: 0px 0px 10px 0px;
+}
+	trip-card span {
+		color:#333;	
+	}
+
+	trip-card .user {
+		padding:8px 0px 0px 0px;
+	}
+
+order-card {
+	display:block;
+	padding: 0px 0px 10px 0px;
 }
 
-trip-card .user {
-	padding:8px 0px 0px 0px;
-}
-
-
-.order-info {
-	padding:8px 0px 0px 0px;
-}
-
-
+	.order-info {
+		padding:8px 0px 0px 0px;
+	
+	}
+	
+	
 
 @media (min-width: 1200px) {
   .container {
@@ -157,6 +166,7 @@ trip-card .user {
 	position: absolute;
 	top: 45px;
 	width: 220px;
+	z-index: 1;
 }
 
 

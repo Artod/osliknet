@@ -13,7 +13,7 @@ export class MessageService {
 	
 		return this.http.get('/messages/order/' + id, {
 			headers: headers
-		}).map(res => <any[]> res.json()).catch(this.handleError);
+		}).map(res => <any[]> res.json());
 	}
 	 
 	public getLastMessages(orderId, lastId) {	
@@ -22,7 +22,7 @@ export class MessageService {
 
 		return this.http.get('/messages/last/' + orderId + '/' + lastId, {
 			headers: headers
-		}).map(res => <any[]> res.json().messages).catch(this.handleError);
+		}).map( res => <any[]> res.json() );
 	}
 	
 	
@@ -38,12 +38,7 @@ export class MessageService {
 	
 		return this.http.post('/messages/add', JSON.stringify(data), {			
 			headers: headers
-		}).map(res => <any[]> res.json().message).catch(this.handleError);
-	}
-	
-	private handleError (error: Response) {
-		console.error(error);
-		return Observable.throw(error.json().error || 'Server error');
+		}).map(res => <any[]> res.json().message);
 	}
 }
 

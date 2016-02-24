@@ -11,7 +11,7 @@
 		</tr>
 	</thead> -->
 	<tbody>	
-		<tr *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)" class="{{ orderId  === order._id ? 'current-chat' : ''}}">
+		<tr *ngFor="#order of orders; #idx = index" class="{{ orderId  === order._id ? 'current-chat' : ''}}">
 			<td class="col-xs-8">
 				<order-card [order]="order" [user]="order.user"></order-card>
 				

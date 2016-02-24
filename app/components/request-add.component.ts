@@ -43,17 +43,13 @@ export class RequestAddComponent {
 	onSubmit(value:Object):void {
 		if (this.form.valid) {
 
-			this._orderService.add(this.formModel)	
-				.subscribe(res => {
-					let order = res.json();
-					
-					this._modalComponent && this._modalComponent.close();
-					
-				}, err => {
-					console.dir(err);
-				}, () => {
-					console.log('done')
-				});
+			this._orderService.add(this.formModel).subscribe(data => {					
+				this._modalComponent && this._modalComponent.close();					
+			}, err => {
+				console.dir(err);
+			}, () => {
+				console.log('done')
+			});
 		}
 	}
 }

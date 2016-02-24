@@ -2,25 +2,37 @@
 
 TODO:
 
-- xhr header 
-
-- router.post('/add'
-	- send email to traveler
-	- inc order counter
+\/- Statuses
+\/- Check comments
+\/- Notification
+\/- router.post('/add'
+	\/- send email to traveler
+	\/- inc order counter
 	
-- joins
+- Reviews + rating
+- Profile
 
+- TripPage + edit
+- Subscribe on new trips
+- Paging
+- Index page
+- Logging errors
+- hide request delivery button if there is order yet
+
+- unauth middleware
 - check auth (session.uid)
+- beforeRouterFilter !req.xhr ? res.render('index')
+
+
+- pre('save' created_at переделать
+- logged in already убрать 
+- not found error on query
+
+
 
 - iptables
 
-- beforeRouterFilter !req.xhr ? res.render('index')
 
-- unauth middleware
-
-- pre('save' created_at переделать
-
-- logged in already убрать 
 
 */
 
@@ -239,14 +251,31 @@ app.use('/app', express.static(__dirname + '/app'));
 // Passwordless middleware
 app.use(passwordless.sessionSupport());
 // app.use(passwordless.acceptToken({ successRedirect: '/successRedirect', failureRedirect: '/errorredir' }));
+ 
+app.set('orderStatus', {
+	5: 'Negotiation',
+	10: 'Processing',
+	15: 'Refused',
+	20: 'Cancelled',
+	25: 'Finished'
+});
 
+app.set('orderStatusConst', require('./models/order').sts/*{
+	NEGOTIATION: 5,
+	PROCESSING: 10,			
+	REFUSED: 15,
+	CANCELLED: 20,			
+	FINISHED: 25
+}*/);
 
 app.use(function (req, res, next) {
 	res.locals = {
 		user: {
 			id: req.session.uid,
 			name: req.session.name
-		}
+		},
+		orderStatus: app.get('orderStatus'),
+		orderStatusConst: app.get('orderStatusConst')
 	};
    
    next();

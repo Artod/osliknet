@@ -1,5 +1,5 @@
-import {Injectable, Inject} from 'angular2/core';
-import {Http, URLSearchParams, Headers, Response} from 'angular2/http';
+import {Injectable} from 'angular2/core';
+import {Http, URLSearchParams, Headers} from 'angular2/http';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 
@@ -18,8 +18,7 @@ export class NotificationService {
 	public currentTimeout: number;
 	 
 	constructor(
-		private _http:Http,
-		@Inject('config.user') public configUser
+		private _http:Http
 	) {	
 		this._headers = new Headers();
 		this._headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -64,11 +63,7 @@ console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
 			this._pollSub.unsubscribe();
 		}
 	}
-	
-	private _handleError(error: Response) {
-console.error('Observable error notif');
-		return Observable.throw(error.json().error || 'Server error');
-	}
+
 }
 
 

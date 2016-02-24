@@ -23,32 +23,32 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 })
 
 export class TripsComponent {
-	public trips: Trip[];
+	public trips : Trip[];
 	
 	// public trips: any[];
 	
-	public searchModel: any = {
+	public searchModel : any = {
 		from: "Montreal, QC, Canada",
 		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"		
 	};
 	
-	public searchForm: ControlGroup;
+	public searchForm : ControlGroup;
 
 	constructor(
 		// private _router: Router,
-		private _fb: FormBuilder,
-		private _tripService: TripService,
-		private _orderService: OrderService,
-		private _modalService: ModalService,
-		private _renderer: Renderer,
-		private routeParams: RouteParams,
+		private _fb : FormBuilder,
+		private _tripService : TripService,
+		private _orderService : OrderService,
+		private _modalService : ModalService,
+		private _renderer : Renderer,
+		private _routeParams : RouteParams,
 		@Inject('config.user') public configUser
 	) {
 		this.searchModel = {
-			from: this.routeParams.get('from') ? decodeURIComponent( this.routeParams.get('from') ) : this.searchModel.from,
-			from_id: this.routeParams.get('from_id') || this.searchModel.from_id,
-			to: this.routeParams.get('to') ? decodeURIComponent( this.routeParams.get('to') ) : this.searchModel.to,
-			to_id: this.routeParams.get('to_id') || this.searchModel.to_id
+			from: this._routeParams.get('from') ? decodeURIComponent( this._routeParams.get('from') ) : this.searchModel.from,
+			from_id: this._routeParams.get('from_id') || this.searchModel.from_id,
+			to: this._routeParams.get('to') ? decodeURIComponent( this._routeParams.get('to') ) : this.searchModel.to,
+			to_id: this._routeParams.get('to_id') || this.searchModel.to_id
 		}
 
 		this.searchForm = _fb.group({
