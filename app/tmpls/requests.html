@@ -20,7 +20,7 @@
 				</p>
 				
 				<p class="text-right">
-					<a class="btn btn-default btn-lg1" [routerLink]="['Chat', {id:order._id}]">Chat <span class="badge" *ngIf="newMessages[order._id]">{{newMessages[order._id]}}</span></a>
+					<a [routerLink]="['Order', {id:order._id}]">Go to the discussion <span class="badge" *ngIf="newMessages[order._id]">{{newMessages[order._id]}}</span></a>
 				</p>
 			</td>
 			<td class="col-xs-4">

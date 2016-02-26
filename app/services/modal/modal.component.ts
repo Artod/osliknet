@@ -4,23 +4,34 @@ import {Component, ElementRef} from 'angular2/core';
 	selector: 'modal',
 	// templateUrl: '/app/services/modal/tmpl.html'
 	template: `
-		<section style="z-index': 1000, display: 'block'" class="splash splash-open">
-		  <div class="splash-inner">
-			<div class="splash-content text-center">
-				<comp #comp></comp>
-				<button class="btn btn-lg btn-outline" (click)="close()">Ok</button>
+		<section class="splash splash-open" (click)="close($event)">
+			<div class="splash-inner">
+				<div class="container" (click)="prevent($event)">
+					<button class="close text-right" type="button" (click)="close($event)">Close</button>
+					<comp #comp [hidden]="loaded" style="text-center">Loading...</comp>				
+				</div>
 			</div>
-		  </div>
-		</section>
-`
+		</section>`
 })
 
 export class ModalComponent {
+	public loaded : boolean = false;
+	
 	constructor(private _ref: ElementRef) {
 		console.dir(this._ref);
 	}
 	
-	public close() {
+	public close($event) : boolean {
 		this.ref.dispose();
+		
+		if ($event)
+			$event.stopPropagation();
+		
+		return false;
 	}
+	
+	public prevent($event) : void {
+		$event.stopPropagation();
+	}
+	
 }

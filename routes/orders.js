@@ -336,88 +336,6 @@ router.get('/my', function(req, res, next) {
 	});
 });
 
-router.get('/:id', function(req, res, next) {	
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
-	
-	async.parallel({
-		trip: function(callback) {	
-			Trip.aggregate([{
-				$match: {
-					'orders._id': ObjectId(req.params.id)
-				}
-			}, {
-				$unwind: "$orders"
-			}, {
-				$match: {
-					'orders._id': ObjectId(req.params.id)
-				}
-			}]).exec(function(err, trips) {
-				if (err) {
-					callback(err, trips);
-					
-					return;
-				}
-				
-				Trip.populate(trips, {path: 'user orders.user'}, function(err, trips) {
-					if (err) {
-						callback(err, trips);
-						
-						return;
-					}
-
-					callback(err, trips[0]);
-				});
-			});			
-		},
-		messages: function(callback){
-			Message.find({order: req.params.id})
-				.sort({created_at: -1})
-				.populate('user')
-				.exec(function (err, messages) {
-					callback(err, messages);
-				});
-		},                    
-	}, function(err, asyncRes){
-		// can use res.team and res.games as you wish
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-		
-		res.type('json').json(asyncRes);		
-	});
-	
-
-	
-	
-	
-
-	/*Order.findOne({
-		_id: req.params.id
-	}, function(err, order) {
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-
-		res.render('orders/one', {
-			order:order,
-			session: JSON.stringify(req.session)
-		});
-		
-	});  */
-});
-
 router.post('/add', function(req, res, next) {
 	/**
 		TODO:
@@ -536,9 +454,12 @@ router.post('/status', function(req, res, next) {
 		}
 		
 		var checkAndSave = function(canAfterCurrent) {
+			var isTripPassed = ( new Date(order.trip.when) ) < ( new Date() );
+			
 			if (
 				order.status !== canAfterCurrent || 
-				( newStatus === sts.FINISHED && order.trip.when >= ( new Date() ) ) // tring to finish before trip
+				( newStatus === sts.FINISHED && !isTripPassed ) || // finish before trip
+				( isTripPassed && [sts.REFUSED, sts.CANCELLED, sts.FINISHED].indexOf(newStatus) === -1 ) // refus cancel and finish always		
 			) {
 				res.status(401).type('json').json({error: 'Unauthorized'});
 
@@ -614,6 +535,88 @@ router.post('/status', function(req, res, next) {
 	});
 });
 
+router.get('/:id', function(req, res, next) {	
+	if (!req.xhr) {
+		res.render('index');
+
+		return;
+	}
+	
+	async.parallel({
+		trip: function(callback) {	
+			Trip.aggregate([{
+				$match: {
+					'orders._id': ObjectId(req.params.id)
+				}
+			}, {
+				$unwind: "$orders"
+			}, {
+				$match: {
+					'orders._id': ObjectId(req.params.id)
+				}
+			}]).exec(function(err, trips) {
+				if (err) {
+					callback(err, trips);
+					
+					return;
+				}
+				
+				Trip.populate(trips, {path: 'user orders.user'}, function(err, trips) {
+					if (err) {
+						callback(err, trips);
+						
+						return;
+					}
+
+					callback(err, trips[0]);
+				});
+			});			
+		},
+		messages: function(callback){
+			Message.find({order: req.params.id})
+				.sort({created_at: -1})
+				.populate('user')
+				.exec(function (err, messages) {
+					callback(err, messages);
+				});
+		},                    
+	}, function(err, asyncRes){
+		// can use res.team and res.games as you wish
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+		res.type('json').json(asyncRes);		
+	});
+	
+
+	
+	
+	
+
+	/*Order.findOne({
+		_id: req.params.id
+	}, function(err, order) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+
+		res.render('orders/one', {
+			order:order,
+			session: JSON.stringify(req.session)
+		});
+		
+	});  */
+});
+
 router.post('/messages/add', function(req, res, next) {	
 	var messages =  req.body.messages || {};
 	messages.uid = req.session.uid
@@ -643,10 +646,7 @@ router.post('/messages/add', function(req, res, next) {
     ); 
 });
 
-
 module.exports = router;
-
-
 
 /*
 {"error":{"name":"MongoError","message":"exception: bad query: BadValue unknown top level operator: $orders

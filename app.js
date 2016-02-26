@@ -15,7 +15,13 @@ TODO:
 - TripPage + edit
 - Subscribe on new trips
 - Paging
+
+- textarea везде maxlength: 2000
+
+- Calendar css
+- Modal css
 - Index page
+
 - Logging errors
 - hide request delivery button if there is order yet
 
@@ -55,6 +61,7 @@ var users = require('./routes/users');
 var trips = require('./routes/trips');
 var orders = require('./routes/orders');
 var messages = require('./routes/messages');
+var reviews = require('./routes/reviews');
 
 var app = express();
 
@@ -260,13 +267,7 @@ app.set('orderStatus', {
 	25: 'Finished'
 });
 
-app.set('orderStatusConst', require('./models/order').sts/*{
-	NEGOTIATION: 5,
-	PROCESSING: 10,			
-	REFUSED: 15,
-	CANCELLED: 20,			
-	FINISHED: 25
-}*/);
+app.set('orderStatusConst', require('./models/order').sts);
 
 app.use(function (req, res, next) {
 	res.locals = {
@@ -287,6 +288,7 @@ app.use('/users', users);
 app.use('/trips', trips);
 app.use('/requests', orders);
 app.use('/messages', messages);
+app.use('/reviews', reviews);
 
 
 // catch 404 and forward to error handler

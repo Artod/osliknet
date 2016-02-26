@@ -25,41 +25,40 @@
 <br />
 <br />
 
+<table class="table">
+	<tr *ngFor="#trip of trips; #idx = index">
+		<td>
+			<trip-card [trip]="trip" [user]="trip.user"></trip-card>
+			<br />
+			<p>
+				{{ trip.description }}
+			</p>
+			<p class="text-right" *ngIf="trip.user._id != configUser.id">
+				<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request Delivery</button>
+			</p>
+		</td>
 
-	<table class="table">
-		<tr *ngFor="#trip of trips; #idx = index">
-			<td>
-				<trip-card [trip]="trip" [user]="trip.user"></trip-card>
-				<br />
-				<p>
-					{{ trip.description }}
-				</p>
-				<p class="text-right" *ngIf="trip.user._id != configUser.id">
-					<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request Delivery</button>
-				</p>
-			</td>
-
+		
+		<!-- <td>
+			<img src="http://gravatar.com/avatar/{{ trip.user.gravatar_hash }}?d=retro" alt="{{ trip.user.name }}" />
+			{{ trip.user.name }}
+		</td>
+		<td>
+			<b>{{ trip.from }}</b>
+			<span class="glyphicon glyphicon-arrow-right"></span>
+			<b>{{ trip.to }}</b>
 			
-			<!-- <td>
-				<img src="http://gravatar.com/avatar/{{ trip.user.gravatar_hash }}?d=retro" alt="{{ trip.user.name }}" />
-				{{ trip.user.name }}
-			</td>
-			<td>
-				<b>{{ trip.from }}</b>
-				<span class="glyphicon glyphicon-arrow-right"></span>
-				<b>{{ trip.to }}</b>
-				
-				<br />
-				
-				<i>{{ trip.when | toDate | date: 'longDate' }}</i>
-				
-				<p>
-					{{ trip.description }}
-				</p>	
-			</td> 
+			<br />
 			
-			<td>
-				
-			</td>-->
-		</tr>
-	</table>
+			<i>{{ trip.when | toDate | date: 'longDate' }}</i>
+			
+			<p>
+				{{ trip.description }}
+			</p>	
+		</td> 
+		
+		<td>
+			
+		</td>-->
+	</tr>
+</table>

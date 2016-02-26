@@ -34,16 +34,22 @@ var schema = mongoose.Schema({
 	is_approved: {
 		type: Boolean,
 		default: false
-	},
-	
+	},	
 	newOrders: {
 		type: Array,
+		select: false,
 		default: []
 	},
 	newMessages: {
 		type: {},
+		select: false,
 		default: {}
 	},
+	newPrivMessages: {
+		type: {},
+		select: false,
+		default: {}
+	},	
 	needEmailNotification: {
 		type: Boolean,		
 		default: false
@@ -154,6 +160,61 @@ schema.statics.setMessagesReaded = function(uid, oid, cb) {
 		}
 
 		user.markModified('newMessages');
+		
+		user.needEmailNotification = false;
+
+		user.save(function(err, user) {
+			//log errors
+			cb && cb(err, user);
+		});
+	});
+};
+
+schema.statics.setPrivMessagesUnreaded = function(uid, cid, cb) {
+	if (uid === cid) {
+		cb && cb({error: 'Message to yourself'});
+		return;
+	}
+	
+	this.findById(uid).select('newPrivMessages needEmailNotification').exec(function(err, user) {
+		if (err) {
+			cb && cb(err, user);
+			return;
+		}
+		
+		user.newPrivMessages[cid] = user.newPrivMessages[cid] || 0;
+		user.newPrivMessages[cid]++;		
+		user.markModified('newPrivMessages');
+
+		user.needEmailNotification = true;
+		
+		user.save(function(err, user) {
+			//log errors
+			cb && cb(err, user);
+		});
+	});
+};
+
+schema.statics.setPrivMessagesReaded = function(uid, cid, cb) {
+	this.findById(uid).select('newPrivMessages needEmailNotification').exec(function(err, user) {
+		if (err) {
+			cb && cb(err, user);
+			return;
+		}
+
+		if (!user.newPrivMessages[cid] && !user.needEmailNotification) {
+			cb && cb(err, user);
+			
+			return;
+		}
+		
+		if (cid) {
+			delete user.newPrivMessages[cid];
+		} else {
+			user.newPrivMessages = {};
+		}
+
+		user.markModified('newPrivMessages');
 		
 		user.needEmailNotification = false;
 

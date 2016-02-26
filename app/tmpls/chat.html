@@ -1,53 +1,3 @@
-<h2>Request</h2>
-
-
-<table class="table" *ngIf="order.trip">
-	<tr>
-		<td class="col-xs-8">
-			<order-card [order]="order" [user]="order.user"></order-card>
-
-			<div *ngIf="configUser.id === order.user._id" [ngSwitch]="order.status">
-				<p *ngSwitchWhen="sts.NEGOTIATION">
-					<button class="btn btn-default" (click)="changeStatus(sts.CANCELLED)">Cancel request</button>
-				</p>
-				<p *ngSwitchWhen="sts.CANCELLED">
-					<button class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
-				</p>
-				<p *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
-					<button *ngIf="isTripPassed()" class="btn btn-warning" (click)="sendReview()">Review</button>
-				</p>
-			</div>			
-
-		</td>
-		<td class="col-xs-4">
-			<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
-
-			<div *ngIf="configUser.id === order.trip.user._id" [ngSwitch]="order.status">
-				<p *ngSwitchWhen="sts.NEGOTIATION">
-					<button class="btn btn-warning" (click)="changeStatus(sts.PROCESSING)">Accept</button> 
-					<button class="btn btn-default" (click)="changeStatus(sts.REFUSED)">Refuse</button>
-				</p>
-				<p *ngSwitchWhen="sts.PROCESSING">
-					<button *ngIf="isTripPassed()" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
-				</p>
-				<p *ngSwitchWhen="sts.REFUSED">
-					<button class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
-				</p>
-			</div>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2" border="0">
-			<p class="order-message">
-				{{ order.message }}
-			</p>
-		</td>
-	</tr>
-</table>
-
-
-
-
 <div class="chat-list" (window:resize)="expand()"> <!-- [scrollTop]="scrollHeight" [style.maxHeight]="height"  [style.maxHeight]="maxHeight"postRender="scrollDown()"-->
 	
 	<table class="table {{ message.user._id === configUser.id ? 'chat-message-my' : '' }}" *ngFor="#message of messages; #idx = index;" >
@@ -71,21 +21,17 @@
 	</table>
 </div>
 
-
-
-
-
-
 <div class="chat-textarea">
-	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)"> <!--  -->
-		<input name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+	<form action="/messages/add" method="post" [ngFormModel]="form" (submit)="onSubmit(elComment)"> <!--  -->
+		<input *ngIf="orderId" name="order" type="hidden" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+		<input *ngIf="corrId" name="corr" type="hidden" [(ngModel)]="formModel.corr" [ngFormControl]="form.controls.corr" />
 		
 		<div class="form-group">			
-			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
+			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" #elComment></textarea>
 		</div>
 		
 		<p class="text-right">
-			<button type="submit" class="btn btn-warning btn-lg">Send</button>
+			<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button>
 		</p>
 	</form>
 </div>

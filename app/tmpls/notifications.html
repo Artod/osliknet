@@ -1,12 +1,15 @@
-<a href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)" *ngIf="newOrders.length || newMessagesKeys.length"><strong class="glyphicon glyphicon-bell"></strong></a>
+<a href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)" *ngIf="newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length"><strong class="glyphicon glyphicon-bell"></strong></a>
 
 <div class="popover-my" *ngIf="isOpened"><!--  (click)="$event.stopPropagation()" -->
 	<ul class="notifications-list">
 		<li *ngFor="#order of newOrders">
-			<a [routerLink]="['Chat', {id: order}]">New order</a>
+			<a [routerLink]="['Order', {id: order}]">New order</a>
 		</li>
 		<li *ngFor="#order of newMessagesKeys">
-			<a [routerLink]="['Chat', {id: order}]">{{ newMessages[order] }} new message{{ newMessages[order] > 1 ? 's' : '' }} in order</a>
+			<a [routerLink]="['Order', {id: order}]">{{ newMessages[order] }} new message{{ newMessages[order] > 1 ? 's' : '' }} in order</a>
+		</li>
+		<li *ngFor="#corr of newPrivMessagesKeys">
+			<a [routerLink]="['Messages', {id: corr}]">{{ newPrivMessages[corr] }} new private message{{ newPrivMessages[corr] > 1 ? 's' : '' }}</a>
 		</li>
 	</ul>
 	<div class="clearfix"></div>

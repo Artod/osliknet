@@ -1,0 +1,39 @@
+<div class="page-header">
+	<h2>Review on the delivery</h2>
+</div>
+
+<form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="onSubmit(comment)">
+	<input type="hidden" name="order" value="" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+	<!-- http://stackoverflow.com/questions/33986633/angular-2-dependency-injection-error-on-ngfor-in-dynamically-created-component -->
+	<div class="form-group">
+		<label class="radio-inline">
+			<input type="radio" name="rating" value="1" (change)="onChangeRating(rate1)" [checked]="formModel.rating === 1" #rate1> 1
+		</label>
+		<label class="radio-inline">
+			<input type="radio" name="rating" value="2" (change)="onChangeRating(rate2)" [checked]="formModel.rating === 2" #rate2> 2
+		</label>
+		<label class="radio-inline">
+			<input type="radio" name="rating" value="3" (change)="onChangeRating(rate3)" [checked]="formModel.rating === 3" #rate3> 3
+		</label>
+		<label class="radio-inline">
+			<input type="radio" name="rating" value="4" (change)="onChangeRating(rate4)" [checked]="formModel.rating === 4" #rate4> 4
+		</label>
+		<label class="radio-inline">
+			<input type="radio" name="rating" value="5" (change)="onChangeRating(rate5)" [checked]="formModel.rating === 5" #rate5> 5
+		</label>
+		
+		<input type="hidden" name="rating" value="" [(ngModel)]="formModel.rating" [ngFormControl]="form.controls.rating" />
+		 <!-- 
+		<select class="form-control" required [(ngModel)]="formModel.order" [ngFormControl]="form.controls.rating">
+			<option *ngFor="#r of ratings" [value]="r">{{r}}</option>
+		</select>-->
+	</div>
+	
+	<div class="form-group">		
+		<textarea class="form-control" name="comment" placeholder="Comment" [(ngModel)]="formModel.comment" [ngFormControl]="form.controls.comment" maxlength="2000" #comment></textarea>
+	</div>
+	
+	<p class="text-right">
+		<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
+	</p>
+</form>

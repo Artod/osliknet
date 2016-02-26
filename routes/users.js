@@ -9,9 +9,9 @@ var User = require('../models/user');
 var Token = require('../models/token');
 
 
-router.get('/notifications', function(req, res, next) {
+router.get('/notifications/:timestamp?', function(req, res, next) {
 	User.findById(req.session.uid)
-		.select('needEmailNotification newMessages newOrders updated_at')
+		.select('needEmailNotification newMessages newOrders newPrivMessages updated_at')
 		.exec(function(err, user) {
 			if (err) {
 				res.status(500)
@@ -21,18 +21,27 @@ router.get('/notifications', function(req, res, next) {
 				return
 			}
 			
-			var out = {
-				newMessages: user.newMessages,
-				newOrders: user.newOrders,
-				updated_at: user.updated_at
-			};
+			var out;
+			
+			if ( req.params.timestamp == user.updated_at.getTime() ) {
+				out = {
+					updated_at: user.updated_at
+				};
+			} else {
+				out = {
+					newMessages: user.newMessages,
+					newOrders: user.newOrders,
+					newPrivMessages: user.newPrivMessages,
+					updated_at: user.updated_at
+				};
+			}
 			
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
 console.log('needEmailNotification false save');
 				user.save(function(err, user) {
 					//log errors
-					console.log('needEmailNotification false save done');
+console.log('needEmailNotification false save done');
 					
 					out.updated_at = user.updated_at;					
 					res.type('json')
@@ -83,7 +92,7 @@ function proceedEmail(callback) {
 		
 		User.findOne({
 			email: req.body.email.toLowerCase()
-		}, function(err, user) {
+		}).exec(function(err, user) {
 			if (err) {
 				res.status(500)
 					.type('json')
@@ -123,9 +132,7 @@ router.post('/signup', function(req, res, next) {
 		console.dir(user)
 		
 		if (user) {
-			res.status(400);			
-		
-			res.type('json')
+			res.status(400).type('json')
 				.json({error: 'Username is occupied.'});
 		} else {
 			next();

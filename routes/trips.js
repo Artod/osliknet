@@ -8,7 +8,6 @@ var ObjectId = require('mongoose').Types.ObjectId;
 
 
 router.get('/', function(req, res, next) {
-	console.log('sdsd')
 	if (!req.xhr) {
 		res.render('index');
 

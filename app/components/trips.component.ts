@@ -59,42 +59,19 @@ export class TripsComponent {
 		});
 	}
 
-	onSubmit(value:Object):void {
+	onSubmit(value : Object) : void {
 		if (this.searchForm.valid) {
-			this._tripService.search(this.searchModel)
-				.subscribe(res => {
-					this.trips = res.json();
-					
-					/* let trips = res.json();
-
-					this.trips = trips.map(trip => {
-						trip.when = new Date(trip.when);
-
-						return trip;
-					}); */
-
-					// console.dir( this.trips );
-				}, err => {
-					// console.dir(err)
-				}, () => {
-					// console.log('done')
-				});
-
-
-			/* .subscribe(
-				res => res.text(), 						// success
-				err => console.dir(err),				// error
-				() => console.log('done')
-			);
-
-			.subscribe(trips => {
-				console.dir(trips);
-				this.trips = trips;
-			});*/
+			this._tripService.search(this.searchModel).subscribe(res => {
+				this.trips = res.json();
+			}, err => {
+				console.dir(err)
+			}, () => {
+				// console.log('done')
+			});
 		}
 	}
 
-	onRequest(trip:Trip):void {
+	onRequest(trip : Trip) : void {
 		this._modalService.open().then(modalComponentRef => {
 		
 			// let tripProvider = Injector.resolve([provide(Trip, {useValue: trip})]);			
@@ -106,16 +83,10 @@ export class TripsComponent {
 				provide('trip', {useValue: trip})
 			]);
 			
-			this._modalService.bind(RequestAddComponent, modalComponentRef, otherResolved).then(componentRef => {
-				
+			this._modalService.bind(RequestAddComponent, modalComponentRef, otherResolved).then(componentRef => {				
 				// let component: RequestAddComponent = componentRef.instance;
-				// component.ref = componentRef;
-				
+				// component.ref = componentRef;				
 				// res.instance.formModel.trip_id = trip._id;
-				
-				// console.log(33333333333333333333333333333333);
-				// console.log(res.instance.formModel.trip_id);
-				// console.log(trip._id);
 			});
 		});
 	}

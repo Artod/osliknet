@@ -7,24 +7,32 @@ import {Observable} from 'rxjs/Observable';
 export class MessageService {
 	constructor(public http:Http) { }
 	
-	public getByOrderId(id) {	
+	public getDialogs() {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
-	
-		return this.http.get('/messages/order/' + id, {
-			headers: headers
-		}).map(res => <any[]> res.json());
-	}
-	 
-	public getLastMessages(orderId, lastId) {	
-		let headers = new Headers();
-		headers.append('X-Requested-With', 'XMLHttpRequest');
-
-		return this.http.get('/messages/last/' + orderId + '/' + lastId, {
+		
+		return this.http.get('/messages', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
 	
+	public getAll(orderId, corrId) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
+		return this.http.get('/messages/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	 
+	public getLastMessages(lastId, orderId, corrId) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+
+		return this.http.get('/messages/last/' + lastId + '/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}	
 	
 	public add(data) {
 		/*let search: URLSearchParams = new URLSearchParams();

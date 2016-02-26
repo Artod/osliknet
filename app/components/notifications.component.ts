@@ -15,6 +15,8 @@ export class NotificationsComponent {
 	public newOrders : string[] = [];
 	public newMessages : Dictionary;
 	public newMessagesKeys : string[] = [];
+	public newPrivMessages : Dictionary;
+	public newPrivMessagesKeys : string[] = [];
 	public isOpened : boolean = false;
 	
 	constructor(
@@ -23,11 +25,13 @@ export class NotificationsComponent {
 	) {
 		this._notificationService.start().subscribe(data => {
 console.log('NotificationsComponent subscribe')
+console.dir(data);
 			this.newOrders = data.newOrders;
 			this.newMessages = data.newMessages;
-			this.newMessagesKeys = this.getNewMessagesKeys();
-console.log('this.newOrders');console.dir(this.newOrders);console.log('this.newMessages');console.dir(this.newMessages);
-			
+			this.newMessagesKeys = this.getKeys(data.newMessages);
+			this.newPrivMessages = data.newPrivMessages;
+			this.newPrivMessagesKeys = this.getKeys(data.newPrivMessages);
+console.log('this.newPrivMessagesKeys', this.newPrivMessagesKeys);
 			this._appRef.tick();
 		});
 	}
@@ -42,19 +46,10 @@ console.log('this.newOrders');console.dir(this.newOrders);console.log('this.newM
 	
 	public onDocumentClick($event) {
 		this.isOpened = false;
-		/*
-		$event.stopPropagation();
-		
-		return false;*/
 	}
 	
-	
-	public lengthMessages() {
-		return Object.keys(this.newMessages);
-	}
-	
-	public getNewMessagesKeys() : string[] {
-		return Object.keys(this.newMessages);
+	public getKeys(obj) : string[] {
+		return obj ? Object.keys(obj) : [];
 	}
 }
 

@@ -11,11 +11,11 @@ export class NotificationService {
 		newMessages:{},
 		newOrders:[]
 	}
-	public updated: number;	
-	public subject: Subject;	
-	private _pollSub: Observable;	
-	private _defaultTimeout: number = 5000;
-	public currentTimeout: number;
+	public updated : number = 0;	
+	public subject : Subject;	
+	private _pollSub : Observable;	
+	private _defaultTimeout : number = 10000;
+	public currentTimeout : number;
 	 
 	constructor(
 		private _http:Http
@@ -39,16 +39,18 @@ export class NotificationService {
 		
 		this.currentTimeout = timeout;
 		
-		this.stop();		
+		this.stop();
+		
 		this._pollSub = Observable.timer(0, this.currentTimeout).switchMap( () => {
-			return this._http.get('/users/notifications', {
+			return this._http.get('/users/notifications/' + this.updated, {
 				headers: this._headers
 			});
 		} ).map( res => res.json() ).catch(this._handleError).subscribe(res => {
-			var notifTimestamp = ( new Date(res.updated_at) ).getTime();
-			if (notifTimestamp !== this.updated ) {
+			var serverUpdated = new Date(res.updated_at).getTime();
+			
+			if (serverUpdated !== this.updated) {
 console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
-				this.updated = notifTimestamp;
+				this.updated = serverUpdated;
 				this.data = res;
 				
 				this.subject.next(this.data);

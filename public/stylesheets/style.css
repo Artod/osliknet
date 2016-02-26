@@ -7,6 +7,10 @@ body {
   color: #00B7FF;
 } */
 
+.page-header {
+    border-bottom: 0px solid #eee;
+}
+
 .navbar-default {
 	background-color: #f8f8f8;
     border-color: #e7e7e7;
