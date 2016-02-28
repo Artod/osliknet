@@ -13,7 +13,7 @@ router.get('/notifications/:timestamp?', function(req, res, next) {
 	User.findById(req.session.uid)
 		.select('needEmailNotification newMessages newOrders newPrivMessages updated_at')
 		.exec(function(err, user) {
-			if (err) {
+			if (err || !user) {
 				res.status(500)
 					.type('json')
 					.json({error: err});
@@ -21,21 +21,16 @@ router.get('/notifications/:timestamp?', function(req, res, next) {
 				return
 			}
 			
-			var out;
-			
-			if ( req.params.timestamp == user.updated_at.getTime() ) {
-				out = {
-					updated_at: user.updated_at
-				};
-			} else {
-				out = {
-					newMessages: user.newMessages,
-					newOrders: user.newOrders,
-					newPrivMessages: user.newPrivMessages,
-					updated_at: user.updated_at
-				};
+			var out = {
+				updated_at: user.updated_at
+			};
+	
+			if (true || Number(req.params.timestamp) !== user.updated_at.getTime() ) {
+				out.newMessages = user.newMessages;
+				out.newOrders = user.newOrders;
+				out.newPrivMessages = user.newPrivMessages;
 			}
-			
+console.dir(out)
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
 console.log('needEmailNotification false save');
@@ -43,7 +38,8 @@ console.log('needEmailNotification false save');
 					//log errors
 console.log('needEmailNotification false save done');
 					
-					out.updated_at = user.updated_at;					
+					out.updated_at = user.updated_at;
+					
 					res.type('json')
 						.json(out);
 				});
@@ -58,6 +54,13 @@ console.log('needEmailNotification false save done');
 User.find().exec(function(err, users) {	
 	users.forEach(function(user) {
 		user.gravatar_hash = crypto.createHash('md5').update(user.email).digest('hex');
+		user.save();
+	});
+})
+
+User.find().select('newPrivMessages').exec(function(err, users) {	
+	users.forEach(function(user) {
+		user.newPrivMessages = null;
 		user.save();
 	});
 })*/

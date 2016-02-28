@@ -2,28 +2,22 @@
 
 <p *ngIf="orders && !orders.length">There are no requests.</p>
 
-<table class="table">
-	<!-- <thead>
-		<tr>
-			<th></th>
-			<th></th>
-			<th>Status</th>
-		</tr>
-	</thead> -->
-	<tbody>	
-		<tr *ngFor="#order of orders; #idx = index" class="{{ orderId  === order._id ? 'current-chat' : ''}}">
-			<td class="col-xs-8">
+		<div class="row "  *ngFor="#order of orders; #idx = index">
+			<div class="col-xs-8">
 				<order-card [order]="order" [user]="order.user"></order-card>
 				
 				<p class="order-message">
 					{{ order.message }}
 				</p>
 				
-				<p class="text-right">
-					<a [routerLink]="['Order', {id:order._id}]">Go to the discussion <span class="badge" *ngIf="newMessages[order._id]">{{newMessages[order._id]}}</span></a>
-				</p>
-			</td>
-			<td class="col-xs-4">
+			<div class="text-right">
+<a [routerLink]="['Order', {id:order._id}]">Go to the discussion <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
+
+<br />
+			<br />
+			</div>
+			</div>
+			<div class="col-xs-4">
 				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
 				
 				<!-- {{ order.trip.from }}
@@ -33,10 +27,11 @@
 				<br />
 				
 				<i>{{ order.trip.when | toDate | date: 'longDate' }}</i> -->
-			</td>
-		</tr>
-	</tbody>
-</table>
+			</div>
+
+			
+		</div>
+
 
 
 

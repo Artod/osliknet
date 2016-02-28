@@ -286,7 +286,7 @@ app.use(function (req, res, next) {
 app.use('/', routes);
 app.use('/users', users);
 app.use('/trips', trips);
-app.use('/requests', orders);
+app.use('/orders', orders);
 app.use('/messages', messages);
 app.use('/reviews', reviews);
 

@@ -17,8 +17,8 @@ import {OrderCardComponent} from './order-card.component';
 })
 
 export class TripsMyComponent implements OnDestroy {
-	public trips: any[];
-	public ordersByTrip: any = {};
+	public trips : any[];
+	public ordersByTrip : any = {};
 	public newMessages : any = {};
 	private _notifSub;
 	
@@ -39,11 +39,11 @@ export class TripsMyComponent implements OnDestroy {
 			console.dir(error);
 		});
 		
-		this.newMessages = this._notificationService.data.newMessages;
+		this.newMessages = this._notificationService.data.newMessages || {};
 		
 		this._notifSub = this._notificationService.start().subscribe(data => {
 console.log('TripsMyComponent subscribe TripsMyComponent subscribe TripsMyComponent subscribe TripsMyComponent subscribe');
-			this.newMessages = data.newMessages;
+			this.newMessages = data.newMessages || {};
 			this._appRef.tick();
 		});
 	}

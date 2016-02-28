@@ -49,12 +49,11 @@ var schema = mongoose.Schema({
 		type: {},
 		select: false,
 		default: {}
-	},	
+	},
 	needEmailNotification: {
 		type: Boolean,		
 		default: false
-	},
-	
+	},	
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
@@ -115,10 +114,24 @@ schema.statics.setOrderReaded = function(uid, oid, cb) {
 	});
 };
 
-schema.statics.setMessagesUnreaded = function(uid, oid, cb) {
+var changeCount = function(obj, setZero, lid) {
+	var count = -1,
+		lid = ( lid || ( obj && obj[1] ) || 0 );
+	
+	if (!setZero) {		
+		count = ( ( obj && Number(obj[0]) ) || 0 );
+	}
+	
+	return [++count, lid];
+};
+
+schema.statics.setMessagesUnreaded = function(uid, oid, lid, cb) {
 	this.findById(uid).select('newMessages needEmailNotification').exec(function(err, user) {	
-		user.newMessages[oid] = user.newMessages[oid] || 0;
-		user.newMessages[oid]++;		
+		//user.newMessages[oid] = user.newMessages[oid] || 0;
+		//user.newMessages[oid]++;		
+		
+		user.newMessages[oid] = changeCount(user.newMessages[oid], false, lid);
+		
 		user.markModified('newMessages');
 
 		user.needEmailNotification = true;
@@ -138,27 +151,28 @@ schema.statics.setMessagesReaded = function(uid, oid, cb) {
 		}
 
 		var indexOf = user.newOrders.indexOf(oid); // if length == 0 or undefined oid then -1 
-
-		if (!user.newMessages[oid] && indexOf === -1 && !user.needEmailNotification) {
+/*console.log('user.newMessages[oid]',user.newMessages[oid]);
+console.log('user.newMessages[oid][0]',user.newMessages[oid][0]);
+console.log('indexOf',indexOf);*/
+		if ( (!user.newMessages[oid] || !user.newMessages[oid][0]) && indexOf === -1 && !user.needEmailNotification ) {
 			cb && cb(err, user);
-			
+console.log('cancelcancelcancelcancelcancelcancelcancelcancelcancel');
 			return;
-		}		
-	
-		if (oid) {
-			if (indexOf > -1) {
-				user.newOrders.splice(indexOf, 1);
-			}
-		} else {
-			user.newOrders = [];
+		}	
+
+		if (indexOf > -1) {
+			user.newOrders.splice(indexOf, 1);
 		}
 		
-		if (oid) {
-			delete user.newMessages[oid];
+	
+		
+		/*if (oid) {
+			// delete user.newMessages[oid];
 		} else {
 			user.newMessages = {};
-		}
+		}*/
 
+		user.newMessages[oid] = changeCount(user.newMessages[oid], true);
 		user.markModified('newMessages');
 		
 		user.needEmailNotification = false;
@@ -170,7 +184,7 @@ schema.statics.setMessagesReaded = function(uid, oid, cb) {
 	});
 };
 
-schema.statics.setPrivMessagesUnreaded = function(uid, cid, cb) {
+schema.statics.setPrivMessagesUnreaded = function(uid, cid, lid, cb) {
 	if (uid === cid) {
 		cb && cb({error: 'Message to yourself'});
 		return;
@@ -182,8 +196,10 @@ schema.statics.setPrivMessagesUnreaded = function(uid, cid, cb) {
 			return;
 		}
 		
-		user.newPrivMessages[cid] = user.newPrivMessages[cid] || 0;
-		user.newPrivMessages[cid]++;		
+		// user.newPrivMessages[cid] = user.newPrivMessages[cid] || 0;
+		// user.newPrivMessages[cid]++;
+		
+		user.newPrivMessages[cid] = changeCount(user.newPrivMessages[cid], false, lid);
 		user.markModified('newPrivMessages');
 
 		user.needEmailNotification = true;
@@ -202,18 +218,13 @@ schema.statics.setPrivMessagesReaded = function(uid, cid, cb) {
 			return;
 		}
 
-		if (!user.newPrivMessages[cid] && !user.needEmailNotification) {
+		if ( (!user.newPrivMessages[cid] || !user.newPrivMessages[cid][0]) && !user.needEmailNotification ) {
 			cb && cb(err, user);
 			
 			return;
 		}
 		
-		if (cid) {
-			delete user.newPrivMessages[cid];
-		} else {
-			user.newPrivMessages = {};
-		}
-
+		user.newPrivMessages[cid] = changeCount(user.newPrivMessages[cid], true);
 		user.markModified('newPrivMessages');
 		
 		user.needEmailNotification = false;
@@ -235,30 +246,59 @@ setInterval(function() {
 		name: 1,
 		email: 1,
 		newMessages: 1,
+		newPrivMessages: 1,
 		newOrders: 1,
 		needEmailNotification: 1
 	}).exec(function(err, users) {
 		users.forEach(function(user) {
 			user.needEmailNotification = false;
+			
+			var newOrders = user.newOrders;
+			
+			var msgsInOrder = Object.keys(user.newMessages).filter(function(oid) {
+				if (!user.newMessages[oid][0]) {
+					delete user.newMessages[oid]; // потому что чела уже давно небыло на сайте все равно
+					
+					return false;
+				}
+				
+				return true;
+			});
+
+			var msgsInDialog = Object.keys(user.newPrivMessages).filter(function(cid) {
+				if (!user.newPrivMessages[cid][0]) {
+					delete user.newPrivMessages[cid];
+					
+					return false;
+				}
+				
+				return true;
+			});			
+			
+			user.markModified('newMessages');
+			user.markModified('newPrivMessages');
+			
 			user.save(function(err, user) {
 				//log errors
+console.dir(user._doc)
 			});
 			
-			var newOrders = user.newOrders,
-				newMessages = Object.keys(user.newMessages);
-			
-			if (newOrders.length || newMessages.length) {
+			if (newOrders.length || msgsInOrder.length) {
 				var text = '<h1>Hello, ' + user.name + '!</h1>';
 				
 				if (newOrders.length) {
-					text += '<p>You have new ' + ( newOrders.length > 1 ? '<a href="http://osliki.net/requests">orders</a>' : '<a href="http://osliki.net//messages/request/' + newOrders[0] + '">order</a>') + '.</p>'
+					text += '<p>You have new ' + ( newOrders.length > 1 ? '<a href="http://osliki.net/orders">orders</a>' : '<a href="http://osliki.net/messages/order/' + newOrders[0] + '">order</a>') + '.</p>'
 				}
 				
-				if (newMessages.length) {
-					text += '<p>You have new ' + (newMessages.length > 1 ? '<a href="http://osliki.net/requests">messages</a>' : '<a href="http://osliki.net//messages/request/' + newMessages[0] + '">message</a>') + '.</p>'
+				if (msgsInOrder.length) {
+					text += '<p>You have new ' + (msgsInOrder.length > 1 ? '<a href="http://osliki.net/orders">messages</a>' : '<a href="http://osliki.net/messages/order/' + msgsInOrder[0] + '">message</a>') + '.</p>'
+				}			
+				
+				if (msgsInDialog.length) {
+					text += '<p>You have new ' + (msgsInDialog.length > 1 ? '<a href="http://osliki.net/messages">private messages</a>' : '<a href="http://osliki.net/messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</p>'
 				}
 				
-				console.log(text);
+console.log(text);
 				
 				var email = new sendgrid.Email();
 				
@@ -280,9 +320,21 @@ setInterval(function() {
 		
 	});
 // }, 1000*60*5);
-}, 1000*10);
+}, 1000*2);
 
 module.exports = User;
+
+/*
+User.find().select('newPrivMessages').exec(function(err, user) {
+	user.forEach(function(user){
+		
+		user.newPrivMessages = {};
+		
+		user.markModified('newPrivMessages');
+		user.save();
+		
+	});
+});*/
 
 
 

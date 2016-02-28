@@ -453,6 +453,7 @@ router.post('/status', function(req, res, next) {
 			return;
 		}
 		
+		
 		var checkAndSave = function(canAfterCurrent) {
 			var isTripPassed = ( new Date(order.trip.when) ) < ( new Date() );
 			
@@ -476,19 +477,23 @@ router.post('/status', function(req, res, next) {
 					return;
 				}
 
+				var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
+				
 				var message = new Message({
 					order: order.id,
 					user: req.session.uid,
-					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+					corr: corr,
+					message: 'I changed the #order' + order.id + ' status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
 				});		
 				
 				message.save(function(err, message) {
+		console.log(err)
 					if (err) {
 						// log error							
 						return;
 					}
 
-					User.setMessagesUnreaded(req.session.uid !== orderUser ? orderUser : tripUser, order.id);
+					User.setMessagesUnreaded(corr, order.id, message.id);
 				});				
 				
 				res.type('json')

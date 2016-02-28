@@ -49,7 +49,13 @@ console.log('this.newPrivMessagesKeys', this.newPrivMessagesKeys);
 	}
 	
 	public getKeys(obj) : string[] {
-		return obj ? Object.keys(obj) : [];
+		if (!obj) {
+			return [];
+		}
+		
+		return Object.keys(obj).filter(function(key) {
+			return obj[key][0];
+		})
 	}
 }
 

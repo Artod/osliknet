@@ -9,17 +9,14 @@ import {OrderService} from '../services/order/order.service';
 import {NotificationService} from '../services/notification/notification.service';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
-// import {ModalService} from '../services/modal/modal.service';
-
-// import {Order} from '../services/order/order';
 
 @Component({
-	templateUrl: '/app/tmpls/requests.html',
+	templateUrl: '/app/tmpls/orders.html',
 	directives: [ROUTER_DIRECTIVES, /*ChatComponent, */TripCardComponent, OrderCardComponent],
 	pipes: [ToDatePipe]
 })
 
-export class RequestsComponent implements OnDestroy {
+export class OrdersComponent implements OnDestroy {
 	public orders : any[];
 	public newMessages : any = {};
 	private _notifSub;
@@ -40,11 +37,12 @@ export class RequestsComponent implements OnDestroy {
 			console.log('done');
 		});
 		
-		this.newMessages = this._notificationService.data.newMessages;
-		
+		this.newMessages = this._notificationService.data.newMessages || {};
+console.log('this._notificationService.datathis._notificationService.datathis._notificationService.datathis._notificationService.data')
+console.dir(this._notificationService.data)
 		this._notifSub = this._notificationService.start().subscribe(data => {
 console.log('RequestsComponent _notifSub subscribeRequestsComponent _notifSub subscribeRequestsComponent _notifSub subscribe');
-			this.newMessages = data.newMessages;
+			this.newMessages = data.newMessages || {};
 			this._appRef.tick();
 		});
 	}

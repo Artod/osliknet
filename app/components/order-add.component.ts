@@ -12,7 +12,7 @@ import {OrderService} from '../services/order/order.service';
 	// viewBindings: [FORM_BINDINGS],
 })
 
-export class RequestAddComponent {
+export class OrderAddComponent {
 	
 	public formModel : any = {};
 

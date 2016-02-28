@@ -59,8 +59,8 @@ export class ChatComponent implements
 	public ngOnInit() : void {
 		this._notifSub = this._notificationService.start(3000).subscribe(data => {
 			if (
-				(this.orderId && data.newMessages && data.newMessages[this.orderId]) ||
-				(this.corrId && data.newPrivMessages && data.newPrivMessages[this.corrId])
+				( this.orderId && data.newMessages && data.newMessages[this.orderId] && (data.newMessages[this.orderId][0] || data.newMessages[this.orderId][1] !== this.lastId) ) ||
+				( this.corrId && data.newPrivMessages && data.newPrivMessages[this.corrId] && (data.newPrivMessages[this.corrId][0] || data.newPrivMessages[this.corrId][1] !== this.lastId) )
 			) {
 				this.getLastMessages();
 			}

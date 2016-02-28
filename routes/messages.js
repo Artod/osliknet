@@ -367,7 +367,7 @@ if (!req.session.uid) {
 					return;
 				}
 
-				User.setMessagesUnreaded(corr, order.id);
+				User.setMessagesUnreaded(corr, order.id, message.id);
 				
 				res.type('json')
 					.json({message: message});
@@ -413,7 +413,7 @@ if (!req.session.uid) {
 					return;
 				}
 
-				User.setPrivMessagesUnreaded(corr, req.session.uid);
+				User.setPrivMessagesUnreaded(corr, req.session.uid, message.id);
 				
 				res.type('json')
 					.json({message: message});

@@ -6,7 +6,7 @@ import {FORM_DIRECTIVES, CORE_DIRECTIVES, FORM_PROVIDERS} from 'angular2/common'
 import {TripsComponent}    from './trips.component';
 import {TripAddComponent}  from './trip-add.component';
 import {TripsMyComponent}  from './trips-my.component';
-import {RequestsComponent} from './requests.component';
+import {OrdersComponent} from './orders.component';
 import {OrderComponent}    from './order.component';
 import {UserComponent}     from './user.component';
 import {NotificationsComponent} from './notifications.component';
@@ -33,9 +33,9 @@ import {NotificationService} from '../services/notification/notification.service
 	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent},
 	{path:'/trips/my', name: 'TripsMy', component: TripsMyComponent},
 	{path:'/users/:id', name: 'User', component: UserComponent},
-	{path:'/requests', name: 'Requests', component: RequestsComponent},
-	{path:'/messages/request/:id', name: 'Order', component: OrderComponent},
-	{path:'/messages/user/:id', name: 'Messages', component: MessagesComponent}
+	{path:'/orders', name: 'Orders', component: OrdersComponent},
+	{path:'/messages/order/:id', name: 'Order', component: OrderComponent},
+	{path:'/messages/user/:id', name: 'Messages', component: MessagesComponent},
 	{path:'/messages', name: 'Dialogs', component: DialogsComponent}
 ])
 

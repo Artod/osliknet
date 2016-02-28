@@ -16,7 +16,7 @@
 				<p class="text-right">
 					<a [routerLink]="['Messages', {id: user._id}]" >
 						Go to the dialog 
-						<span class="badge" *ngIf="newPrivMessages[user._id]">{{newPrivMessages[user._id]}}</span>
+						<span class="badge" *ngIf="newPrivMessages[user._id] && newPrivMessages[user._id][0]">{{newPrivMessages[user._id][0]}}</span>
 					</a>
 				</p>
 	

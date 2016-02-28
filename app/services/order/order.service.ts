@@ -14,7 +14,7 @@ export class OrderService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/requests', {
+		return this.http.get('/orders', {
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
 		}).map(res => <any[]> res.json().orders);
@@ -24,7 +24,7 @@ export class OrderService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/requests/my', {			
+		return this.http.get('/orders/my', {			
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
 		}).map(res => <any[]> res.json().trips);
@@ -35,7 +35,7 @@ export class OrderService {
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		headers.append('Content-Type', 'application/json');
 	
-		return this.http.post('/requests/add', JSON.stringify(data), {			
+		return this.http.post('/orders/add', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -50,7 +50,7 @@ export class OrderService {
 			order: order
 		};
 	
-		return this.http.post('/requests/status', JSON.stringify(data), {			
+		return this.http.post('/orders/status', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
