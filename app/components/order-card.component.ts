@@ -1,12 +1,13 @@
 import {Component, Input, Inject} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
+import {UserCardComponent} from './user-card.component';
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	selector: 'order-card',
 	templateUrl: '/app/tmpls/order-card.html',
-	directives: [ROUTER_DIRECTIVES],
+	directives: [ROUTER_DIRECTIVES, UserCardComponent],
 	pipes: [ToDatePipe]
 })
 

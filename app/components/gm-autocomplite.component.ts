@@ -19,7 +19,7 @@ export class GmAutocompliteComponent implements OnInit {
 	@Input() model;
 	public isInvalid: boolean = false;
 	private _currentCity: string = '';
-	private _place: string = '';
+	// private _place: string = '';
 	
 	constructor(
 		private _loader: LazyMapsAPILoader,
@@ -37,6 +37,8 @@ export class GmAutocompliteComponent implements OnInit {
 		this._loader.load().then( () =>	{
 			this.init($place, $place_id);
 		});
+		
+		this._currentCity = this.model[this.name_place];
 	}
 
 	
@@ -48,28 +50,32 @@ export class GmAutocompliteComponent implements OnInit {
 		var that = this;
 		
 		google.maps.event.addListener(autocomplete, 'place_changed', function() {		
-			var place = this.getPlace();
-			
-			that._currentCity = $place.value;
+			var place = this.getPlace();			
 			
 			that._zone.run(() => {
+				that._currentCity = $place.value;
 				that.model[that.name_place] = that._currentCity;
 				that.model[that.name_id] = place.place_id;
 			});
 		});
 	}
 	
-	onChange(value: String): void {
+	check(value: String): void {
 		if (this._currentCity && value !== this._currentCity) {
 			this._currentCity = '';
-			this._place = '';
+			// this._place = '';
 			this.model[this.name_place] = '';
 			this.model[this.name_id] = '';
+
 		}
 	}
 	
+	onChange(value: String): void {
+		this.check(value);
+	}
+	
 	onBlur(value: String): void {
-	 
+		
 	}
 }
 

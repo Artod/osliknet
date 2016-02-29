@@ -3,6 +3,7 @@ var router = express.Router();
 
 var Trip = require('../models/trip');
 var Order = require('../models/order');
+var User = require('../models/user');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -112,10 +113,10 @@ if (!req.session.uid) {
 		// res.render('index', { title:trips[1].to + trips[0].from });
 	});
 });
-
+/*
 router.get('/add', function(req, res, next) {
 	res.render('trips/add');
-});
+});*/
 
 router.post('/add', function(req, res, next) {
 	// console.log(111111111111111111111111111111111111111111111111111)
@@ -138,7 +139,7 @@ router.post('/add', function(req, res, next) {
 	
 	trip.save(function (err, trip) {
 		if (err) {
-			res.status(err.name == 'ValidationError' ? 400 : 500)				
+			res.status(err.name === 'ValidationError' ? 400 : 500)				
 			
 			res.type('json')
 				.json({error: err});
@@ -146,8 +147,10 @@ router.post('/add', function(req, res, next) {
 			return;
 		}
 		
-		 res.type('json')
-				.json({trip: trip});
+		User.stats(req.session.uid, 't_cnt', 1);
+		
+		res.type('json')
+			.json({trip: trip});
 	});  
 });
 

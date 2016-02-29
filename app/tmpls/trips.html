@@ -2,11 +2,11 @@
 	<h2>Find a Trip</h2>
 </div>
 
-<form class="text-center1 form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit(searchForm.value)">
+<form class="text-center1 form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event)">
 	<!-- <label class="control-label input-lg">Trip</label> -->
 	
 	<div class="form-group">
-		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [model]="searchModel" placeholder="From"></gm-autocomplite>
+		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
 	</div>
 	
 	<div class="form-group">
@@ -14,7 +14,7 @@
 	</div>
 
 	<div class="form-group">	
-		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [model]="searchModel" placeholder="To"></gm-autocomplite>
+		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" placeholder="To"></gm-autocomplite>
 	</div>
 
 	<!-- <input type="text" required [(ngModel)]="model.test" /> [disabled]="!form.form.valid" -->

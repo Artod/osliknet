@@ -2,12 +2,7 @@
 <div class="page-header">
 	<h2>
 		Dialog with 
-		<span *ngIf="user && user.name">
-			<a [routerLink]="['User', {id: user._id}]">
-				<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=40" alt="{{ user.name }}" />
-			</a>
-			<a [routerLink]="['User', {id: user._id}]">{{user.name}}</a>
-		</span>
+		<user-card [user]="user" *ngIf="user && user._id"></user-card>
 	</h2>		
 </div>
 

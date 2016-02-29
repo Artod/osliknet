@@ -1,11 +1,7 @@
-<h2>Profile</h2>
+<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
 
-<div class="row" *ngIf="user && user.name">
-	<div class="col-sm-3 col-xs-12">
-		<p>
-			<span class="text-muted small1">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
-		</p>
-		
+<div class="row" *ngIf="user && user._id">
+	<div class="col-sm-3 col-xs-12">	
 		<p>
 			<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=200" alt="{{ user.name }}" width="100%" />
 		</p>
@@ -22,11 +18,59 @@
 			<a [routerLink]="['Dialogs']"> Dialogs</a>
 		</p>
 	</div>
-	<div class="col-sm-9 col-xs-12">		
+	<div class="col-sm-9 col-xs-12">
+		<p>
+			<span class="text-muted">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
+		</p>
+		
+		<div *ngIf="user.stats">
+			<h4>Statistic:</h4>
+			<table class="table">
+				<tr>
+					<td>Trips</td>
+					<td>{{ user.stats.t_cnt }}</td>
+				</tr>
+				<tr>
+					<td>Requests on delivery</td>
+					<td>{{ user.stats.t_order }}</td>
+				</tr>
+				<tr>
+					<td>Processed requests</td>
+					<td>{{ user.stats.t_proc }}</td>
+				</tr>
+				<tr>
+					<td>Rating</td>
+					<td>
+						<span class="glyphicon glyphicon-thumbs-down"></span> {{ user.stats.t_rate[0] }} 
+						<span class="glyphicon glyphicon-thumbs-up"></span> {{ user.stats.t_rate[1] }}
+					</td>
+				</tr>
+			</table>
+			
+			<table class="table">
+				<tr>
+					<td>Requests on delivery</td>
+					<td>{{ user.stats.r_cnt }}</td>
+				</tr>
+				<tr>
+					<td>Processed requests</td>
+					<td>{{ user.stats.r_proc }}</td>
+				</tr>
+				<tr>
+					<td>Rating</td>
+					<td>
+						<span class="glyphicon glyphicon-thumbs-down"></span> {{ user.stats.r_rate[0] }} 
+						<span class="glyphicon glyphicon-thumbs-up"></span> {{ user.stats.r_rate[1] }}
+					</td>
+				</tr>
+			</table>
+		</div>
+		
 		<p>
 			{{ user.about }}
 		</p>
-		<button class="btn btn-warning" *ngIf="configUser.id === user._id">Edit</button>
+		
+		<button class="btn btn-default" *ngIf="configUser.id === user._id">Edit</button>
 	</div>
 	<div class="col-xs-12">		
 		<h3>Reviews</h3>

@@ -9,21 +9,22 @@ TODO:
 	\/- send email to traveler
 	\/- inc order counter
 	
-- Reviews + rating
 - Profile
+- Reviews + 
+\/-rating
 
 - TripPage + edit
 - Subscribe on new trips
 - Paging
 
-- textarea везде maxlength: 2000
+\/- textarea везде maxlength: 2000
 
 - Calendar css
-- Modal css
+\/- Modal css
 - Index page
 
 - Logging errors
-- hide request delivery button if there is order yet
+\/- hide request delivery button if there is order already
 
 - unauth middleware
 - check auth (session.uid)

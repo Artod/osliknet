@@ -25,12 +25,12 @@ router.get('/notifications/:timestamp?', function(req, res, next) {
 				updated_at: user.updated_at
 			};
 	
-			if (true || Number(req.params.timestamp) !== user.updated_at.getTime() ) {
+			if (/*true || */Number(req.params.timestamp) !== user.updated_at.getTime() ) {
 				out.newMessages = user.newMessages;
 				out.newOrders = user.newOrders;
 				out.newPrivMessages = user.newPrivMessages;
 			}
-console.dir(out)
+/*console.dir(out)*/
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
 console.log('needEmailNotification false save');
@@ -316,7 +316,7 @@ router.get('/:id', function(req, res, next) {
 	}
 	
 	User.findById(req.params.id)
-		.select('created_at name gravatar_hash about')
+		.select('created_at name gravatar_hash about stats')
 		.exec(function(err, user) {
 			if (err) {
 				res.status(500)

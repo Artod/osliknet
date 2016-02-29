@@ -1,4 +1,4 @@
-import {Component} from 'angular2/core';
+import {Component/*, Location*/} from 'angular2/core';
 import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
 import {HTTP_PROVIDERS} from 'angular2/http';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FORM_PROVIDERS} from 'angular2/common';
@@ -25,7 +25,7 @@ import {NotificationService} from '../services/notification/notification.service
     selector: 'app',
 	templateUrl: '/app/tmpls/app.html',
 	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES, NotificationsComponent],
-	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService]
+	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, /*Location, */TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService]
 })
 
 @RouteConfig([

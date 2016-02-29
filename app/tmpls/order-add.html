@@ -1,18 +1,36 @@
-<h2>Add a Request for Delivery</h2>
+<div *ngIf="_checked && order && order._id">
+	<div class="page-header">
+		<h2>Request for delivery</h2>
+	</div>
+	<p>
+		<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</span>
+	</p>	
+	
+	<p class="order-message">
+		{{ order.message }}
+	</p>
+	
+	<div class="text-right">
+		<a href="#" (click)="onClick()">Go to negotiation.</a>
+	</div>
+</div>
 
-<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+<div *ngIf="_checked && !order">
+	<div class="page-header">
+		<h2>Add a Request for delivery</h2>
+	</div>
 
-	<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
-	
-	<br />
-	
-	<label for="">
-		Description:
+	<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+		<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
 
-		<textarea name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message"></textarea>
-	</label>
-	
-	<br />
-	
-	<button>Send</button>
-</form>
+		<div class="form-group">	
+			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description"></textarea>
+		</div>
+		
+		<br />
+		
+		<p class="text-right">
+			<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
+		</p>
+	</form>
+</div>

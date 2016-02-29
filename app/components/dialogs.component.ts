@@ -4,11 +4,12 @@ import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 import {MessageService} from '../services/message/message.service';
 import {NotificationService} from '../services/notification/notification.service';
 
+import {UserCardComponent} from './user-card.component';
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/dialogs.html',
-	directives: [ROUTER_DIRECTIVES],
+	directives: [ROUTER_DIRECTIVES, UserCardComponent],
 	pipes: [ToDatePipe]
 })
 

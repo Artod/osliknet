@@ -64,7 +64,8 @@ var tripSchema = mongoose.Schema({
 	description: {
 		type: String,
 		default: '',
-		trim: true
+		trim: true,
+		maxlength: 2000
 	},
 	is_removed: {
 		type: Boolean,

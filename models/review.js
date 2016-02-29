@@ -14,8 +14,7 @@ var schema = mongoose.Schema({
 	},
 	rating: {
 		type: Number,
-		required: true,
-		trim: true
+		required: true
 	},
 	comment: {
 		type: String,

@@ -3,13 +3,14 @@ import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
+import {UserCardComponent} from './user-card.component';
 import {ChatComponent} from './chat.component';
 
 @Component({
 	selector: 'messages',
 	templateUrl: '/app/tmpls/messages.html',
 	pipes: [ToDatePipe],
-	directives: [ROUTER_DIRECTIVES, ChatComponent]
+	directives: [ROUTER_DIRECTIVES, ChatComponent, UserCardComponent]
 })
 
 export class MessagesComponent {

@@ -29,12 +29,53 @@ var schema = mongoose.Schema({
 	about: {
 		type: String,
 		default: '',
-		trim: true
+		trim: true,
+		maxlength: 2000
 	},
 	is_approved: {
 		type: Boolean,
 		default: false
-	},	
+	},
+	stats: {
+		select: false,
+		t_cnt: { // on create trip
+			type: Number,
+			default: 0
+		},
+		t_order: { // on create trip
+			type: Number,
+			default: 0
+		},
+		t_proc: { // on set order status finish
+			type: Number,
+			default: 0
+		},
+		t_rate: { // on create or change review
+			type: Array,
+			default: [0, 0]
+		},
+		
+		r_cnt: { // on create order (request)
+			type: Number,
+			default: 0
+		},
+		r_proc: { // on set order status finish
+			type: Number,
+			default: 0
+		},
+		r_rate: { // on create or change review
+			type: Array,
+			default: [0, 0]
+		}
+	},
+	
+	/*
+	{
+		
+		
+	}
+	
+	*/
 	newOrders: {
 		type: Array,
 		select: false,
@@ -69,6 +110,42 @@ schema.pre('save', function(next) {
 	
 	next();
 });
+
+schema.statics.stats = function(uid, param, val, oldVal) {
+	this.findById(uid).select('stats.' + param).exec(function(err, user) {
+		if (err || !user) {
+			//log
+			return;
+		}
+console.log('before user.stats[param]')
+console.dir(user.stats[param])
+
+console.log('uid = ', uid)
+console.log('val = ', val)
+console.log('oldVal = ', oldVal)
+		if (param === 't_rate' || param === 'r_rate') {
+			if (oldVal) {
+				if (oldVal === val) {
+					return;
+				}
+				
+				user.stats[param][oldVal === -1 ? 0 : 1]--;
+			}
+
+			user.stats[param][val === -1 ? 0 : 1]++;			
+		} else {
+			user.stats[param] = user.stats[param] + val;			
+		}
+console.log('after user.stats[param]')
+console.dir(user.stats[param])
+user.markModified('stats.' + param);
+		user.save(function(err, user) {
+			//log
+console.log('savesavesavesavesavesavesavesave')
+console.dir(user._doc)
+		});
+	});
+};
 
 schema.statics.setOrderUnreaded = function(uid, oid, cb) {
 	this.findById(uid).select('newOrders needEmailNotification').exec(function(err, user) {
@@ -280,7 +357,6 @@ setInterval(function() {
 			
 			user.save(function(err, user) {
 				//log errors
-console.dir(user._doc)
 			});
 			
 			if (newOrders.length || msgsInOrder.length) {
@@ -320,7 +396,7 @@ console.log(text);
 		
 	});
 // }, 1000*60*5);
-}, 1000*2);
+}, 1000*20);
 
 module.exports = User;
 

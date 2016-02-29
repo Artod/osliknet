@@ -89,26 +89,29 @@ console.log('ngOnChangesngOnChangesngOnChanges', changes.isChatActual)
 		this._notifSub.unsubscribe();
 	}
 	
+	private _chatHeight : number = 0;
+	private _listTop : number;	
+	
 	public ngAfterViewChecked() : void {
 console.log('Chat ngAfterViewChecked');
-		let current = this.elChatList.scrollHeight;		
-		if ( this._chatHeight !== current ) {
-			this._chatHeight = current;
-			this.scrollDown();
-		}
-
-		let listTop = Math.round( this.elChatList.getBoundingClientRect().top + (window.document.documentElement.scrollTop || window.document.body.scrollTop) );
+		let listTop = Math.round( this.elChatList.getBoundingClientRect().top + (window.document.documentElement.scrollTop || window.document.body.scrollTop) ); // round for mozilla round
+		
 		if (this._listTop !== listTop) {
 			this._listTop = listTop;
 			this.expand(listTop);
 		}
+		
+		if ( this._chatHeight !== this.elChatList.scrollHeight ) {
+			this._chatHeight = this.elChatList.scrollHeight;
+			this.scrollDown();
+		}
 	}
 	
-	private _chatHeight : number = 0;
-	private _listTop : number;
+
 	
 	public scrollDown() : void {
 		this.elChatList.scrollTop = this.elChatList.scrollHeight;
+console.log('setsetsetsetsetsetsetsetsetsetsetset this.elChatList.scrollHeight = ', this.elChatList.scrollHeight)	
 	}
 	
 	public expand(listTop?) : void {
@@ -144,6 +147,8 @@ console.log('expandexpandexpandexpandexpandexpandexpan')
 			this.isChatActualChange.emit(this.isChatActual);
 
 			this._busy = false;
+			
+			// setTimeout(() => this.scrollDown(), 0);			
 		}, error => {
 			this._busy = false;
 		});

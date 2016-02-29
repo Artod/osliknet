@@ -36,10 +36,8 @@ export class OrderComponent {
 		@Inject('config.orderStatus') public configOrderStatus,
 		@Inject('config.orderStatusConst') public sts,
 		@Inject('config.user') public configUser
-	) {	
-console.log('OrderComponent constructor');	
+	) {
 		this.orderId = this._routeParams.get('id');
-console.log('this.orderId = ',this.orderId);
 	}
 	
 	private _changeStatusBusy : boolean = false;
@@ -65,9 +63,14 @@ console.log('this.orderId = ',this.orderId);
 			this._modalService.bind( ReviewAddComponent, modalComponentRef, Injector.resolve([
 				provide(Renderer, {useValue: this._renderer}),				
 				provide(ReviewService, {useValue: this._reviewService}),				
-				provide('orderId', {useValue: this.orderId})
+				provide('orderId', {useValue: this.orderId}),
+				provide('onReviewAdd', {
+					useValue: () => {
+						this.isChatActual = false;
+					}
+				})
 			]) );
-		});
+		})
 	}
 	
 	public onOrder(order) : void {

@@ -2,7 +2,7 @@
 	
 	<table class="table {{ message.user._id === configUser.id ? 'chat-message-my' : '' }}" *ngFor="#message of messages; #idx = index;" >
 		<tr>
-			<td class="chat-avatar">
+			<td class="chat-avatar avatar">
 				<img src="http://gravatar.com/avatar/{{ message.user.gravatar_hash }}?d=monsterid" alt="{{ message.user.name }}" width="40px" height="40px" />
 			</td>
 			<td>

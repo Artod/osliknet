@@ -25,6 +25,7 @@ export class ReviewAddComponent {
 		private _fb : FormBuilder,		
 		private _reviewService : ReviewService,
 		@Inject('orderId') public orderId : string
+		@Inject('onReviewAdd') public onReviewAdd : Function
 	) {
 		this.form = _fb.group({ 
 			order: ['', Validators.required],
@@ -32,7 +33,7 @@ export class ReviewAddComponent {
 			comment: ['', Validators.required]
 		});
 		
-		this.formModel.rating = 5;		
+		this.formModel.rating = 1;		
 		this.formModel.order = this.orderId;		
 		
 		this._busy = true;
@@ -65,7 +66,9 @@ export class ReviewAddComponent {
 			this._reviewService.add(this.formModel).subscribe(data => {
 				this._busy = false;
 				
-				this._modalComponent && this._modalComponent.close();					
+				this._modalComponent && this._modalComponent.close();
+
+				this.onReviewAdd()				
 			}, err => {
 console.error(err);
 				this._busy = false;

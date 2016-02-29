@@ -10,12 +10,10 @@
 					{{ order.message }}
 				</p>
 				
-			<div class="text-right">
-<a [routerLink]="['Order', {id:order._id}]">Go to the discussion <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-
-<br />
-			<br />
-			</div>
+				<div class="text-right">
+					<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
+				</div>
+			
 			</div>
 			<div class="col-xs-4">
 				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>

@@ -32,11 +32,12 @@ export class ModalService {
 		
 		// providers = providers || [];		
 		// providers.push( Injector.resolve([ provide(ModalComponent, {useValue: modalComponentRef.instance}) ]) );
-console.log('loadIntoLocation');
+
 		let promise = this._componentLoader.loadIntoLocation(Component, elementRef, 'comp', providers).then( componentRef => {
-console.log('loadIntoLocation then');
 			componentRef.instance._modalComponent = modalComponentRef.instance;
 			modalComponentRef.instance.loaded = true;
+
+			return componentRef;
 		});
 		
 		return promise;

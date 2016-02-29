@@ -1,6 +1,6 @@
-<a href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)" *ngIf="newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length"><strong class="glyphicon glyphicon-bell"></strong></a>
+<a *ngIf="newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length" href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)"><strong class="glyphicon glyphicon-bell"></strong></a>
 
-<div class="popover-my" *ngIf="isOpened"><!--  (click)="$event.stopPropagation()" -->
+<div *ngIf="isOpened && (newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length)" class="popover-my"><!--  (click)="$event.stopPropagation()" -->
 	<ul class="notifications-list">
 		<li *ngFor="#order of newOrders">
 			<a [routerLink]="['Order', {id: order}]">New order</a>

@@ -337,18 +337,92 @@ router.get('/my', function(req, res, next) {
 });
 
 router.post('/add', function(req, res, next) {
-	/**
-		TODO:
-		- send email to traveler
-		- inc order counter
-	*/
-
-	// req.body.messages = req.body.messages || {};	
-
-	var order = new Order({
-		user: req.session.uid,
+	async.parallel({
+		trip: function(callback) {	
+			Trip.findById(req.body.trip).exec(function(err, trip) {
+				callback(err, trip);
+			});
+		},
+		order: function(callback){
+			Order.findOne({
+				trip: req.body.trip,
+				user: req.session.uid
+			}).exec(function (err, order) {
+				callback(err, order);
+			});
+		},                    
+	}, function(err, asyncRes){
+		if (err) {
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+		if (!asyncRes.trip) {
+			res.status(400).type('json')
+				.json({error: 'Trip not found.'});
+				
+			return;
+		}
+		
+		if (asyncRes.trip.user.toString() === req.session.uid) {
+			res.status(400).type('json')
+				.json({error: 'Order to the own trip.'});
+				
+			return;
+		}		
+		
+		if (asyncRes.order) {
+			res.status(400).type('json')
+				.json({error: 'Only one order allowed.'});
+				
+			return;
+		}
+		
+		var order = new Order({
+			trip: req.body.trip,
+			user: req.session.uid,
+			message: req.body.message
+		});
+		
+		order.save(function(err, order) {
+			if (err) {
+				res.status(err.name === 'ValidationError' ? 400 : 500);
+				
+				res.type('json')
+					.json({error: err});
+					
+				return;
+			}			
+			
+			User.setOrderUnreaded(asyncRes.trip.user, order.id);	
+			
+			User.stats(asyncRes.trip.user, 't_order', 1);
+			User.stats(req.session.uid, 'r_cnt', 1);
+			
+			res.type('json')
+				.json({order: order});
+		});
+		
+		// res.type('json').json(asyncRes);		
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*var order = new Order({
 		trip: req.body.trip,
-		status: 5,
+		user: req.session.uid,
 		message: req.body.message
 	});
 
@@ -366,55 +440,13 @@ router.post('/add', function(req, res, next) {
 			User.setOrderUnreaded(trip.user, order.id);
 		});
 		
-		res.type('json')
-			.json({order: order});
-
-		// res.redirect('/trips/' + req.body.trip_id);
-	});	
-	
-	/*Trip.findByIdAndUpdate(
-        req.body.trip_id, {
-			$push: {
-				orders: order
-			}
-		},
-		// {new: true},
-        function(err, oldTrip) {
-			if (err) {
-				res.status(err.name == 'ValidationError' ? 400 : 500);			
-				
-				res.type('json')
-					.json({error: err});
-					
-				return;
-			}
-			
-			res.type('json')
-				.json({});
-        }
-    );
-	
-	
-	Trip.find({
-		uid: req.body.trip_id
-	}).exec(function (err, order) {
-		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500);
-			
-			res.type('json')
-				.json({error: err});
-				
-			return;
-		}
+		User.stats(req.session.uid, 'r_cnt', 1);
+		User.stats(req.session.uid, 't_order', 1);
 		
 		res.type('json')
 			.json({order: order});
+	});	*/
 
-		// res.redirect('/trips/' + req.body.trip_id);
-
-	});
-	
-	  */
 });
 
 router.post('/status', function(req, res, next) {
@@ -451,8 +483,7 @@ router.post('/status', function(req, res, next) {
 			res.status(401).type('json').json({error: 'Unauthorized'});
 
 			return;
-		}
-		
+		}		
 		
 		var checkAndSave = function(canAfterCurrent) {
 			var isTripPassed = ( new Date(order.trip.when) ) < ( new Date() );
@@ -460,7 +491,7 @@ router.post('/status', function(req, res, next) {
 			if (
 				order.status !== canAfterCurrent || 
 				( newStatus === sts.FINISHED && !isTripPassed ) || // finish before trip
-				( isTripPassed && [sts.REFUSED, sts.CANCELLED, sts.FINISHED].indexOf(newStatus) === -1 ) // refus cancel and finish always		
+				( isTripPassed && [sts.REFUSED, sts.CANCELLED, sts.FINISHED].indexOf(newStatus) === -1 ) //  can refus cancel and finish always
 			) {
 				res.status(401).type('json').json({error: 'Unauthorized'});
 
@@ -487,14 +518,17 @@ router.post('/status', function(req, res, next) {
 				});		
 				
 				message.save(function(err, message) {
-		console.log(err)
-					if (err) {
-						// log error							
+					if (err) {// log error							
 						return;
 					}
 
 					User.setMessagesUnreaded(corr, order.id, message.id);
-				});				
+				});
+
+				if (newStatus === sts.FINISHED) {
+					User.stats(tripUser, 't_proc', 1);
+					User.stats(orderUser, 'r_proc', 1);
+				}
 				
 				res.type('json')
 					.json({order: order});
@@ -537,6 +571,24 @@ router.post('/status', function(req, res, next) {
 		
 		res.status(401).json({error: 'Unauthorized'});
 
+	});
+});
+
+router.get('/trip/:id', function(req, res, next) {
+	Order.findOne({
+		trip: req.params.id,
+		user: req.session.uid
+	}).exec(function(err, order) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		res.type('json')
+			.json({order: order});
 	});
 });
 

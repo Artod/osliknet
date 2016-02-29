@@ -19,7 +19,8 @@ var messageSchema = mongoose.Schema({
 	message: {
 		type: String,
 		required: true,
-		trim: true
+		trim: true,
+		maxlength: 2000
 	},
 	created_at: {
 		type: Date,

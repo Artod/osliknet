@@ -3,9 +3,9 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-/* a {
-  color: #00B7FF;
-} */
+a:focus, a:hover {
+  text-decoration:none;
+}
 
 .page-header {
     border-bottom: 0px solid #eee;
@@ -110,10 +110,10 @@ trip-card {
 	trip-card span {
 		color:#333;	
 	}
-
+/*
 	trip-card .user {
 		padding:8px 0px 0px 0px;
-	}
+	}*/
 
 order-card {
 	display:block;
@@ -203,9 +203,32 @@ order-card {
 			padding: 10px 15px;
 			position: relative;
 		}
-
+/*
 .btn-default .badge {
 	background-color: #f0ad4e;
+}
+*/
+
+.btn {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+.form-control {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+
+a.avatar {
+	display: inline-block;
+}
+
+.avatar img {
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
 }
 
 

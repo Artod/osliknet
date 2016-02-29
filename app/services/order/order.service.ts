@@ -19,6 +19,16 @@ export class OrderService {
 		// }).map(res => <Order[]> res.json().orders)
 		}).map(res => <any[]> res.json().orders);
 	}
+	
+	public getByTripId(tripId) {
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
+		return this.http.get('/orders/trip/' + tripId, {
+			headers: headers
+		// }).map(res => <Order[]> res.json().orders)
+		}).map( res => <any[]> res.json() );
+	}
 
 	public getMy() {
 		let headers = new Headers();

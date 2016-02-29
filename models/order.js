@@ -15,10 +15,12 @@ var schema = mongoose.Schema({
 	message: {
 		type: String,
 		required: true,
-		trim: true
+		trim: true,
+		maxlength: 2000
 	},
 	status: {
 		type: Number,
+		required: true,
 		default: 5
 	},
 	created_at: { type: Date },
