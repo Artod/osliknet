@@ -1,12 +1,10 @@
 <h2>Request</h2>
 
 <div class="row" *ngIf="order && order.trip">
-	<div class="col-xs-8">
+	<div class="col-xs-6">
 		<order-card [order]="order" [user]="order.user"></order-card>
-
-
 	</div>
-	<div class="col-xs-4">
+	<div class="col-xs-6">
 		<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
 	</div>
 	<div class="col-xs-12">
@@ -15,37 +13,41 @@
 		</p>
 		
 		<div *ngIf="configUser.id === order.user._id" [ngSwitch]="order.status" class="text-center">
-			<span *ngSwitchWhen="sts.NEGOTIATION">
-				<button class="btn btn-default" (click)="changeStatus(sts.CANCELLED)">Cancel request</button>
-			</span>
-			<span *ngSwitchWhen="sts.CANCELLED">
-				<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
-			</span>
-			<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
-				<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
-			</span>
+			<p>
+				<span *ngSwitchWhen="sts.NEGOTIATION">
+					<button class="btn btn-default" (click)="changeStatus(sts.CANCELLED)">Cancel request</button>
+				</span>
+				<span *ngSwitchWhen="sts.CANCELLED">
+					<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
+				</span>
+				<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
+					<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
+				</span>
+			</p>
 		</div>
 		
 		<div *ngIf="configUser.id === order.trip.user._id" [ngSwitch]="order.status" class="text-center">
-			<span *ngSwitchWhen="sts.NEGOTIATION">
-				<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.PROCESSING)">Accept</button> 
-				<button class="btn btn-default" (click)="changeStatus(sts.REFUSED)">Refuse</button>
-			</span>
-			<span *ngSwitchWhen="sts.PROCESSING">
-				<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
-			</span>
-			<span *ngSwitchWhen="sts.REFUSED">
-				<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
-			</span>
-			<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
-				<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
-			</span>
-		</div>		
+			<p>
+				<span *ngSwitchWhen="sts.NEGOTIATION">
+					<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.PROCESSING)">Accept</button> 
+					<button class="btn btn-default" (click)="changeStatus(sts.REFUSED)">Refuse</button>
+				</span>
+				<span *ngSwitchWhen="sts.PROCESSING">
+					<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
+				</span>
+				<span *ngSwitchWhen="sts.REFUSED">
+					<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
+				</span>
+				<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
+					<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
+				</span>
+			</p>
+		</div>
 	</div>
 </div>
 
 
 <!-- (orderStatus)="onOrderStatus($event)"  -->
-<chat [hidden]="!order || !order.trip" (order)="onOrder($event)" (orderStatus)="order.status = $event" [(isChatActual)]="isChatActual" [orderId]="orderId"></chat>
+<chat [hidden]="!order || !order.trip" (order)="onOrder($event)" (orderStatus)="onOrderStatus($event)" [(isChatActual)]="isChatActual" [orderId]="orderId"></chat>
 
 <div [hidden]="order && order.trip" >Loading...</div>

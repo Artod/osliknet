@@ -231,6 +231,19 @@ a.avatar {
     border-radius: 50%;
 }
 
+.star, .star-clickable {
+	color: #f0ad4e;
+}
+
+.star-clickable {
+	font-size: 2em;
+	cursor:pointer;
+}
+
+.star-clickable:hover {
+	color: #ec971f;
+}
+
 
 /*
 .btn-default {

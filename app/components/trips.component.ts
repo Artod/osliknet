@@ -4,7 +4,7 @@ import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router'
 
 import {TripCardComponent} from './trip-card.component';
 
-import {Trip} from '../services/trip/trip';
+// import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
@@ -21,7 +21,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 })
 
 export class TripsComponent {
-	public trips : Trip[];
+	public trips : any[];
 	
 	// public trips: any[];
 	
@@ -75,8 +75,7 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 	}
 	
 	public onSubmit($event) : void {
-		if (this.searchForm.valid) {
-			
+		if (this.searchForm.valid) {			
 			if ($event) {
 				this._location.go('/trips', this.serialize({
 					from: this.searchModel.from,
@@ -86,8 +85,8 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 				}));				
 			}
 			
-			this._tripService.search(this.searchModel).subscribe(res => {
-				this.trips = res.json();
+			this._tripService.search(this.searchModel).subscribe(data => {
+				this.trips = data.trips || [];				
 			}, err => {
 				console.dir(err)
 			});

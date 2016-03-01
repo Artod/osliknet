@@ -5,7 +5,9 @@
 		<p>
 			<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=200" alt="{{ user.name }}" width="100%" />
 		</p>
-		
+		<p>
+			<span class="text-muted">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
+		</p>
 		<p *ngIf="configUser.id === user._id">
 			<a href="https://gravatar.com" target="blank">Change Gravatar</a>
 		</p>
@@ -17,15 +19,19 @@
 		<p *ngIf="configUser.id === user._id">
 			<a [routerLink]="['Dialogs']"> Dialogs</a>
 		</p>
+		
+		<button class="btn btn-default" *ngIf="configUser.id === user._id" (click)="editMode = !editMode">Edit</button>
 	</div>
 	<div class="col-sm-9 col-xs-12">
-		<p>
-			<span class="text-muted">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
-		</p>
+
 		
 		<div *ngIf="user.stats">
 			<h4>Statistic:</h4>
+
 			<table class="table">
+				<tr>
+					<th colspan="2">As a voyager:</th>
+				</tr>
 				<tr>
 					<td>Trips</td>
 					<td>{{ user.stats.t_cnt }}</td>
@@ -41,13 +47,13 @@
 				<tr>
 					<td>Rating</td>
 					<td>
-						<span class="glyphicon glyphicon-thumbs-down"></span> {{ user.stats.t_rate[0] }} 
-						<span class="glyphicon glyphicon-thumbs-up"></span> {{ user.stats.t_rate[1] }}
+						 {{tRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{tRating[0]}} rates</small>
 					</td>
 				</tr>
-			</table>
-			
-			<table class="table">
+
+				<tr>
+					<th colspan="2">As a customer:</th>
+				</tr>
 				<tr>
 					<td>Requests on delivery</td>
 					<td>{{ user.stats.r_cnt }}</td>
@@ -59,20 +65,68 @@
 				<tr>
 					<td>Rating</td>
 					<td>
-						<span class="glyphicon glyphicon-thumbs-down"></span> {{ user.stats.r_rate[0] }} 
-						<span class="glyphicon glyphicon-thumbs-up"></span> {{ user.stats.r_rate[1] }}
+						{{rRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{rRating[0]}} rates</small>
 					</td>
 				</tr>
 			</table>
 		</div>
-		
-		<p>
-			{{ user.about }}
-		</p>
-		
-		<button class="btn btn-default" *ngIf="configUser.id === user._id">Edit</button>
 	</div>
-	<div class="col-xs-12">		
+	
+	<div class="col-xs-12">
+		<h3 *ngIf="user && user.about">About me</h3>
+		
+		<div *ngIf="!editMode">
+			{{ user.about }}
+		</div>
+		
+		<form *ngIf="editMode" action="/users/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
+			<div class="form-group">	
+				<label>About me:</label>
+				
+				<textarea class="form-control" name="about" [(ngModel)]="formModel.about" [ngFormControl]="form.controls.about"></textarea>
+			</div>
+			
+			<p class="text-right">
+				<button type="submit" class="btn btn-warning input-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Update' }}</button>
+			</p>
+		</form>
+
+	
 		<h3>Reviews</h3>
+		
+		<p *ngIf="reviews && !reviews.length">There are no reviews yet.</p>
+		
+		<!-- <div class="row" *ngFor="#review of reviews">
+			<div class="col-xs-12">
+			
+
+				
+			</div>
+		</div> -->
+		
+		<table class="table">
+			<tr *ngFor="#review of reviews">
+				<td>
+					<span *ngFor="#rating of _ratings" class="star glyphicon glyphicon-star{{ review.rating >= rating ? '' : '-empty' }}"></span>
+					
+					<p>
+						<user-card *ngIf="review.user && review.user._id" [user]="review.user"></user-card>
+						about
+						<user-card *ngIf="review.corr && review.corr._id" [user]="review.corr"></user-card>						
+					</p>
+					
+					
+					<span class="text-muted">{{ review.created_at | toDate | date: 'longDate' }}</span>			
+
+					<p>
+						{{ review.comment }}
+					</p>
+					
+					<p *ngIf="configUser.id === user._id">
+						<a [routerLink]="['Order', {id: review.order}]"> Go to the order</a>
+					</p>
+				</td>
+			</tr>
+		</table>
 	</div>
 </div>

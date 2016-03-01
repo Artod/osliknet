@@ -32,7 +32,9 @@ router.get('/', function(req, res, next) {
 		return;
 	}
 	
-	query.when = { $gt: ( new Date() ).getTime() - 1000*60*60*24 };
+	var now = (new Date()).getTime() - 1000*60*60*24;
+	
+	query.when = { $gt: now };
 	
 	query.is_removed = false;
 	
@@ -46,7 +48,7 @@ router.get('/', function(req, res, next) {
 		}
 		
 		res.type('json')
-			.json(trips);
+			.json({trips: trips});
 			
 		// res.render('trips/index', { trips: trips });
 			
@@ -69,27 +71,22 @@ if (!req.session.uid) {
 }
 	
 	Trip.find({
-		user: ObjectId(req.session.uid)
-	}).exec(function (err, trips) {
+		user: req.session.uid
+	}).sort('-when').exec(function (err, trips) {
 		if (err) {
-			res.status(500)
-				.type('json')
+			res.status(500).type('json')
 				.json({error: err});
 				
 			return;
 		}
 		
 		var tids = trips.map(function(trip) {
-			// return ObjectId(trip._id);
 			return trip._id;
 		});
 		
 		Order.find({
 			trip: {$in: tids}
-		}).sort({
-			status: 1,
-			created_at: -1
-		}).populate('user').exec(function(err, orders) {
+		}).sort('status -created_at').populate('user').exec(function(err, orders) {
 			if (err) {
 				res.status(500)
 					.type('json')
@@ -113,6 +110,7 @@ if (!req.session.uid) {
 		// res.render('index', { title:trips[1].to + trips[0].from });
 	});
 });
+
 /*
 router.get('/add', function(req, res, next) {
 	res.render('trips/add');
@@ -128,9 +126,9 @@ router.post('/add', function(req, res, next) {
 	// return
 	// console.dir(req.body);
 	
-	/*if (req.body.when) {
-		req.body.when += ' 23:59:59'		
-	}*/
+	// if (req.body.when) {
+		// req.body.when += ' 23:59:59'		
+	// }
 	
 	req.body.is_removed = false;	
 	req.body.user = req.session.uid;
@@ -147,14 +145,22 @@ router.post('/add', function(req, res, next) {
 			return;
 		}
 		
-		User.stats(req.session.uid, 't_cnt', 1);
+		Trip.find({user: trip.user}).count().exec(function(err, count) {
+			if (err) {
+				//log
+					
+				return;
+			}
+			
+			User.stats(req.session.uid, 't_cnt', count);
+		});		
 		
 		res.type('json')
 			.json({trip: trip});
 	});  
 });
 
-router.get('/:id', function(req, res, next) {	
+/*router.get('/:id', function(req, res, next) {	
 	Trip.findById(req.params.id, function(err, trip) {
 		if (err) {
 			res.status(500)
@@ -176,9 +182,9 @@ router.get('/:id', function(req, res, next) {
 	  // console.log('%s --- %s.', trips.name, trips.from)
 	  // res.render('index', { title:trips[1].to + trips[0].from });
 	});
-});
+});*/
 
-router.get('/edit/:id', function(req, res, next) {	
+/*router.get('/edit/:id', function(req, res, next) {	
 	Trip.findById(req.params.id, function(err, trip) {
 		if (err) {
 			res.status(500)
@@ -200,13 +206,13 @@ router.get('/edit/:id', function(req, res, next) {
 	  // console.log('%s --- %s.', trips.name, trips.from)
 	  // res.render('index', { title:trips[1].to + trips[0].from });
 	});
-});
+});*/
 
 // переделать на PUT
-router.post('/edit/:id', function(req, res, next) {	
-	/* if (req.body.when) {
-		req.body.when += ' 23:59:59'		
-	} */
+/*router.post('/edit/:id', function(req, res, next) {	
+	 // if (req.body.when) {
+		// req.body.when += ' 23:59:59'		
+	// } 
 	
 	
 	Trip.findOne({
@@ -308,9 +314,10 @@ router.post('/edit/:id', function(req, res, next) {
 		
 	});
 });
+*/
 
 // переделать на DELETE 
-router.get('/del/:id', function(req, res, next) {
+/*router.get('/del/:id', function(req, res, next) {
 	Trip.findOne({
 		_id: req.params.id
 	}, function(err, trip) {
@@ -342,8 +349,8 @@ router.get('/del/:id', function(req, res, next) {
 		
 	});
 });
-
-router.post('/comments/add', function(req, res, next) {		
+*/
+/*router.post('/comments/add', function(req, res, next) {		
 	req.body.user = req.session.uid;
 
 	console.dir(req.body);
@@ -369,6 +376,6 @@ router.post('/comments/add', function(req, res, next) {
 			res.redirect('/trips/' + req.body.trip_id);
         }
     );  
-});
+});*/
 
 module.exports = router;

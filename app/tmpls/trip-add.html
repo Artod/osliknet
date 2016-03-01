@@ -2,7 +2,7 @@
 	<h2>Add a Trip</h2>
 </div>
 
-<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit()">
 	
 	<div class="form-group">
 		<label>Trip:</label>
@@ -39,7 +39,7 @@
 	</div>
 	
 	<p class="text-right">
-		<button type="submit" class="btn btn-warning input-lg">Add</button>
+		<button type="submit" class="btn btn-warning input-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Add' }}</button>
 	</p>
 	
 </form>

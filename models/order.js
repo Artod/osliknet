@@ -12,6 +12,11 @@ var schema = mongoose.Schema({
 		required: true,
 		ref: 'User'
 	},
+	tripUser: {
+		type: Schema.Types.ObjectId,
+		required: true,
+		ref: 'User'
+	},
 	message: {
 		type: String,
 		required: true,
@@ -58,8 +63,13 @@ var Order = mongoose.model('Order', schema);
 
 
 module.exports = Order;
-
-
+/*
+Order.find().populate('trip').exec(function(err, order){
+	order.forEach(function(order) {
+		order.tripUser = mongoose.Types.ObjectId(order.trip.user);
+		order.save();
+	});
+});*/
 	/*messages: [
 		{
 			uid: {

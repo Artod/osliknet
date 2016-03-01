@@ -20,11 +20,101 @@ router.get('/', function(req, res, next) {
 		res.status(401).json({error: 'Unauthorized'});
 
 		return;
-	}
+	}	
+	
+	Order.find({
+		$or: [{
+			user: req.session.uid
+		}, {
+			tripUser: req.session.uid
+		}]			
+	}).sort('status -created_at').populate('user tripUser trip').exec(function(err, orders) {
+		if (err) {
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		orders.forEach(function(order) {
+			order.trip.user = order.tripUser;
+		});	
+		
+		User.setOrderReaded(req.session.uid);
+		
+		res.type('json').json({
+			orders: orders
+		});
+		
+		
+		return;
+		
+		/*var tripUids = [];
+		
+		orders.forEach(function(order) {
+			var uid = order.trip.user.toString();
+			
+			if (tripUids.indexOf(uid) === -1) {
+				tripUids.push(uid);
+			}
+		});*/
+		
+		// console.log(tripUids.length);
+		// console.dir(tripUids);
+		
+		/*
+		var _tripUids = [];
+		var tripUids = orders.filter(function(order) {
+			_tripUids.push( order.trip.user.toString() );
+			return order.trip.user;
+			// return ObjectId(order.trip.user);
+			
+			blockedTile.indexOf("118") != -1
+		});
+		
+		User.find({
+			_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
+		}).select('name gravatar_hash').exec(function(err, users) {
+			if (err) {
+				res.status(500).type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			var usersIndex = {};
+			
+			users.forEach(function(user) {				
+				usersIndex[user.id] = user
+			});
+
+			orders.forEach(function(order) {
+				if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
+					order.trip.user = usersIndex[ order.trip.user.toString() ];
+				}
+			});
+			
+			User.setOrderReaded(req.session.uid);
+			
+			res.type('json').json({
+				orders: orders
+			});
+		});*/
+	});
+	
+	
+	
+	return;
+	
+	
+	
+	
+	
+	
+	
 	
 	Trip.find({
-		user: ObjectId(req.session.uid)/*,
-		is_removed: false*/
+		user: req.session.uid
 	}).select({ _id: 1}).exec(function(err, trips) {
 		if (err) {
 			res.status(500)
@@ -237,6 +327,7 @@ router.get('/', function(req, res, next) {
 	
 });
 
+/*
 router.get('/my', function(req, res, next) {
 	if (!req.xhr) {
 		res.render('index');
@@ -250,27 +341,27 @@ router.get('/my', function(req, res, next) {
 		return;
 	}
 
-	/*
-	.find({
-		'orders.uid': mongoose.Types.ObjectId(req.session.uid)
-	}).select({'orders.$': 1}).populate('uid')
-	*/
+	// 
+	// .find({
+		// 'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+	// }).select({'orders.$': 1}).populate('uid')
+	// 
 
-	/*
-	aggregate([
-	{
-		$match: {
-            'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
-			'orders': { 
-               '$elemMatch': { 
-                   "uid": req.session.uid
-				}
-			}
-        }
-	}, {
-		$unwind: "$orders"
-	}]).
-	*/
+	// 
+	// aggregate([
+	// {
+		// $match: {
+            // 'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
+			// 'orders': { 
+               // '$elemMatch': { 
+                   // "uid": req.session.uid
+				// }
+			// }
+        // }
+	// }, {
+		// $unwind: "$orders"
+	// }]).
+	// 
 	
 	
 	
@@ -293,8 +384,7 @@ router.get('/my', function(req, res, next) {
 		}
 	}]).exec(function(err, trips) {
 		if (err) {
-			res.status(500)
-				.type('json')
+			res.status(500).type('json')
 				.json({error: err});
 				
 			return;
@@ -302,13 +392,13 @@ router.get('/my', function(req, res, next) {
 		
 		// var res = {}
 		
-		/*var out = trips.map(function(trip) {	
-			var order = trip.orders.id();
+		// var out = trips.map(function(trip) {	
+			// var order = trip.orders.id();
 			
-			return {
+			// return {
 				
-			};			
-		});*/
+			// };			
+		// });
 		
 		Trip.populate(trips, {path: 'user'}, function(err, trips) {
 			if (err) {
@@ -335,6 +425,7 @@ router.get('/my', function(req, res, next) {
 		// res.render('index', { title:trips[1].to + trips[0].from });
 	});
 });
+*/
 
 router.post('/add', function(req, res, next) {
 	async.parallel({
@@ -383,6 +474,7 @@ router.post('/add', function(req, res, next) {
 		var order = new Order({
 			trip: req.body.trip,
 			user: req.session.uid,
+			tripUser: asyncRes.trip.user,
 			message: req.body.message
 		});
 		
@@ -396,28 +488,34 @@ router.post('/add', function(req, res, next) {
 				return;
 			}			
 			
-			User.setOrderUnreaded(asyncRes.trip.user, order.id);	
+			User.setOrderUnreaded(order.tripUser, order.id);
 			
-			User.stats(asyncRes.trip.user, 't_order', 1);
-			User.stats(req.session.uid, 'r_cnt', 1);
+			Order.find({
+				user: order.user
+			}).count().exec(function(err, count) {
+				if (err) {
+					//log
+					return;
+				}
+				
+				User.stats(order.user, 'r_cnt', count);
+			});
+			
+			Order.find({
+				tripUser: order.tripUser
+			}).count().exec(function(err, count) {
+				if (err) {
+					//log
+					return;
+				}
+
+				User.stats(order.tripUser, 't_order', count);
+			});			
 			
 			res.type('json')
 				.json({order: order});
-		});
-		
-		// res.type('json').json(asyncRes);		
+		});	
 	});
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	/*var order = new Order({
@@ -486,7 +584,8 @@ router.post('/status', function(req, res, next) {
 		}		
 		
 		var checkAndSave = function(canAfterCurrent) {
-			var isTripPassed = ( new Date(order.trip.when) ) < ( new Date() );
+			var now = (new Date()).getTime() - 1000*60*60*24;
+			var isTripPassed = ( new Date(order.trip.when) ) < now;
 			
 			if (
 				order.status !== canAfterCurrent || 
@@ -514,7 +613,7 @@ router.post('/status', function(req, res, next) {
 					order: order.id,
 					user: req.session.uid,
 					corr: corr,
-					message: 'I changed the #order' + order.id + ' status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
 				});		
 				
 				message.save(function(err, message) {
@@ -525,9 +624,30 @@ router.post('/status', function(req, res, next) {
 					User.setMessagesUnreaded(corr, order.id, message.id);
 				});
 
-				if (newStatus === sts.FINISHED) {
-					User.stats(tripUser, 't_proc', 1);
-					User.stats(orderUser, 'r_proc', 1);
+				if (newStatus === sts.FINISHED) {					
+					Order.find({
+						user: orderUser,
+						status: sts.FINISHED
+					}).count().exec(function(err, count) {
+						if (err) {
+							//log
+							return;
+						}
+						
+						User.stats(orderUser, 'r_proc', count);
+					});
+					
+					Order.find({
+						tripUser: tripUser,
+						status: sts.FINISHED
+					}).count().exec(function(err, count) {
+						if (err) {
+							//log
+							return;
+						}
+						
+						User.stats(tripUser, 't_proc', count);
+					});
 				}
 				
 				res.type('json')
@@ -592,7 +712,7 @@ router.get('/trip/:id', function(req, res, next) {
 	});
 });
 
-router.get('/:id', function(req, res, next) {	
+/*router.get('/:id', function(req, res, next) {	
 	if (!req.xhr) {
 		res.render('index');
 
@@ -655,26 +775,26 @@ router.get('/:id', function(req, res, next) {
 	
 	
 
-	/*Order.findOne({
-		_id: req.params.id
-	}, function(err, order) {
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+	// Order.findOne({
+		// _id: req.params.id
+	// }, function(err, order) {
+		// if (err) {
+			// res.status(500)
+				// .type('json')
+				// .json({error: err});
 				
-			return
-		}
+			// return
+		// }
 
-		res.render('orders/one', {
-			order:order,
-			session: JSON.stringify(req.session)
-		});
+		// res.render('orders/one', {
+			// order:order,
+			// session: JSON.stringify(req.session)
+		// });
 		
-	});  */
-});
+	// });  
+});*/
 
-router.post('/messages/add', function(req, res, next) {	
+/*router.post('/messages/add', function(req, res, next) {	
 	var messages =  req.body.messages || {};
 	messages.uid = req.session.uid
 
@@ -701,7 +821,7 @@ router.post('/messages/add', function(req, res, next) {
 			res.redirect('/orders/' + req.body.order_id);
         }
     ); 
-});
+});*/
 
 module.exports = router;
 

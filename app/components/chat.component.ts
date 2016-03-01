@@ -52,11 +52,13 @@ export class ChatComponent implements
 		this.form = _fb.group({			
 			message: ['', Validators.required]
 		});
-		
-		this.elChatList = this._el.nativeElement.querySelector('.chat-list');
 	}
 	
 	public ngOnInit() : void {
+// console.dir(this._el.nativeElement)
+		
+		this.elChatList = this._el.nativeElement.querySelector('.chat-list');
+		
 		this._notifSub = this._notificationService.start(3000).subscribe(data => {
 			if (
 				( this.orderId && data.newMessages && data.newMessages[this.orderId] && (data.newMessages[this.orderId][0] || data.newMessages[this.orderId][1] !== this.lastId) ) ||

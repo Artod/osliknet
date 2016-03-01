@@ -22,7 +22,7 @@ export class TripService {
 		return this.http.get('/trips', {
 			headers: headers,
 			search: search			
-		});
+		}).map( res => <any[]> res.json() );
 	}
 
 	public getMy() {	
@@ -55,7 +55,7 @@ export class TripService {
 	
 		return this.http.post('/trips/add', JSON.stringify(data), {			
 			headers: headers
-		});
+		}).map( res => <any[]> res.json() );
 	}
 	
 	private handleError (error: Response) {

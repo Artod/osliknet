@@ -20,26 +20,28 @@ export class ReviewAddComponent {
 	private _modalComponent : ModalComponent;
 	
 	private _busy : boolean;
+	
+	private _ratings : Array = [1, 2, 3, 4, 5];
 
 	constructor(
 		private _fb : FormBuilder,		
 		private _reviewService : ReviewService,
-		@Inject('orderId') public orderId : string
+		@Inject('orderId') public orderId : string,
 		@Inject('onReviewAdd') public onReviewAdd : Function
 	) {
-		this.form = _fb.group({ 
+		this.form = this._fb.group({ 
 			order: ['', Validators.required],
 			rating: ['', Validators.required],
 			comment: ['', Validators.required]
 		});
 		
-		this.formModel.rating = 1;		
+		this.formModel.rating = 5;		
 		this.formModel.order = this.orderId;		
 		
 		this._busy = true;
 		
 		this._reviewService.getByOrderId(this.orderId).subscribe(data => {
-			if (data.review._id) {
+			if (data.review && data.review._id) {
 				this.formModel = data.review;
 			}
 			
@@ -63,14 +65,13 @@ export class ReviewAddComponent {
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
 
-			this._reviewService.add(this.formModel).subscribe(data => {
-				this._busy = false;
-				
+			this._reviewService.add(this.formModel).subscribe(data => {				
 				this._modalComponent && this._modalComponent.close();
 
-				this.onReviewAdd()				
+				this.onReviewAdd();
+				
+				this._busy = false;
 			}, err => {
-console.error(err);
 				this._busy = false;
 			});
 		}

@@ -10,7 +10,7 @@ var whenValidator = function(value) {
 		return true;
 	}
 	
-	var now = (new Date()).getTime() - 1000*60*60*24
+	var now = (new Date()).getTime() - 1000*60*60*24;
 
 	return now < value.getTime();
 };

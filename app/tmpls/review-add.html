@@ -5,9 +5,12 @@
 <form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="onSubmit(comment)">
 	<input type="hidden" name="order" value="" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
 	<!-- http://stackoverflow.com/questions/33986633/angular-2-dependency-injection-error-on-ngfor-in-dynamically-created-component -->
-	<div class="form-group">
-
-		<label class="radio-inline">
+	<div class="form-group text-center">
+		<span *ngFor="#rating of _ratings" class="star-clickable glyphicon glyphicon-star{{ formModel.rating >= rating ? '' : '-empty' }}" (click)="formModel.rating = rating"></span>
+		
+		<input type="hidden" name="rating" value="" [(ngModel)]="formModel.rating" [ngFormControl]="form.controls.rating" />
+	
+		 <!-- <label class="radio-inline">
 			<input type="radio" name="rating" value="-1" (change)="onChangeRating(rate1)" [checked]="formModel.rating === -1" #rate1 /> <span class="glyphicon glyphicon-thumbs-down"></span> 
 		</label>
 		
@@ -15,11 +18,10 @@
 			<input type="radio" name="rating" value="1" (change)="onChangeRating(rate2)" [checked]="formModel.rating === 1" #rate2 /> <span class="glyphicon glyphicon-thumbs-up"></span> 
 		</label>	
 		
-		<input type="hidden" name="rating" value="" [(ngModel)]="formModel.rating" [ngFormControl]="form.controls.rating" />
-		 <!-- 
 		<select class="form-control" required [(ngModel)]="formModel.order" [ngFormControl]="form.controls.rating">
 			<option *ngFor="#r of ratings" [value]="r">{{r}}</option>
-		</select>-->
+		</select>-->		
+
 	</div>
 	
 	<div class="form-group">		

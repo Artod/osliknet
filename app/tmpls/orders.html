@@ -2,33 +2,34 @@
 
 <p *ngIf="orders && !orders.length">There are no requests.</p>
 
-		<div class="row "  *ngFor="#order of orders; #idx = index">
+		<table class="table">
+			<tr *ngFor="#order of orders; #idx = index">
+				<td class="col-xs-8">
+					<order-card [order]="order" [user]="order.user"></order-card>
+					
+					<p class="order-message">
+						{{ order.message }}
+					</p>
+					
+					<div class="text-right">
+						<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
+					</div>				
+				</td>
+				<td class="col-xs-4">
+					<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				
+				</td>
+			</tr>
+		</table>
+
+	<!-- 	<div class="row"  *ngFor="#order of orders; #idx = index">
 			<div class="col-xs-8">
-				<order-card [order]="order" [user]="order.user"></order-card>
-				
-				<p class="order-message">
-					{{ order.message }}
-				</p>
-				
-				<div class="text-right">
-					<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-				</div>
+
 			
 			</div>
 			<div class="col-xs-4">
-				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
-				
-				<!-- {{ order.trip.from }}
-				<span class="glyphicon glyphicon-arrow-right"></span>
-				{{ order.trip.to }}
-				
-				<br />
-				
-				<i>{{ order.trip.when | toDate | date: 'longDate' }}</i> -->
-			</div>
 
-			
-		</div>
+			</div>			
+		</div> -->
 
 
 

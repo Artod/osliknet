@@ -1,5 +1,4 @@
-import {Component, 
-	Inject, provide, Renderer, Injector} from 'angular2/core';	
+import {Component, Inject, provide, Renderer, Injector, ApplicationRef} from 'angular2/core';	
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 
 import {OrderService} from '../services/order/order.service';
@@ -33,6 +32,7 @@ export class OrderComponent {
 		private _reviewService : ReviewService,
 		private _routeParams : RouteParams,
 		private _renderer : Renderer,
+		private _appRef : ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus,
 		@Inject('config.orderStatusConst') public sts,
 		@Inject('config.user') public configUser
@@ -76,8 +76,15 @@ export class OrderComponent {
 	public onOrder(order) : void {
 		this.order = order;
 		
-		if (this.order && this.order.trip) 
-			this.isTripPassed = ( new Date(this.order.trip.when) ) < ( new Date() );
+		if (this.order && this.order.trip) {
+			var now = (new Date()).getTime() - 1000*60*60*24;
+			this.isTripPassed = ( new Date(this.order.trip.when) ) < now;
+		}
+	}
+	
+	public onOrderStatus(status) : void {
+		this.order.status = status;
+		this._appRef.tick();
 	}
 }
 

@@ -24,4 +24,21 @@ export class ReviewService {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
+	
+	public get() {	
+		return this.http.get('/reviews').map( res => <any[]> res.json() );
+	}
+	
+	public calculateRating(rawRate) {
+		var total = (rawRate || []).reduce((res, count, rate) => {
+			count = Number(count);			
+			if (!count) {
+				return res;
+			}
+			
+			return [res[0] + count, res[1] + ( count * (rate + 1) )];
+		}, [0, 0]);
+
+		return [ total[0], total[0] ? ( total[1]/total[0] ).toFixed(1) : 0 ];
+	}
 }

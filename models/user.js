@@ -52,7 +52,7 @@ var schema = mongoose.Schema({
 		},
 		t_rate: { // on create or change review
 			type: Array,
-			default: [0, 0]
+			default: [0, 0, 0, 0, 0]
 		},
 		
 		r_cnt: { // on create order (request)
@@ -65,7 +65,7 @@ var schema = mongoose.Schema({
 		},
 		r_rate: { // on create or change review
 			type: Array,
-			default: [0, 0]
+			default: [0, 0, 0, 0, 0]
 		}
 	},
 	
@@ -117,28 +117,27 @@ schema.statics.stats = function(uid, param, val, oldVal) {
 			//log
 			return;
 		}
-console.log('before user.stats[param]')
-console.dir(user.stats[param])
 
-console.log('uid = ', uid)
-console.log('val = ', val)
-console.log('oldVal = ', oldVal)
-		if (param === 't_rate' || param === 'r_rate') {
+		/*if (param === 't_rate' || param === 'r_rate') {
 			if (oldVal) {
 				if (oldVal === val) {
 					return;
 				}
 				
-				user.stats[param][oldVal === -1 ? 0 : 1]--;
+				user.stats[param][oldVal - 1]--;
 			}
 
-			user.stats[param][val === -1 ? 0 : 1]++;			
+			user.stats[param][val - 1]++;			
 		} else {
 			user.stats[param] = user.stats[param] + val;			
-		}
+		}*/
+		
+		
 console.log('after user.stats[param]')
 console.dir(user.stats[param])
-user.markModified('stats.' + param);
+
+		user.stats[param] = val;		
+		user.markModified('stats.' + param);
 		user.save(function(err, user) {
 			//log
 console.log('savesavesavesavesavesavesavesave')
@@ -401,17 +400,19 @@ console.log(text);
 module.exports = User;
 
 /*
-User.find().select('newPrivMessages').exec(function(err, user) {
+User.find().select('stats.t_rate stats.r_rate').exec(function(err, user) {
 	user.forEach(function(user){
 		
-		user.newPrivMessages = {};
+		user.stats.t_rate = null
+		user.stats.r_rate = null
 		
-		user.markModified('newPrivMessages');
+		user.markModified('stats.t_rate');
+		user.markModified('stats.r_rate');
 		user.save();
 		
 	});
-});*/
-
+});
+*/
 
 
 

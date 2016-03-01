@@ -12,9 +12,21 @@ var schema = mongoose.Schema({
 		required: true,
 		ref: 'User'
 	},
+	corr: {
+		type: Schema.Types.ObjectId,
+		required: true,
+		ref: 'User'
+	},
+	isUserTripper: {
+		type: Boolean,
+		required: true
+	},
 	rating: {
 		type: Number,
-		required: true
+		required: true,
+		validate: [function(value) {
+			return [1, 2, 3, 4, 5].indexOf(value) > -1;
+		}, 'Rating can be 1, 2, 3, 4 or 5']
 	},
 	comment: {
 		type: String,

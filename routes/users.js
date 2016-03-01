@@ -306,6 +306,38 @@ console.log('Возможно токен протух')
 });
 
 
+router.post('/update', function(req, res, next) {
+	User.findById(req.session.uid).exec(function(err, user) {
+		if (err) {
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		if (!user) {
+			res.status(400).type('json')
+				.json({error: 'User not found.'});
+				
+			return;
+		}
+		
+		user.about = req.body.about;
+		
+		user.save(function(err, user) {
+			if (err) {
+				res.status(err.name === 'ValidationError' ? 400 : 500);
+				
+				res.type('json').json({error: err});
+					
+				return;
+			}
+
+			res.type('json')
+				.json({user: user});
+		});
+	});
+});
 
 
 router.get('/:id', function(req, res, next) {

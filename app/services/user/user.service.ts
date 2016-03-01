@@ -14,4 +14,13 @@ export class UserService {
 			headers: headers
 		}).map(res => <any[]> res.json());
 	}
+	
+	public update(data) {		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+	
+		return this.http.post('/users/update', JSON.stringify(data), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
 }

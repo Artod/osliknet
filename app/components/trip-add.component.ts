@@ -3,7 +3,7 @@ import {FORM_DIRECTIVES, CORE_DIRECTIVES, FormBuilder, ControlGroup, Validators}
 
 // import {DatePicker} from 'ng2-datepicker';
 import {MyDatePicker} from '../services/datepicker/mydatepicker';
-import {Trip} from '../services/trip/trip';
+// import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
 
 import {GmAutocompliteComponent} from './gm-autocomplite.component';
@@ -14,7 +14,7 @@ import {GmAutocompliteComponent} from './gm-autocomplite.component';
 })
 
 export class TripAddComponent {
-	public trips: Trip[];
+	public trips : any[];
 	public formModel = {
 /*from: "Montreal, QC, Canada",
 from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU",
@@ -55,25 +55,20 @@ description:""*/
 		
 	}
 	
-	onSubmit(value:Object):void {
-		if (this.form.valid) {
-			console.log('this.formModel')
-			console.dir(this.formModel)
-			
-			this._tripService.addTrips(this.formModel)			
-				.subscribe(res => {
-					let trip = res.json();
-					
-					console.dir(trip);
-				}, err => {
-					console.dir(err);
-				}, () => {
-					console.log('done')
-				});
+	private _busy : boolean;
+	
+	public onSubmit(value:Object) : void {
+		if (this.form.valid && !this._busy) {
+			this._busy = true;
+			this._tripService.addTrips(this.formModel).subscribe(res => {
+				this._busy = true;
+			}, err => {
+				this._busy = false;
+			});
 		}
 	}
 	
-	onDateChanged(event) {
+	public onDateChanged(event) {
         // console.log('onDateChanged(): ', event.date, ' - formatted: ', event.formatted, ' - epoc timestamp: ', event.epoc);
 
 		this.form.controls.when._touched = true;

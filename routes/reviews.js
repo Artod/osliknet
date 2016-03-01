@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
+
 /*var async = require('async');
-
-
 var Message = require('../models/message');*/
+
 var Trip = require('../models/trip');
 var Order = require('../models/order');
 var User = require('../models/user');
@@ -12,6 +12,26 @@ var Message = require('../models/message');
 var Review = require('../models/review');
 
 var ObjectId = require('mongoose').Types.ObjectId;
+
+router.get('/', function(req, res, next) {
+	Review.find({
+		$or: [{
+			user: req.session.uid
+		}, {
+			corr: req.session.uid
+		}]
+	}).sort('-created_at order ').populate('user corr').exec(function(err, reviews) {
+		if (err) {
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return;
+		}
+	
+		res.type('json')
+			.json({reviews: reviews});
+	});
+});
 
 router.post('/add', function(req, res, next) {
 	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
@@ -53,16 +73,17 @@ router.post('/add', function(req, res, next) {
 			}
 			
 			var wasNew = false;
+
 			if (!review) {
 				wasNew = true;
-				review = new Review();				
-			}
+				review = new Review();
+			}			
 			
-			var oldRating = review.rating;
-		
 			review.order = order._id;
 			review.user = req.session.uid;
-			review.rating = req.body.rating < 0 ? -1 : 1;
+			review.isUserTripper = (req.session.uid === tripUser);
+			review.corr = (req.session.uid !== orderUser ? orderUser : tripUser);
+			review.rating = (req.body.rating && [1, 2, 3, 4, 5].indexOf( Number(req.body.rating) ) > -1 ? req.body.rating : 5);
 			review.comment = req.body.comment;
 			
 			review.save(function(err, review) {
@@ -75,12 +96,10 @@ router.post('/add', function(req, res, next) {
 					return;
 				}
 				
-				var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
-				
 				var message = new Message({
 					order: order._id,
-					user: req.session.uid,
-					corr: corr,
+					user: review.user,
+					corr: review.corr,
 					message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' review.'
 				});		
 				
@@ -89,10 +108,38 @@ router.post('/add', function(req, res, next) {
 						return;
 					}
 
-					User.setMessagesUnreaded(corr, order.id, message.id);
+					User.setMessagesUnreaded(review.corr, order.id, message.id);
 				});
 				
-				User.stats( corr, req.session.uid === orderUser ? 't_rate' : 'r_rate', review.rating, (wasNew ? null : oldRating) );	
+				Review.aggregate([{
+					$match: {
+						isUserTripper: review.isUserTripper,
+						corr: review.corr
+					}
+				}, {
+					$group: {
+						_id: "$rating",
+						count: { $sum : 1 }/*,
+						totalRating: { $sum: "$rating" }*/
+					}
+				}]).exec(function(err, docs) {
+console.log('docsdocsdocsdocsdocsdocsdocsdocsdocs');
+console.dir(docs);
+					if (err) {
+						//log
+							
+						return;
+					}
+					
+					var rate = [0, 0, 0, 0, 0];
+					
+					docs.forEach(function(doc) {
+						rate[doc._id - 1] = doc.count;
+					});
+console.log('raterateraterateraterateraterate');
+console.dir(rate);
+					User.stats(review.corr, review.isUserTripper ? 'r_rate' : 't_rate', rate);	
+				});
 				
 				res.type('json')
 					.json({review: review});

@@ -9,31 +9,55 @@ TODO:
 	\/- send email to traveler
 	\/- inc order counter
 	
-- Profile
-- Reviews + 
+\/- Profile
+\/- Reviews + 
 \/-rating
 
-- TripPage + edit
-- Subscribe on new trips
-- Paging
-
+\/- Modal css
+\/- hide request delivery button if there is order already
 \/- textarea везде maxlength: 2000
 
-- Calendar css
-\/- Modal css
-- Index page
+
+
+
+- TripPage + edit
+- Paging
+- Subscribe on new trips
+
 
 - Logging errors
-\/- hide request delivery button if there is order already
-
 - unauth middleware
 - check auth (session.uid)
 - beforeRouterFilter !req.xhr ? res.render('index')
-
-
 - pre('save' created_at переделать
 - logged in already убрать 
 - not found error on query
+
+
+- Calendar css
+- Index page
+
+
+- assembling gulp
+
+
+- hosting 
+- deploy 
+
+
+- soc share
+- paypal
+
+
+- tests
+
+
+
+
+
+
+
+
 
 
 
@@ -41,8 +65,15 @@ TODO:
 
 
 
+
+
 */
 
+    /*"angular2": "2.0.0-beta.0", */
+    /*"es6-promise": "^3.0.2",
+    "es6-shim": "^0.33.3",*/	    /*"reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.0",*/    /*"systemjs": "0.19.6",
+    "zone.js": "0.5.10"*/
 
 
 
