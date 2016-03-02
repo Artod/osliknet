@@ -6,7 +6,7 @@
 			<a [routerLink]="['Order', {id: order}]">New order</a>
 		</li>
 		<li *ngFor="#order of newMessagesKeys">
-			<a [routerLink]="['Order', {id: order}]">{{ newMessages[order][0] }} new message{{ newMessages[order] > 1 ? 's' : '' }} in order</a>
+			<a [routerLink]="['Order', {id: order}]">{{ newMessages[order][0] }} new message{{ newMessages[order] > 1 ? 's' : '' }} in a order</a>
 		</li>
 		<li *ngFor="#corr of newPrivMessagesKeys">
 			<a [routerLink]="['Messages', {id: corr}]">{{ newPrivMessages[corr][0] }} new private message{{ newPrivMessages[corr] > 1 ? 's' : '' }}</a>

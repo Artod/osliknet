@@ -10,7 +10,7 @@ export class UserService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/users/' + id, {
+		return this.http.get('/users/' + (id || 'my'), {
 			headers: headers
 		}).map(res => <any[]> res.json());
 	}

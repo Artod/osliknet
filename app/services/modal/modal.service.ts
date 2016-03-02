@@ -2,7 +2,9 @@ import {
 	Injectable,
     DynamicComponentLoader,
     ElementRef,
-    ApplicationRef
+    ApplicationRef,
+	Injector,
+	provide
 } from 'angular2/core';
 
 import {ModalComponent} from './modal.component';
@@ -12,16 +14,23 @@ export class ModalService {
     constructor(
 		private _componentLoader: DynamicComponentLoader,
 		private _appRef: ApplicationRef
+		
 	) {
 		
     }
-// , bindings: ResolvedProvider[]
+	
     public open() {
 		let elementRef: ElementRef = this._appRef['_rootComponents'][0].location;
-		let promise = this._componentLoader.loadNextToLocation(ModalComponent, elementRef);
+		
+		// var otherResolved = Injector.resolve([
+			// provide('locationEl', {useValue: elementRef}),
+			// provide(Location, {useValue: this._location})
+		// ]);
+			
+		let promise = this._componentLoader.loadNextToLocation(ModalComponent, elementRef/*, otherResolved*/);
 		
 		promise.then(modalComponentRef => {
-			modalComponentRef.instance.ref = modalComponentRef;
+			modalComponentRef.instance._ref = modalComponentRef;
 		});	
 		
 		return promise;
@@ -36,7 +45,7 @@ export class ModalService {
 		let promise = this._componentLoader.loadIntoLocation(Component, elementRef, 'comp', providers).then( componentRef => {
 			componentRef.instance._modalComponent = modalComponentRef.instance;
 			modalComponentRef.instance.loaded = true;
-
+			
 			return componentRef;
 		});
 		

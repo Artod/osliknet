@@ -17,10 +17,12 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 })
 
 export class OrdersComponent implements OnDestroy {
-	public orders : any[];
+	public orders : any[] = [];
 	public newMessages : any = {};
 	private _notifSub;
 
+	private _inited : boolean = false;
+	
 	constructor(
 		private _orderService : OrderService,
 		private _routeParams : RouteParams,
@@ -28,13 +30,12 @@ export class OrdersComponent implements OnDestroy {
 		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus
 	) {
-		this._orderService.get().subscribe(orders => {
-
-			this.orders = orders;
+		this._orderService.get().subscribe(data => {
+			this.orders = data.orders || [];
+			
+			this._inited = true;
 		}, error => {
-			console.dir(error);
-		}, () => {
-			console.log('done');
+			this._inited = true;
 		});
 		
 		this.newMessages = this._notificationService.data.newMessages || {};

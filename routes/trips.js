@@ -59,10 +59,10 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/my', function(req, res, next) {
-	if (!req.xhr) {		
-		res.render('index');
-		return;
-	}
+if (!req.xhr) {		
+	res.render('index');
+	return;
+}
 	
 if (!req.session.uid) {
 	res.status(401).json({error: 'Unauthorized'});
@@ -72,7 +72,7 @@ if (!req.session.uid) {
 	
 	Trip.find({
 		user: req.session.uid
-	}).sort('-when').exec(function (err, trips) {
+	}).sort('-when').exec(function(err, trips) {
 		if (err) {
 			res.status(500).type('json')
 				.json({error: err});
@@ -110,11 +110,6 @@ if (!req.session.uid) {
 		// res.render('index', { title:trips[1].to + trips[0].from });
 	});
 });
-
-/*
-router.get('/add', function(req, res, next) {
-	res.render('trips/add');
-});*/
 
 router.post('/add', function(req, res, next) {
 	// console.log(111111111111111111111111111111111111111111111111111)
@@ -160,29 +155,89 @@ router.post('/add', function(req, res, next) {
 	});  
 });
 
-/*router.get('/:id', function(req, res, next) {	
-	Trip.findById(req.params.id, function(err, trip) {
+router.post('/update', function(req, res, next) {
+	Trip.findById(req.body.id).exec(function(err, trip) {
 		if (err) {
-			res.status(500)
-				.type('json')
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		if (!trip) {
+			res.status(400).type('json')
+				.json({error: 'Trip not found.'});
+				
+			return;
+		}
+		
+		if (trip.user.toString() !== req.session.uid) {
+			res.status(401).json({error: 'Unauthorized'});
+				
+			return;
+		}
+		
+		trip.description = req.body.description;
+		
+		trip.save(function(err, trip) {
+			if (err) {
+				res.status(err.name === 'ValidationError' ? 400 : 500);				
+				res.type('json').json({error: err});
+					
+				return;
+			}
+
+			res.type('json')
+				.json({trip: trip});
+		});
+	});
+});
+
+router.get('/:id', function(req, res, next) {
+	Trip.findById(req.params.id).populate('user').exec(function(err, trip) {
+		if (err) {
+			res.status(500).type('json')
 				.json({error: err});
 				
 			return
 		}
 		
-		if (!trip) {
-			res.status(404);
+		if (!trip || trip.user.id !== req.session.uid) {
+			res.type('json')
+				.json({trip: trip});
+
+			return;				
 		}
 		
-		// res.type('json')
-			// .json({trips: trip});
-			
-		res.render('trips/one', { trip: trip });  
-		
-	  // console.log('%s --- %s.', trips.name, trips.from)
-	  // res.render('index', { title:trips[1].to + trips[0].from });
+		if (trip.user.id === req.session.uid) { // my trip
+			Order.find({
+				tripUser: req.session.uid
+			}).sort('status -created_at').populate('user').exec(function(err, orders) {
+				if (err) {
+					res.status(500).type('json')
+						.json({error: err});
+						
+					return
+				}
+				
+				res.type('json').json({
+					trip: trip,
+					orders: orders
+				});
+			});		
+		}
+
 	});
+});
+
+
+
+
+/*
+router.get('/add', function(req, res, next) {
+	res.render('trips/add');
 });*/
+
 
 /*router.get('/edit/:id', function(req, res, next) {	
 	Trip.findById(req.params.id, function(err, trip) {

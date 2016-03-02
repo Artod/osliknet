@@ -16,8 +16,9 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 
 export class UserComponent {
 	public uid : string = '';
+	
 	public user : any = {};
-	public reviews : any[];
+	public reviews : any[] = [];
 	
 	public formModel : any = {};
 	public form : ControlGroup;
@@ -26,6 +27,8 @@ export class UserComponent {
 	
 	public tRating : [] = [0, 0];
 	public rRating : [] = [0, 0];
+	
+	private _inited : boolean = false;
 
 	constructor(
 		private _fb : FormBuilder,
@@ -34,23 +37,26 @@ export class UserComponent {
 		private _routeParams : RouteParams,
 		@Inject('config.user') public configUser
 	) {
+		this.uid = this._routeParams.get('id') || '';
+		
 		this.form = this._fb.group({ 
 			about: ''//['', Validators.required]
-		});
-		
-		this.uid = this._routeParams.get('id')
+		});		
 		
 		this._userService.getById(this.uid).subscribe(res => {			
-			this.user = res.user;
+			this.user = res.user || {};
 			
-			this.user && (this.formModel.about = this.user.about);
+			this.user && ( this.formModel.about = (this.user.about || '') );
 
 			if (this.user && this.user.stats) {
 				this.tRating = this._reviewService.calculateRating(this.user.stats.t_rate);
 				this.rRating = this._reviewService.calculateRating(this.user.stats.r_rate);
 			}
 			
-		}, error => {});
+			this._inited = true;
+		}, error => {
+			this._inited = true;
+		});
 		
 		this._reviewService.get().subscribe(res => {			
 			this.reviews = res.reviews || [];

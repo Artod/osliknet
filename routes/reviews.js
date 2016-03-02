@@ -88,15 +88,25 @@ router.post('/add', function(req, res, next) {
 			
 			review.save(function(err, review) {
 				if (err) {
-					res.status(err.name === 'ValidationError' ? 400 : 500);
-					
+					res.status(err.name === 'ValidationError' ? 400 : 500);					
 					res.type('json')
 						.json({error: err});
 						
 					return;
 				}
 				
-				var message = new Message({
+				Message.addToOrder(order, {
+					order: order._id,
+					user: review.user,
+					corr: review.corr,
+					message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' #review.'
+				}, function(err, message) {
+					if (err) {// log error							
+						return;
+					}
+				});
+				
+				/*var message = new Message({
 					order: order._id,
 					user: review.user,
 					corr: review.corr,
@@ -109,7 +119,8 @@ router.post('/add', function(req, res, next) {
 					}
 
 					User.setMessagesUnreaded(review.corr, order.id, message.id);
-				});
+				});*/
+				
 				
 				Review.aggregate([{
 					$match: {

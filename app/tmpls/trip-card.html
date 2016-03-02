@@ -1,13 +1,15 @@
-<div>
-	<a href="">
-		{{ trip.from }}
-		<span class="glyphicon glyphicon-arrow-right"></span>
-		{{ trip.to }}
-	</a>
-</div>
+<div class="trip-card">
+	<p class="trip-from-to">
+		<a href="#" [routerLink]="['Trip', {id: trip._id}]">
+			{{ trip.from }}
+			<span class="glyphicon glyphicon-arrow-right"></span>
+			{{ trip.to }}
+		</a>
+	</p>
 
-<div>
-	<span class="text-muted small1">{{ trip.when | toDate | date: 'longDate' }}</span>
-</div>
+	<p>
+		<span class="text-muted small1">{{ trip.when | toDate | date: 'longDate' }}</span>
+	</p>
 
-<user-card [user]="user" *ngIf="user && user._id"></user-card>
+	<user-card [user]="user" *ngIf="user && user._id"></user-card>
+</div>

@@ -1,6 +1,8 @@
-<user-card [user]="user" *ngIf="user && user._id"></user-card>
+<div class="order-card">
+	<user-card [user]="user" *ngIf="user && user._id"></user-card>
 
-<div class="order-info">
-	<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }} | 
-	Order status: <b>{{ configOrderStatus[order.status] }}</b></span>
+	<p class="order-info">
+		<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }} | 
+		Order status: <b>{{ configOrderStatus[order.status] }}</b></span>
+	</p>
 </div>

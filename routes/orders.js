@@ -609,7 +609,18 @@ router.post('/status', function(req, res, next) {
 
 				var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
 				
-				var message = new Message({
+				Message.addToOrder(order, {
+					order: order.id,
+					user: req.session.uid,
+					corr: corr,
+					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+				}, function(err, message) {
+					if (err) {// log error							
+						return;
+					}
+				});
+				
+				/*var message = new Message({
 					order: order.id,
 					user: req.session.uid,
 					corr: corr,
@@ -622,7 +633,29 @@ router.post('/status', function(req, res, next) {
 					}
 
 					User.setMessagesUnreaded(corr, order.id, message.id);
-				});
+					
+					Message.find({
+						order: message.order
+					}).count().exec(function(err, count) {
+						if (err) {
+							//log
+							
+							return;
+						}
+						
+						order.msg_cnt = count;
+
+						order.save(function(err, order) {
+							if (err) {
+								//log
+							}						
+						});
+					});
+				});*/
+				
+				
+				
+				
 
 				if (newStatus === sts.FINISHED) {					
 					Order.find({

@@ -7,8 +7,20 @@ a:focus, a:hover {
   text-decoration:none;
 }
 
+th {
+	border-top:0px !important;
+}
+
+textarea.form-control {
+	height:150px;
+}
+
 .page-header {
     border-bottom: 0px solid #eee;
+}
+
+.row {
+	padding-bottom: 20px;
 }
 
 .navbar-default {
@@ -22,6 +34,14 @@ a:focus, a:hover {
 
 .mydp input[readonly] {
     background-color: white;
+}
+/*
+.trips-my */.trip-card .trip-from-to {
+	font-weight:bold;
+}
+
+.trips-my .requests-table {
+	padding-left: 20px;
 }
 
 .trips-add-form {
@@ -49,6 +69,10 @@ input.input-lg {
 	.chat-list .table td {
 		border: 0px;
 	}
+	
+.chat-textarea textarea.form-control {
+	height:90px;
+}
 	
 	/* .chat-list ul {
 		position:relative;
@@ -103,21 +127,13 @@ input.input-lg {
 	vertical-align: middle;*/
 }
 
-trip-card {
-	display:block;
-	padding: 0px 0px 10px 0px;
+.trip-card {
+	padding: 0px 0px 20px 0px;
 }
-	trip-card span {
-		color:#333;	
-	}
-/*
-	trip-card .user {
-		padding:8px 0px 0px 0px;
-	}*/
 
-order-card {
-	display:block;
-	padding: 0px 0px 10px 0px;
+
+.order-card {
+	padding: 0px 0px 20px 0px;
 }
 
 	.order-info {
@@ -244,6 +260,13 @@ a.avatar {
 	color: #ec971f;
 }
 
+.trip-from-to a {
+	display:inline-block;
+}
+
+.splash .close {
+	font-size: 2.5em;
+}
 
 /*
 .btn-default {

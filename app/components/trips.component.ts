@@ -1,14 +1,13 @@
-import {Component, ElementRef, Injector, Inject, provide, Renderer} from 'angular2/core';
+import {Component, ElementRef, Injector, Inject, provide/*, Renderer*/} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router';
 
-import {TripCardComponent} from './trip-card.component';
 
-// import {Trip} from '../services/trip/trip';
 import {TripService} from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
 
+import {TripCardComponent} from './trip-card.component';
 import {GmAutocompliteComponent} from './gm-autocomplite.component';
 import {OrderAddComponent} from './order-add.component';
 
@@ -35,11 +34,11 @@ export class TripsComponent {
 	constructor(
 		private _router: Router,
 		private _location: Location,
-		private _fb : FormBuilder,
-		private _tripService : TripService,
-		private _orderService : OrderService,
+		// private _renderer : Renderer,
 		private _modalService : ModalService,
-		private _renderer : Renderer,
+		private _orderService : OrderService,
+		private _tripService : TripService,
+		private _fb : FormBuilder,
 		private _routeParams : RouteParams,
 		@Inject('config.user') public configUser
 	) {
@@ -71,7 +70,7 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 	}
 	
 	public serialize(obj) {
-		return '?'+Object.keys(obj).reduce(function(a,k){if(obj[k])a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&')
+		return '?' + Object.keys(obj).reduce(function(a,k){if(obj[k])a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&');
 	}
 	
 	public onSubmit($event) : void {
@@ -93,14 +92,14 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 		}
 	}
 
-	public onRequest(trip : Trip) : void {
+	public onRequest(trip) : void {
 		this._modalService.open().then(modalComponentRef => {
 		
 			// let tripProvider = Injector.resolve([provide(Trip, {useValue: trip})]);			
 			// var tripProvider = Injector.resolve([bind(Trip).toValue(trip)]);			
 			
 			var otherResolved = Injector.resolve([
-				provide(Renderer, {useValue: this._renderer}),
+				// provide(Renderer, {useValue: this._renderer}),
 				provide(OrderService, {useValue: this._orderService}),
 				provide(Router, {useValue: this._router}),
 				provide(Location, {useValue: this._location}),
@@ -111,6 +110,8 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 				// let component: RequestAddComponent = componentRef.instance;
 				// component.ref = componentRef;				
 				// res.instance.formModel.trip_id = trip._id;
+				
+				// modalComponentRef.instance.show();
 			});
 		});
 	}

@@ -348,10 +348,29 @@ if (!req.session.uid) {
 				return;
 			}
 			
-			var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
+			var corr = (req.session.uid !== orderUser ? orderUser : tripUser);	
 			
-			var message = new Message({
-				order: req.body.order,
+			Message.addToOrder(order, {
+				order: order._id,
+				user: req.session.uid,
+				corr: corr,
+				message: req.body.message
+			}, function(err, message) {
+				if (err) {
+					res.status(err.name == 'ValidationError' ? 400 : 500);
+					
+					res.type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				res.type('json')
+					.json({message: message});
+			});
+			
+			/*var message = new Message({
+				order: order._id,
 				user: req.session.uid,
 				corr: corr,
 				message: req.body.message
@@ -369,9 +388,27 @@ if (!req.session.uid) {
 
 				User.setMessagesUnreaded(corr, order.id, message.id);
 				
+				Message.find({
+					order: order._id
+				}).count().exec(function(err, count) {
+					if (err) {
+						//log
+						
+						return;
+					}
+					
+					order.msg_cnt = count;
+
+					order.save(function(err, order) {
+						if (err) {
+							//log
+						}						
+					});
+				});
+				
 				res.type('json')
 					.json({message: message});
-			});
+			});*/
 		});
 	} else {
 		if (req.session.uid === req.body.corr) {
@@ -395,11 +432,29 @@ if (!req.session.uid) {
 				return;
 			}
 			
-			var corr = user.id;
+			// var corr = user.id;
+			
+			/*Message.addToOrder({
+				user: req.session.uid,
+				corr: user.id,
+				message: req.body.message
+			}, function(err, message) {
+				if (err) {
+					res.status(err.name == 'ValidationError' ? 400 : 500);
+					
+					res.type('json')
+						.json({error: err});
+						
+					return;
+				}
+
+				res.type('json')
+					.json({message: message});
+			});*/
 			
 			var message = new Message({
 				user: req.session.uid,
-				corr: corr,
+				corr: user.id,
 				message: req.body.message
 			});		
 			
@@ -413,7 +468,7 @@ if (!req.session.uid) {
 					return;
 				}
 
-				User.setPrivMessagesUnreaded(corr, req.session.uid, message.id);
+				User.setPrivMessagesUnreaded(message.corr, message.user, message.id);
 				
 				res.type('json')
 					.json({message: message});

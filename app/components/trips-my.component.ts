@@ -4,11 +4,10 @@ import {ROUTER_DIRECTIVES} from 'angular2/router';
 import {TripService} from '../services/trip/trip.service';
 import {NotificationService} from '../services/notification/notification.service';
 
-import {ToDatePipe} from '../pipes/to-date.pipe';
-
 import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
 
+import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/trips-my.html',
@@ -17,10 +16,13 @@ import {OrderCardComponent} from './order-card.component';
 })
 
 export class TripsMyComponent implements OnDestroy {
-	public trips : any[];
+	public trips : any[] = [];
 	public ordersByTrip : any = {};
+	
 	public newMessages : any = {};
 	private _notifSub;
+	
+	private _inited : boolean = false;
 	
 	constructor(
 		private _tripService: TripService,
@@ -29,20 +31,21 @@ export class TripsMyComponent implements OnDestroy {
 		@Inject('config.orderStatus') public configOrderStatus
 	) {
 		this._tripService.getMy().subscribe(res => {	
-			this.trips = <any[]>res.trips;
+			this.trips = <any[]>res.trips || [];
 			
-			res.orders.forEach( (order, i, arr) => {
+			(res.orders || []).forEach( (order, i, arr) => {
 				this.ordersByTrip[order.trip] = this.ordersByTrip[order.trip] || [];
 				this.ordersByTrip[order.trip].push(order);
 			});
+			
+			this._inited = true;
 		}, error => {
-			console.dir(error);
+			this._inited = true;
 		});
 		
 		this.newMessages = this._notificationService.data.newMessages || {};
 		
 		this._notifSub = this._notificationService.start().subscribe(data => {
-console.log('TripsMyComponent subscribe TripsMyComponent subscribe TripsMyComponent subscribe TripsMyComponent subscribe');
 			this.newMessages = data.newMessages || {};
 			this._appRef.tick();
 		});

@@ -21,7 +21,7 @@ export class OrderAddComponent {
 	public formModel : any = {};
 	public form : ControlGroup;
 	
-	public order : any;
+	public order : any = {};
 	
 	private _modalComponent : ModalComponent;
 
@@ -42,7 +42,8 @@ export class OrderAddComponent {
 		this.formModel.trip = trip._id;
 		
 		this._orderService.getByTripId(trip._id).subscribe(data => {					
-			this.order = data.order;
+			this.order = data.order || {};
+			
 			this._checked = true;
 		}, err => {
 			this._checked = true;	
@@ -51,6 +52,13 @@ export class OrderAddComponent {
 		this._location.subscribe(() => {
 			this.closeModal();
 		});
+		
+		this.showModal();
+	}
+	
+	
+	public showModal() : void {
+		this._modalComponent && this._modalComponent.show();
 	}
 	
 	public closeModal() : void {

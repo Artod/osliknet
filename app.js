@@ -20,10 +20,12 @@ TODO:
 
 
 
-- TripPage + edit
+\/- TripPage + edit
+\/- messages counter
+
 - Paging
 - Subscribe on new trips
-
+- login + sign in page + validation add trip form
 
 - Logging errors
 - unauth middleware

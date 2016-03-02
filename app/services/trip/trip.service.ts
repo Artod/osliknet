@@ -34,6 +34,16 @@ export class TripService {
 		}).map( res => <any[]> res.json() );
 	}
 	
+	public getById(id) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.get('/trips/' + id, {
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
+	/*
 	public getOrder(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -41,7 +51,7 @@ export class TripService {
 		return this.http.get('/orders/' + id, {
 			headers: headers
 		}).map( res => <any[]> res.json() );
-	}
+	}*/
 	
 	public addTrips(data) {
 		/*let search: URLSearchParams = new URLSearchParams();
@@ -58,10 +68,15 @@ export class TripService {
 		}).map( res => <any[]> res.json() );
 	}
 	
-	private handleError (error: Response) {
-		console.error(error);
-		return Observable.throw(error.json().error || 'Server error');
+	public update(data) {		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+	
+		return this.http.post('/trips/update', JSON.stringify(data), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
 	}
+
 }
 
 

@@ -17,7 +17,7 @@ export class OrderService {
 		return this.http.get('/orders', {
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
-		}).map(res => <any[]> res.json().orders);
+		}).map( res => <any> res.json() );
 	}
 	
 	public getByTripId(tripId) {
@@ -27,9 +27,9 @@ export class OrderService {
 		return this.http.get('/orders/trip/' + tripId, {
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
-		}).map( res => <any[]> res.json() );
+		}).map( res => <any> res.json() );
 	}
-
+/*
 	public getMy() {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -37,8 +37,8 @@ export class OrderService {
 		return this.http.get('/orders/my', {			
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
-		}).map(res => <any[]> res.json().trips);
-	}
+		}).map( res => <any[]> res.json() );
+	}*/
 	
 	public add(data) {		
 		let headers = new Headers();
@@ -47,7 +47,7 @@ export class OrderService {
 	
 		return this.http.post('/orders/add', JSON.stringify(data), {			
 			headers: headers
-		}).map( res => <any[]> res.json() );
+		}).map( res => <any> res.json() );
 	}
 	
 	public changeStatus(status, order) {		
@@ -62,7 +62,7 @@ export class OrderService {
 	
 		return this.http.post('/orders/status', JSON.stringify(data), {			
 			headers: headers
-		}).map( res => <any[]> res.json() );
+		}).map( res => <any> res.json() );
 	}
 
 }

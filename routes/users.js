@@ -50,21 +50,6 @@ console.log('needEmailNotification false save done');
 		});
 });
 
-/*
-User.find().exec(function(err, users) {	
-	users.forEach(function(user) {
-		user.gravatar_hash = crypto.createHash('md5').update(user.email).digest('hex');
-		user.save();
-	});
-})
-
-User.find().select('newPrivMessages').exec(function(err, users) {	
-	users.forEach(function(user) {
-		user.newPrivMessages = null;
-		user.save();
-	});
-})*/
-
 router.get('/logout', passwordless.logout(/*{successFlash: 'Hope to see you soon!'}*/), function(req, res) {
 	/*delete req.session.uid;
 	delete req.session.name;
@@ -79,7 +64,6 @@ router.get('/logout', passwordless.logout(/*{successFlash: 'Hope to see you soon
 		session: JSON.stringify(req.session)
 	});
 });
-
 
 function proceedEmail(callback) {
 	return function (req, res, next) {
@@ -179,8 +163,6 @@ router.post('/signup', function(req, res, next) {
 	res.render('index', { message: 'sent', session: JSON.stringify(req.session) });
 });
 
-
-
 function loggedInAlready(req, res, next) {
 	if (req.session.passwordless) {
 		res.type('json')
@@ -190,15 +172,13 @@ function loggedInAlready(req, res, next) {
 	}
 }
 
-
 /* POST login details. */
 router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res, next) {
 	if (user) {
 		req.userId = user.id;
 		next();
 	} else {
-		res.status(400)
-			.type('json')
+		res.status(400).type('json')
 			.json({error: 'Email not found.'});
 	}
 }), function(req, res, next) {
@@ -249,7 +229,6 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 	// success!
 	res.render('index', { message: 'sent', session: JSON.stringify(req.session) });
 });
-
 
 router.get('/logged_in', loggedInAlready, passwordless.acceptToken({
 	// successRedirect: '/', //'/если норм залогинелся редиректит сюда',
@@ -305,7 +284,6 @@ console.log('Возможно токен протух')
 	}
 });
 
-
 router.post('/update', function(req, res, next) {
 	User.findById(req.session.uid).exec(function(err, user) {
 		if (err) {
@@ -339,20 +317,18 @@ router.post('/update', function(req, res, next) {
 	});
 });
 
-
-router.get('/:id', function(req, res, next) {
+function getUser(req, res, next) {
 	if (!req.xhr) {
 		res.render('index');
 
 		return;
 	}
 	
-	User.findById(req.params.id)
+	User.findById(req.params.id || req.session.uid)
 		.select('created_at name gravatar_hash about stats')
 		.exec(function(err, user) {
 			if (err) {
-				res.status(500)
-					.type('json')
+				res.status(500).type('json')
 					.json({error: err});
 					
 				return;
@@ -360,11 +336,11 @@ router.get('/:id', function(req, res, next) {
 			
 			res.type('json')
 				.json({user: user});
-		});
-});
+		});	
+}
 
+router.get('/my', getUser);
 
-
-
+router.get('/:id', getUser);
 
 module.exports = router;

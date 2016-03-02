@@ -1,6 +1,8 @@
 <h2>Request</h2>
 
-<div class="row" *ngIf="order && order.trip">
+<div *ngIf="!order || !order.trip">Loading...</div>
+
+<div *ngIf="order && order.trip" class="row">
 	<div class="col-xs-6">
 		<order-card [order]="order" [user]="order.user"></order-card>
 	</div>
@@ -46,8 +48,5 @@
 	</div>
 </div>
 
-
 <!-- (orderStatus)="onOrderStatus($event)"  -->
 <chat [hidden]="!order || !order.trip" (order)="onOrder($event)" (orderStatus)="onOrderStatus($event)" [(isChatActual)]="isChatActual" [orderId]="orderId"></chat>
-
-<div [hidden]="order && order.trip" >Loading...</div>

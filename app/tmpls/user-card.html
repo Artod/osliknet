@@ -1,4 +1,6 @@
-<a [routerLink]="['User', {id: user._id}]" class="avatar">
-	<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=40" alt="{{ user.name }}" />
-<!-- </a>
-<a [routerLink]="['User', {id: user._id}]"> -->{{ user.name }}</a>
+<span *ngIf="user && user.name" class="user-card">
+	<a [routerLink]="['User', {id: user._id}]" class="avatar">
+		<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=40" alt="{{ user.name }}" />
+		{{ user.name }}
+	</a>
+</span>

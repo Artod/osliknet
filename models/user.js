@@ -28,54 +28,53 @@ var schema = mongoose.Schema({
 	},
 	about: {
 		type: String,
+		select: false,
 		default: '',
 		trim: true,
 		maxlength: 2000
 	},
 	is_approved: {
 		type: Boolean,
+		select: false,
 		default: false
 	},
 	stats: {
-		select: false,
 		t_cnt: { // on create trip
 			type: Number,
+			select: false,
 			default: 0
 		},
 		t_order: { // on create trip
 			type: Number,
+			select: false,
 			default: 0
 		},
 		t_proc: { // on set order status finish
 			type: Number,
+			select: false,
 			default: 0
 		},
 		t_rate: { // on create or change review
 			type: Array,
+			select: false,
 			default: [0, 0, 0, 0, 0]
-		},
-		
+		},		
 		r_cnt: { // on create order (request)
 			type: Number,
+			select: false,
 			default: 0
 		},
 		r_proc: { // on set order status finish
 			type: Number,
+			select: false,
 			default: 0
 		},
 		r_rate: { // on create or change review
 			type: Array,
+			select: false,
 			default: [0, 0, 0, 0, 0]
 		}
 	},
-	
-	/*
-	{
-		
-		
-	}
-	
-	*/
 	newOrders: {
 		type: Array,
 		select: false,
@@ -92,7 +91,8 @@ var schema = mongoose.Schema({
 		default: {}
 	},
 	needEmailNotification: {
-		type: Boolean,		
+		type: Boolean,
+		select: false,
 		default: false
 	},	
 	created_at: { type: Date },
@@ -398,6 +398,21 @@ console.log(text);
 }, 1000*20);
 
 module.exports = User;
+
+/*
+User.find().exec(function(err, users) {	
+	users.forEach(function(user) {
+		user.gravatar_hash = crypto.createHash('md5').update(user.email).digest('hex');
+		user.save();
+	});
+})
+
+User.find().select('newPrivMessages').exec(function(err, users) {	
+	users.forEach(function(user) {
+		user.newPrivMessages = null;
+		user.save();
+	});
+})*/
 
 /*
 User.find().select('stats.t_rate stats.r_rate').exec(function(err, user) {

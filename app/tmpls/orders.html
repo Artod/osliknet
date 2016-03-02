@@ -1,25 +1,27 @@
 <h2>Requests</h2>
 
-<p *ngIf="orders && !orders.length">There are no requests.</p>
+<p *ngIf="!_inited">Loading...</p>
 
-		<table class="table">
-			<tr *ngFor="#order of orders; #idx = index">
-				<td class="col-xs-8">
-					<order-card [order]="order" [user]="order.user"></order-card>
-					
-					<p class="order-message">
-						{{ order.message }}
-					</p>
-					
-					<div class="text-right">
-						<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-					</div>				
-				</td>
-				<td class="col-xs-4">
-					<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				
-				</td>
-			</tr>
-		</table>
+<p *ngIf="_inited && orders && !orders.length">There are no requests yet.</p>
+
+<table class="table">
+	<tr *ngFor="#order of orders; #idx = index">
+		<td class="col-xs-8">
+			<order-card [order]="order" [user]="order.user"></order-card>
+			
+			<p class="order-message">
+				{{ order.message }}
+			</p>
+			
+			<div class="text-right">
+				<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span>  <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
+			</div>				
+		</td>
+		<td class="col-xs-4">
+			<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				
+		</td>
+	</tr>
+</table>
 
 	<!-- 	<div class="row"  *ngFor="#order of orders; #idx = index">
 			<div class="col-xs-8">

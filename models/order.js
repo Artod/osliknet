@@ -28,6 +28,10 @@ var schema = mongoose.Schema({
 		required: true,
 		default: 5
 	},
+	msg_cnt: {
+		type: Number,
+		default: 0
+	},
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
