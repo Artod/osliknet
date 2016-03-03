@@ -7,17 +7,24 @@ import {Observable} from 'rxjs/Observable';
 export class TripService {
 	constructor(public http:Http) { }
 	
-	public search(data) {
+	public search(data, limit, lastId) {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		let search: URLSearchParams = new URLSearchParams();
+		let search : URLSearchParams = new URLSearchParams();
 		
 		if (data.from_id)
 			search.set('from_id', data.from_id);
 		
 		if (data.to_id)
 			search.set('to_id', data.to_id);
+		
+		if (limit)
+			search.set('limit', limit);	
+		
+		if (lastId)
+			search.set('lastId', lastId);
+
 
 		return this.http.get('/trips', {
 			headers: headers,
@@ -25,12 +32,22 @@ export class TripService {
 		}).map( res => <any[]> res.json() );
 	}
 
-	public getMy() {	
+	public getMy(limit, page) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
-	
+		
+		let search : URLSearchParams = new URLSearchParams();
+		
+		if (limit)
+			search.set('limit', limit);	
+		
+		if (page)
+			search.set('page', page);
+
+		
 		return this.http.get('/trips/my', {			
-			headers: headers
+			headers: headers,
+			search: search
 		}).map( res => <any[]> res.json() );
 	}
 	

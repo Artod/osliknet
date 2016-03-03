@@ -14,13 +14,18 @@ var Review = require('../models/review');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 router.get('/', function(req, res, next) {
+	var limit = Number(req.query.limit);	
+	limit = (limit && limit < 30 ? limit : 30);
+	
+	var page = Number(req.query.page) || 0;
+	
 	Review.find({
 		$or: [{
 			user: req.session.uid
 		}, {
 			corr: req.session.uid
 		}]
-	}).sort('-created_at order ').populate('user corr').exec(function(err, reviews) {
+	}).sort('-_id').skip(page * limit).limit(limit).populate('user corr').exec(function(err, reviews) {
 		if (err) {
 			res.status(500).type('json')
 				.json({error: err});

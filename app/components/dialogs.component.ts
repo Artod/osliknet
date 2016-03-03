@@ -1,4 +1,5 @@
 import {Component, Inject, ApplicationRef} from 'angular2/core';
+import {OnDestroy} from 'angular2/core';
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 
 import {MessageService} from '../services/message/message.service';
@@ -13,7 +14,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 	pipes: [ToDatePipe]
 })
 
-export class DialogsComponent {
+export class DialogsComponent implements OnDestroy {
 	public users : any[];
 	public newPrivMessages : any;
 	private _notifSub;
@@ -37,6 +38,10 @@ console.log('DialogsComponent _notifSub ');
 			this.newPrivMessages = data.newPrivMessages || {};
 			this._appRef.tick();
 		});
+	}
+	
+	public ngOnDestroy() : void {
+		this._notifSub.unsubscribe();
 	}
 }
 

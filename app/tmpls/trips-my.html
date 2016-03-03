@@ -5,7 +5,7 @@
 <p *ngIf="!_inited">Loading...</p>
 
 <p *ngIf="_inited && trips && !trips.length">
-	There are no trips yet. You can <a [routerLink]="['TripAdd']" href="#">Add a trip.</a>
+	<i>There are no trips yet. You can <a [routerLink]="['TripAdd']" href="#">Add a trip</a>.</i>
 </p>
 
 <div class="row trips-my" *ngFor="#trip of trips">
@@ -60,3 +60,8 @@
 		</td>
 	</tr>
 </table> -->
+
+
+<p *ngIf="_inited && !fullPage" class="text-center">
+	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+</p>

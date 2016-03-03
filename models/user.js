@@ -19,6 +19,7 @@ var schema = mongoose.Schema({
 		required: true,
 		validate: [emailValidator, 'Invalid email'],
 		unique: true,
+		trim: true,
 		select: false/*,
 		set: function(v) { return v.toLowerCase(); }*/
 	},

@@ -39,11 +39,9 @@ export class ModalComponent  implements AfterContentInit {
 	}
 	
 	public show() : void {
-console.dir(this._ref)
 		this.$splash = this._ref.location.nativeElement.querySelector('.splash');
-		
-		this.$body.classList.add(this.bodyOpenClass);
 		this.$splash.classList.add(this.splashOpenClass);
+		this.$body.classList.add(this.bodyOpenClass);
 	}
 	
 	public close($event) : boolean {

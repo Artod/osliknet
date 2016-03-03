@@ -1,4 +1,4 @@
-import {Component, Inject, ApplicationRef, /*Renderer, */Injector, provide} from 'angular2/core';
+import {Component, Inject, ApplicationRef, /*Renderer, */Injector, provide, OnDestroy} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router';
 
@@ -19,7 +19,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 	pipes: [ToDatePipe]
 })
 
-export class TripComponent {
+export class TripComponent implements OnDestroy {
 	public tripId : string = '';
 	
 	public trip : any = {};
@@ -108,5 +108,10 @@ export class TripComponent {
 			
 			this._modalService.bind(OrderAddComponent, modalComponentRef, otherResolved);
 		});
+	}
+	
+	
+	public ngOnDestroy() : void {
+		this._notifSub.unsubscribe();
 	}
 }

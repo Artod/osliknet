@@ -10,14 +10,23 @@ export class OrderService {
 		console.log('OrderService constructor');
 	}
 	
-	public get() {
+	public get(limit, page) {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
+		let search : URLSearchParams = new URLSearchParams();
+		
+		if (limit)
+			search.set('limit', limit);	
+		
+		if (page)
+			search.set('page', page);
+		
 		return this.http.get('/orders', {
-			headers: headers
-		// }).map(res => <Order[]> res.json().orders)
+			headers: headers,
+			search: search
 		}).map( res => <any> res.json() );
+		// }).map(res => <Order[]> res.json().orders)
 	}
 	
 	public getByTripId(tripId) {

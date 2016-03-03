@@ -2,7 +2,7 @@
 	<h2>Add a Trip</h2>
 </div>
 
-<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="onSubmit()">
+<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit()">
 	
 	<div class="form-group">
 		<label>Trip:</label>
@@ -35,11 +35,11 @@
 	<div class="form-group">	
 		<label>Description:</label>
 		
-		<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description"></textarea>
+		<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description" maxlength="1000"></textarea>
 	</div>
 	
 	<p class="text-right">
-		<button type="submit" class="btn btn-warning input-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Add' }}</button>
+		<button type="submit" class="btn btn-warning input-lg">{{ _busy ? 'Wait...' : 'Add' }}</button>
 	</p>
 	
 </form>

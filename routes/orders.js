@@ -10,6 +10,8 @@ var User = require('../models/user');
 var ObjectId = require('mongoose').Types.ObjectId;
 
 router.get('/', function(req, res, next) {
+	
+
 	if (!req.xhr) {
 		res.render('index');
 
@@ -20,7 +22,12 @@ router.get('/', function(req, res, next) {
 		res.status(401).json({error: 'Unauthorized'});
 
 		return;
-	}	
+	}
+
+	var limit = Number(req.query.limit);	
+	limit = (limit && limit < 30 ? limit : 30);
+	
+	var page = Number(req.query.page) || 0;
 	
 	Order.find({
 		$or: [{
@@ -28,7 +35,7 @@ router.get('/', function(req, res, next) {
 		}, {
 			tripUser: req.session.uid
 		}]			
-	}).sort('status -created_at').populate('user tripUser trip').exec(function(err, orders) {
+	}).sort('status -created_at').skip(page * limit).limit(limit).populate('user tripUser trip').exec(function(err, orders) {
 		if (err) {
 			res.status(500).type('json')
 				.json({error: err});

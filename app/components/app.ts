@@ -21,16 +21,17 @@ import {MessageService} from '../services/message/message.service';
 import {ReviewService}  from '../services/review/review.service';
 import {UserService}    from '../services/user/user.service';
 import {NotificationService} from '../services/notification/notification.service';
+import {SubscribeService} from '../services/subscribe/subscribe.service';
 
 @Component({
     selector: 'app',
 	templateUrl: '/app/tmpls/app.html',
 	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES, NotificationsComponent],
-	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, /*Location, */TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService]
+	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, /*Location, */TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService, SubscribeService]
 })
 
 @RouteConfig([
-	{path:'/trip/:id',  name: 'Trip',    component: TripComponent},
+	{path:'/trips/:id',  name: 'Trip',    component: TripComponent},
 	{path:'/trips',     name: 'Trips',   component: TripsComponent},
 	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent},
 	{path:'/trips/my',  name: 'TripsMy', component: TripsMyComponent},

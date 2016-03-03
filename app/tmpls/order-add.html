@@ -28,7 +28,7 @@
 		<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
 
 		<div class="form-group">	
-			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description"></textarea>
+			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description" maxlength="2000"></textarea>
 		</div>
 		
 		<br />

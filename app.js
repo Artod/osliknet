@@ -17,21 +17,22 @@ TODO:
 \/- hide request delivery button if there is order already
 \/- textarea везде maxlength: 2000
 
-
-
-
 \/- TripPage + edit
 \/- messages counter
 
-- Paging
+\/- Paging
+
+\/- pre('save' created_at переделать
+
+
+
 - Subscribe on new trips
 - login + sign in page + validation add trip form
 
+- text pipe to br + msg about new review to link
 - Logging errors
 - unauth middleware
-- check auth (session.uid)
 - beforeRouterFilter !req.xhr ? res.render('index')
-- pre('save' created_at переделать
 - logged in already убрать 
 - not found error on query
 
@@ -47,8 +48,9 @@ TODO:
 - deploy 
 
 
-- soc share
 - paypal
+
+- soc share
 
 
 - tests
@@ -96,6 +98,7 @@ var trips = require('./routes/trips');
 var orders = require('./routes/orders');
 var messages = require('./routes/messages');
 var reviews = require('./routes/reviews');
+var subscribes = require('./routes/subscribes');
 
 var app = express();
 
@@ -323,6 +326,7 @@ app.use('/trips', trips);
 app.use('/orders', orders);
 app.use('/messages', messages);
 app.use('/reviews', reviews);
+app.use('/subscribes', subscribes);
 
 
 // catch 404 and forward to error handler

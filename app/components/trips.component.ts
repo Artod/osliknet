@@ -2,9 +2,9 @@ import {Component, ElementRef, Injector, Inject, provide/*, Renderer*/} from 'an
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router';
 
-
-import {TripService} from '../services/trip/trip.service';
+import {TripService}  from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
+import {SubscribeService} from '../services/subscribe/subscribe.service';
 import {ModalService} from '../services/modal/modal.service';
 
 import {TripCardComponent} from './trip-card.component';
@@ -24,12 +24,15 @@ export class TripsComponent {
 	
 	// public trips: any[];
 	
-	public searchModel : any = {
-
-	};
-		/*from: "Montreal, QC, Canada",
-		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"	*/		
+	public searchModel : any = {};
 	public searchForm : ControlGroup;
+	
+	public subModel : any = {};
+	public subForm : ControlGroup;
+	
+		/*from: "Montreal, QC, Canada",
+		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"	*/
+		
 
 	constructor(
 		private _router: Router,
@@ -38,6 +41,7 @@ export class TripsComponent {
 		private _modalService : ModalService,
 		private _orderService : OrderService,
 		private _tripService : TripService,
+		private _subscribeService : SubscribeService,
 		private _fb : FormBuilder,
 		private _routeParams : RouteParams,
 		@Inject('config.user') public configUser
@@ -49,6 +53,10 @@ export class TripsComponent {
 			to_id: '' //['', Validators.required]
 		});
 		
+		this.subForm = this._fb.group({
+			email: configUser.id ? '' : [/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i, Validators.pattern]
+		});
+		
 		this.init();
 		
 		this._location.subscribe(() => {
@@ -57,8 +65,6 @@ export class TripsComponent {
 	}
 	
 	public init() {
-
-console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id'));
 		this.searchModel = {
 			from: this._routeParams.get('from') ? decodeURIComponent( this._routeParams.get('from') ) : this.searchModel.from,
 			from_id: this._routeParams.get('from_id') || this.searchModel.from_id,
@@ -69,51 +75,107 @@ console.log('this._routeParams.get(from_id) = ',this._routeParams.get('from_id')
 		this.onSubmit();		
 	}
 	
-	public serialize(obj) {
+	public serialize(obj) : string {
 		return '?' + Object.keys(obj).reduce(function(a,k){if(obj[k])a.push(k+'='+encodeURIComponent(obj[k]));return a},[]).join('&');
 	}
-	
-	public onSubmit($event) : void {
-		if (this.searchForm.valid) {			
-			if ($event) {
-				this._location.go('/trips', this.serialize({
-					from: this.searchModel.from,
-					from_id: this.searchModel.from_id,
-					to: this.searchModel.to,
-					to_id: this.searchModel.to_id
-				}));				
+
+	public lastId : string = '';
+	public limit : number = 5;
+	private _busy : boolean = false;
+
+	public loadNext() : void {
+		this._busy = true;
+		
+		let queryId = this.serialize(this.searchModel) + this.lastId;
+		
+		this._tripService.search(this.searchModel, this.limit, this.lastId).subscribe(data => {
+			if ( queryId !== (this.serialize(this.searchModel) + this.lastId) ) {
+				return;
 			}
-			
-			this._tripService.search(this.searchModel).subscribe(data => {
-				this.trips = data.trips || [];				
-			}, err => {
-				console.dir(err)
+
+			(data.trips || []).forEach( (trip) => {
+				this.trips.push(trip);
 			});
+			
+			this.lastId = (data.trips[this.limit - 1] || {})._id || '';
+
+			// this.isSearch = false;
+			this._busy = false;
+		}, err => {
+			this._busy = false;
+		});
+	}
+	
+	private _inited : boolean = false;
+	
+	public onSubmit($event, $form, $thanx) : void {
+		if (!this.searchForm.valid) {			
+			return false;
 		}
+
+		if ($event) {
+			this._location.go('/trips', this.serialize({
+				from: this.searchModel.from,
+				from_id: this.searchModel.from_id,
+				to: this.searchModel.to,
+				to_id: this.searchModel.to_id
+			}));				
+		}
+		
+		if (this.subModel.from_id !== this.searchModel.from_id || this.subModel.to_id !== this.searchModel.to_id) {
+			this._subsFinished = false;
+		}
+		
+		this.subModel.from = this.searchModel.from;
+		this.subModel.from_id = this.searchModel.from_id;
+		this.subModel.to = this.searchModel.to;
+		this.subModel.to_id = this.searchModel.to_id;
+		
+		if (!this.searchModel.from_id && !this.searchModel.to_id) {
+			this.trips = [];
+			this.lastId = '';
+			
+			return;
+		}
+		
+		this._tripService.search(this.searchModel, this.limit).subscribe(data => {
+			this.trips = data.trips || [];
+			this.lastId = (data.trips[this.limit - 1] || {})._id || '';
+			
+			this._inited = true;
+		}, err => {
+			this._inited = true;
+		});
 	}
 
-	public onRequest(trip) : void {
-		this._modalService.open().then(modalComponentRef => {
+	private _subBusy : boolean = false;
+	private _subsFinished : boolean = false;
+	
+	public onSubscribe(/*$form, $thanx*/) : void {
+		if (!this.subForm.valid) {
+			return false;
+		}
 		
-			// let tripProvider = Injector.resolve([provide(Trip, {useValue: trip})]);			
-			// var tripProvider = Injector.resolve([bind(Trip).toValue(trip)]);			
+		this._subBusy = true;
+		
+		this._subscribeService.add(this.subModel).subscribe(data => {
+			// $form.style.display = 'none';
+			// $thanx.style.display = 'inherit';
+			this._subsFinished = true;
 			
-			var otherResolved = Injector.resolve([
-				// provide(Renderer, {useValue: this._renderer}),
-				provide(OrderService, {useValue: this._orderService}),
-				provide(Router, {useValue: this._router}),
-				provide(Location, {useValue: this._location}),
-				provide('trip', {useValue: trip})
-			]);
-			
-			this._modalService.bind(OrderAddComponent, modalComponentRef, otherResolved).then(componentRef => {				
-				// let component: RequestAddComponent = componentRef.instance;
-				// component.ref = componentRef;				
-				// res.instance.formModel.trip_id = trip._id;
-				
-				// modalComponentRef.instance.show();
-			});
+			this._subBusy = false;
+		}, err => {
+			this._subBusy = false;
 		});
+	}
+	
+	public onRequest(trip) : void {
+		this._modalService.show(OrderAddComponent, Injector.resolve([
+			provide(OrderService, {useValue: this._orderService}),
+			provide(Router, {useValue: this._router}),
+			provide(Location, {useValue: this._location}),
+			provide('trip', {useValue: trip})
+		]));
 	}
 }
 

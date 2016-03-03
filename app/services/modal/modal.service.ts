@@ -19,6 +19,26 @@ export class ModalService {
 		
     }
 	
+    public show(Component, providers) {
+		var promise = this.open().then(modalComponentRef => {
+		
+			// let tripProvider = Injector.resolve([provide(Trip, {useValue: trip})]);			
+			// var tripProvider = Injector.resolve([bind(Trip).toValue(trip)]);
+			
+			this._modalService.bind(Component, modalComponentRef, providers).then(componentRef => {				
+				// let component: RequestAddComponent = componentRef.instance;
+				// component.ref = componentRef;				
+				// res.instance.formModel.trip_id = trip._id;
+				
+				// modalComponentRef.instance.show();
+				
+				return modalComponentRef.instance;
+			});
+		});
+		
+		return promise;
+    }
+	
     public open() {
 		let elementRef: ElementRef = this._appRef['_rootComponents'][0].location;
 		

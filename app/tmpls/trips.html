@@ -2,7 +2,7 @@
 	<h2>Find a Trip</h2>
 </div>
 
-<form class="text-center1 form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event)">
+<form class="text-center form-inline" action="/search" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
 	<!-- <label class="control-label input-lg">Trip</label> -->
 	
 	<div class="form-group">
@@ -17,16 +17,33 @@
 		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" placeholder="To"></gm-autocomplite>
 	</div>
 
-	<!-- <input type="text" required [(ngModel)]="model.test" /> [disabled]="!form.form.valid" -->
-
 	<button type="submit" class="btn btn-warning btn-lg">Find</button>
 </form>
 
 <br />
 <br />
 
+<div *ngIf="_inited && (subModel.from_id || subModel.to_id) && (!trips || !trips.length)" class="text-center">
+	<p>
+		<i>Trips on this route are not presented at the moment</i>
+	</p>	
+	<p [hidden]="!_subsFinished" #thanx>
+		Thank you.
+	</p>
+	<form [hidden]="_subsFinished" *ngIf="(subModel.from_id && subModel.to_id)" action="/subscribe" method="post" [ngFormModel]="subForm" (submit)="_subBusy ? false : onSubscribe(form, thanx)" #form>
+		
+		<p>
+			<i>We can notify you by email:</i>
+		</p>
+		
+		<input class="form-control input-lg1" type="{{ configUser.id ? 'hidden' : 'text' }}" [(ngModel)]="subModel.email" [ngFormControl]="subForm.controls.email" placeholder="email" />
+		
+		<button type="submit" class="btn btn-warning btn-lg1">{{ _subBusy ? 'Wait...' : 'Subscribe' }}</button>
+	</form>
+</div>
+
 <table class="table">
-	<tr *ngFor="#trip of trips; #idx = index">
+	<tr *ngFor="#trip of trips">
 		<td>
 			<trip-card [trip]="trip" [user]="trip.user"></trip-card>
 			<br />
@@ -34,31 +51,12 @@
 				{{ trip.description }}
 			</p>
 			<p class="text-right" *ngIf="trip.user._id != configUser.id">
-				<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request Delivery</button>
+				<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request a delivery</button>
 			</p>
 		</td>
-
-		
-		<!-- <td>
-			<img src="http://gravatar.com/avatar/{{ trip.user.gravatar_hash }}?d=retro" alt="{{ trip.user.name }}" />
-			{{ trip.user.name }}
-		</td>
-		<td>
-			<b>{{ trip.from }}</b>
-			<span class="glyphicon glyphicon-arrow-right"></span>
-			<b>{{ trip.to }}</b>
-			
-			<br />
-			
-			<i>{{ trip.when | toDate | date: 'longDate' }}</i>
-			
-			<p>
-				{{ trip.description }}
-			</p>	
-		</td> 
-		
-		<td>
-			
-		</td>-->
 	</tr>
 </table>
+
+<p *ngIf="lastId" class="text-center">
+	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+</p>

@@ -58,10 +58,12 @@ description:""*/
 	private _busy : boolean;
 	
 	public onSubmit(value:Object) : void {
-		if (this.form.valid && !this._busy) {
+		if (this.form.valid) {
+			
 			this._busy = true;
+			
 			this._tripService.addTrips(this.formModel).subscribe(res => {
-				this._busy = true;
+				this._busy = false;
 			}, err => {
 				this._busy = false;
 			});

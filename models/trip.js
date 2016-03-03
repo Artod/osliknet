@@ -31,7 +31,7 @@ var dateFormat = function(when, needTime) {
 		when.getFullYear();
 };
 
-var tripSchema = mongoose.Schema({
+var schema = mongoose.Schema({
 	user: {
 		type: Schema.Types.ObjectId,
 		required: true,
@@ -47,18 +47,22 @@ var tripSchema = mongoose.Schema({
 	},
 	from: {
 		type: String,
+		trim: true,
 		required: true
 	},
 	from_id: {
 		type: String,
+		trim: true,
 		required: true
 	},
 	to: {
 		type: String,
+		trim: true,
 		required: true
 	},
 	to_id: {
 		type: String,
+		trim: true,
 		required: true
 	},
 	description: {
@@ -96,20 +100,21 @@ var tripSchema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
-tripSchema.method('dateFormat', dateFormat);
+schema.method('dateFormat', dateFormat);
 
-tripSchema.pre('save', function(next) {
+
+schema.pre('save', function(next) {
 	var now = new Date();
 	
 	this.updated_at = now;
 	
-	if ( !this.created_at ) {
+	if (this.isNew) {
 		this.created_at = now;
 	}
 	
 	next();
 });
 
-var Trip = mongoose.model('Trip', tripSchema);
+var Trip = mongoose.model('Trip', schema);
 
 module.exports = Trip;

@@ -1,4 +1,5 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "target": "ES5",
     "module": "system",
@@ -7,7 +8,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+	"isolatedModules": true
   },
   "exclude": [
     "node_modules"

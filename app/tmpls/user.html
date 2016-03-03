@@ -115,8 +115,14 @@
 					
 					<p>
 						<user-card [user]="review.user"></user-card>
-						<strong>as a {{ review.isUserTripper ? ' traveler ' : ' customer ' }}</strong> about 
-						<user-card [user]="review.corr"></user-card>						
+						
+						<strong *ngIf="user._id === review.user._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>
+						
+						about 
+						 
+						<user-card [user]="review.corr"></user-card>
+						
+						<strong *ngIf="user._id === review.corr._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>						
 					</p>
 					
 					
@@ -132,5 +138,9 @@
 				</td>
 			</tr>
 		</table>
+		
+		<p *ngIf="_inited && !fullPage" class="text-center">
+			<button class="btn btn-default btn-lg" (click)="_busyPaging ? false : loadNext()">{{ _busyPaging ? 'Wait...' : 'Load more' }}</button>
+		</p>
 	</div>
 </div>

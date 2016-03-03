@@ -53,14 +53,14 @@ export class UserComponent {
 				this.rRating = this._reviewService.calculateRating(this.user.stats.r_rate);
 			}
 			
-			this._inited = true;
+			// this._inited = true;
 		}, error => {
-			this._inited = true;
+			// this._inited = true;
 		});
 		
-		this._reviewService.get().subscribe(res => {			
-			this.reviews = res.reviews || [];
-		}, error => {});
+		this.loadNext();
+		
+
 	}
 	
 	private _busy = false;
@@ -82,6 +82,34 @@ export class UserComponent {
 				this.editMode = false
 			});
 		}
+	}
+	
+	public page : number = 0;
+	public limit : number = 2;
+	public fullPage : boolean = false;
+	private _busyPaging : boolean = false;
+
+	public loadNext() : void {	
+		this._busyPaging = true;
+		
+		this._reviewService.get(this.limit, this.page).subscribe(data => {
+			(data.reviews || []).forEach( (review) => {
+				this.reviews.push(review);
+			} );
+			
+			if ( (data.reviews || [])[this.limit - 1] ) {
+				this.page++;
+			} else {
+				this.fullPage = true;
+			}
+			
+			this._busyPaging = false;
+			this._inited = true;
+		}, error => {
+			
+			this._busyPaging = false;
+			this._inited = true;
+		});
 	}
 }
 

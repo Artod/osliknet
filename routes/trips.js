@@ -4,9 +4,12 @@ var router = express.Router();
 var Trip = require('../models/trip');
 var Order = require('../models/order');
 var User = require('../models/user');
+var Subscribe = require('../models/subscribe');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
+var sendgrid_api_key = 'v ftp';
+var sendgrid  = require('sendgrid')(sendgrid_api_key);
 
 router.get('/', function(req, res, next) {
 	if (!req.xhr) {
@@ -27,7 +30,7 @@ router.get('/', function(req, res, next) {
 	
 	if (!query.from_id && !query.to_id) {
 		res.type('json')
-			.json([]);
+			.json({trips: []});
 			
 		return;
 	}
@@ -36,9 +39,16 @@ router.get('/', function(req, res, next) {
 	
 	query.when = { $gt: now };
 	
-	query.is_removed = false;
+	// query.is_removed = false;
 	
-	Trip.find(query).sort({created_at: -1}).populate('user').exec(function (err, trips) {
+	if (req.query.lastId) {
+		query._id = { $lt: req.query.lastId };	
+	}	
+	
+	var limit = Number(req.query.limit);	
+	limit = (limit && limit < 30 ? limit : 30);
+	
+	Trip.find(query).sort('-_id').limit(limit).populate('user').exec(function (err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -70,9 +80,14 @@ if (!req.session.uid) {
 	return;
 }
 	
+	var limit = Number(req.query.limit);	
+	limit = (limit && limit < 30 ? limit : 30);
+	
+	var page = Number(req.query.page) || 0;
+	
 	Trip.find({
 		user: req.session.uid
-	}).sort('-when').exec(function(err, trips) {
+	}).sort('-when').skip(page * limit).limit(limit).exec(function(err, trips) {
 		if (err) {
 			res.status(500).type('json')
 				.json({error: err});
@@ -111,26 +126,18 @@ if (!req.session.uid) {
 	});
 });
 
+router.get('/add', function(req, res, next) {
+	res.render('index');
+});
+	
 router.post('/add', function(req, res, next) {
-	// console.log(111111111111111111111111111111111111111111111111111)
-	// console.log(req.body.when instanceof Number)
-	// console.log(req.body.when instanceof String)
-	// console.log(new Date(req.body.when))
-	
-	// res.render('index', { title: req });
-	// return
-	// console.dir(req.body);
-	
-	// if (req.body.when) {
-		// req.body.when += ' 23:59:59'		
-	// }
 	
 	req.body.is_removed = false;	
 	req.body.user = req.session.uid;
 	
 	var trip = new Trip(req.body);	
 	
-	trip.save(function (err, trip) {
+	trip.save(function(err, trip) {
 		if (err) {
 			res.status(err.name === 'ValidationError' ? 400 : 500)				
 			
@@ -148,6 +155,41 @@ router.post('/add', function(req, res, next) {
 			}
 			
 			User.stats(req.session.uid, 't_cnt', count);
+		});		
+		
+		Subscribe.find({
+			from_id: trip.from_id,
+			to_id: trip.to_id,
+			is_unsubed: false
+		}).exec(function(err, subscribes) {
+			if (err) {
+				res.status(500).type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			subscribes.forEach(function(subscribe) {
+				var email = new sendgrid.Email();
+				
+				email.addTo(subscribe.email);
+				email.subject = 'New trip on Osliki.Net';
+				email.from = 'osliknet@gmail.com';
+				
+				email.text += 'Hello!\n\r\n\r';
+				email.text += 'We have new trip from ' + subscribe.from + ' to ' + subscribe.to + ' http://osliki.net/trips/' + trip.id + '.\n\r';
+				email.text += 'Unsubscribe: http://osliki.net/subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
+				email.text += 'Team http://Osliki.Net .';
+console.log(email.text);
+				sendgrid.send(email, function(err, json) {
+					if (err) {
+						console.log(err);
+					}
+					
+					console.dir(json);
+				});
+				
+			});
 		});		
 		
 		res.type('json')
@@ -194,6 +236,11 @@ router.post('/update', function(req, res, next) {
 });
 
 router.get('/:id', function(req, res, next) {
+if (!req.xhr) {		
+	res.render('index');
+	return;
+}
+	
 	Trip.findById(req.params.id).populate('user').exec(function(err, trip) {
 		if (err) {
 			res.status(500).type('json')

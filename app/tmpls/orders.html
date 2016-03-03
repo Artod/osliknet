@@ -2,7 +2,7 @@
 
 <p *ngIf="!_inited">Loading...</p>
 
-<p *ngIf="_inited && orders && !orders.length">There are no requests yet.</p>
+<p *ngIf="_inited && orders && !orders.length"><i>There are no requests yet.</i></p>
 
 <table class="table">
 	<tr *ngFor="#order of orders; #idx = index">
@@ -22,6 +22,11 @@
 		</td>
 	</tr>
 </table>
+
+<p *ngIf="_inited && !fullPage" class="text-center">
+	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+</p>
+
 
 	<!-- 	<div class="row"  *ngFor="#order of orders; #idx = index">
 			<div class="col-xs-8">

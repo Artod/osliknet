@@ -27,7 +27,7 @@
 		<input *ngIf="corrId" name="corr" type="hidden" [(ngModel)]="formModel.corr" [ngFormControl]="form.controls.corr" />
 		
 		<div class="form-group">			
-			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Message" #elComment></textarea>
+			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Message" maxlength="1000" #elComment></textarea>
 		</div>
 		
 		<p class="text-right">

@@ -30,7 +30,7 @@ export class TripsMyComponent implements OnDestroy {
 		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus
 	) {
-		this._tripService.getMy().subscribe(res => {	
+		/*this._tripService.getMy().subscribe(res => {	
 			this.trips = <any[]>res.trips || [];
 			
 			(res.orders || []).forEach( (order, i, arr) => {
@@ -41,7 +41,9 @@ export class TripsMyComponent implements OnDestroy {
 			this._inited = true;
 		}, error => {
 			this._inited = true;
-		});
+		});*/
+		
+		this.loadNext();
 		
 		this.newMessages = this._notificationService.data.newMessages || {};
 		
@@ -50,6 +52,41 @@ export class TripsMyComponent implements OnDestroy {
 			this._appRef.tick();
 		});
 	}
+	
+	public page : number = 0;
+	public limit : number = 5;
+	public fullPage : boolean = false;
+	private _busy : boolean = false;
+
+	public loadNext() : void {	
+		this._busy = true;
+		
+		this._tripService.getMy(this.limit, this.page).subscribe(res => {
+			(res.trips || []).forEach( (trip) => {
+				this.trips.push(trip);
+			} );
+			
+			(res.orders || []).forEach( (order, i, arr) => {
+				this.ordersByTrip[order.trip] = this.ordersByTrip[order.trip] || [];
+				this.ordersByTrip[order.trip].push(order);
+			});
+			
+			if ( (res.trips || [])[this.limit - 1] ) {
+				this.page++;
+			} else {
+				this.fullPage = true;
+			}
+			
+			this._busy = false;
+			this._inited = true;
+		}, error => {
+			
+			this._busy = false;
+			this._inited = true;
+		});
+	}
+		
+		
 	
 	public ngOnDestroy() : void {
 		this._notifSub.unsubscribe();
