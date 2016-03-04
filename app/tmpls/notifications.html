@@ -1,12 +1,15 @@
-<a *ngIf="newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length" href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)"><strong class="glyphicon glyphicon-bell"></strong></a>
+<a *ngIf="newTrips.length || newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length" href="" (click)="onClick($event)" (document:click)="onDocumentClick($event)"><strong class="glyphicon glyphicon-bell"></strong></a>
 
-<div *ngIf="isOpened && (newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length)" class="popover-my"><!--  (click)="$event.stopPropagation()" -->
+<div *ngIf="isOpened && (newTrips.length || newOrders.length || newMessagesKeys.length || newPrivMessagesKeys.length)" class="popover-my"><!--  (click)="$event.stopPropagation()" -->
 	<ul class="notifications-list">
 		<li *ngFor="#order of newOrders">
 			<a [routerLink]="['Order', {id: order}]">New order</a>
 		</li>
+		<li *ngFor="#trip of newTrips">
+			<a [routerLink]="['Trip', {id: trip}]">New trip</a>
+		</li>
 		<li *ngFor="#order of newMessagesKeys">
-			<a [routerLink]="['Order', {id: order}]">{{ newMessages[order][0] }} new message{{ newMessages[order] > 1 ? 's' : '' }} in an order</a>
+			<a [routerLink]="['Order', {id: order}]">{{ newMessages[order][0] }} new message{{ newMessages[order] > 1 ? 's' : '' }}</a>
 		</li>
 		<li *ngFor="#corr of newPrivMessagesKeys">
 			<a [routerLink]="['Messages', {id: corr}]">{{ newPrivMessages[corr][0] }} new private message{{ newPrivMessages[corr] > 1 ? 's' : '' }}</a>

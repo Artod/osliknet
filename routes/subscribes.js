@@ -1,8 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var captcha = require('../libs/captcha');
 
 var Trip = require('../models/trip');
 var Subscribe = require('../models/subscribe');
+
+
 
 /*router.get('/', function(req, res, next) {
 	var limit = Number(req.query.limit);	
@@ -29,7 +32,7 @@ var Subscribe = require('../models/subscribe');
 	});
 });*/
 
-router.get('/cancel/:id', function(req, res, next) {	
+router.get('/cancel/:id', function(req, res, next) {
 	Subscribe.findById(req.params.id).exec(function(err, subscribe) {
 		if (err) {
 			res.status(500).type('json')
@@ -47,21 +50,44 @@ router.get('/cancel/:id', function(req, res, next) {
 					
 				return;
 			}
-
-			res.type('text').send('You have been successfully unsubscribed from notifications about new trips from ' + subscribe.from + ' to ' + subscribe.to + '.');
+			
+			if (!req.xhr) {
+				res.type('text').send('You have successfully unsubscribed from notifications about new trips from ' + subscribe.from + ' to ' + subscribe.to + '.');
+				
+				return;
+			} else {
+				res.type('json').json({});
+			}
 		});
 	});
 
 });
 
-router.post('/add', function(req, res, next) {	
+var checkCaptcha = function(req, res, next) {
+	if (req.session.uid) {
+		next();
+		
+		return;
+	}
+
+	captcha.verify(req.body['recaptcha'], function(success) {
+		if (success) {
+			next();
+		} else {
+			res.status(400).type('json')
+				.json({error: 'Invalid captcha'});
+		}
+	});
+};
+
+router.post('/add', checkCaptcha, function(req, res, next) {
 	req.body.email = req.session.email || req.body.email;
 	req.body.is_unsubed = false;
 	
 	Subscribe.findOne({
 		from_id: req.body.from_id,
 		to_id: req.body.to_id,
-		email: req.body.email	
+		email: req.body.email
 	}).exec(function(err, subscribe) {
 		if (err) {
 			res.status(500).type('json')
@@ -76,7 +102,7 @@ router.post('/add', function(req, res, next) {
 					.json({subscribe: subscribe});
 					
 				return;
-			} else {
+			} else {				
 				subscribe.is_unsubed = false;
 				subscribe.save(function(err, subscribe) {
 					if (err) {
@@ -93,6 +119,10 @@ router.post('/add', function(req, res, next) {
 				return;
 			}
 		} else {
+			if (req.session.uid) {
+				req.body.user = req.session.uid;
+			}
+			
 			subscribe = new Subscribe(req.body);
 			
 			subscribe.save(function(err, subscribe) {

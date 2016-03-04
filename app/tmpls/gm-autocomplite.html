@@ -1,2 +1,2 @@
-<input placeholder="{{placeholder}}" name="{{name_place}}" type="text" class="{{class}}" [(ngModel)]="model[name_place]" [ngFormControl]="form.controls[name_place]" (change)="onChange(place.value)" (blur)="onBlur(place.value)" #place />
+<input placeholder="{{placeholder}}" name="{{name_place}}" type="text" class="{{class}}" [(ngModel)]="model[name_place]" [ngFormControl]="form.controls[name_place]" (change)="check(place.value)" (keydown.enter)="onEnter($event, place.value)" #place />
 <input name="{{name_id}}" type="hidden" [(ngModel)]="model[name_id]" [ngFormControl]="form.controls[name_id]" value="" />

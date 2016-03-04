@@ -29,6 +29,9 @@ bootstrap(AppComponent, [
 	provide('config.user', {useFactory: () => {
 		return window.user;
 	}}),
+	provide('config.captcha', {useFactory: () => {
+		return window.googleRecaptcha;
+	}}),	
 	provide('config.orderStatus', {useFactory: () => {
 		return {
 			5: 'Negotiation',

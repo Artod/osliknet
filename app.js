@@ -26,7 +26,11 @@ TODO:
 
 
 
-- Subscribe on new trips
+\- Subscribe on new trips
+\/- капча
+	субскрайб по емайл
+	перенос субскрайбов при авторизации
+	нотификации
 - login + sign in page + validation add trip form
 
 - text pipe to br + msg about new review to link
@@ -45,9 +49,9 @@ TODO:
 
 
 - hosting 
-- deploy 
+- deploy (secret key captcha + sendgrid)
 
-
+- ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
 - paypal
 
 - soc share

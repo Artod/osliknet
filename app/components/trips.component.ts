@@ -1,4 +1,4 @@
-import {Component, ElementRef, Injector, Inject, provide/*, Renderer*/} from 'angular2/core';
+import {Component, ElementRef, Injector, Inject, provide, ApplicationRef/*, Renderer*/} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
 import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router';
 
@@ -7,6 +7,7 @@ import {OrderService} from '../services/order/order.service';
 import {SubscribeService} from '../services/subscribe/subscribe.service';
 import {ModalService} from '../services/modal/modal.service';
 
+import {CaptchaComponent} from './captcha.component';
 import {TripCardComponent} from './trip-card.component';
 import {GmAutocompliteComponent} from './gm-autocomplite.component';
 import {OrderAddComponent} from './order-add.component';
@@ -15,12 +16,13 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/trips.html',
-	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES, TripCardComponent],
+	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES, TripCardComponent, CaptchaComponent],
 	pipes: [ToDatePipe]
 })
 
 export class TripsComponent {
-	public trips : any[];
+	public trips : any[] = [];
+	public subscribe : any = {};	
 	
 	// public trips: any[];
 	
@@ -32,7 +34,7 @@ export class TripsComponent {
 	
 		/*from: "Montreal, QC, Canada",
 		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"	*/
-		
+	public sitekey : string;	
 
 	constructor(
 		private _router: Router,
@@ -44,6 +46,7 @@ export class TripsComponent {
 		private _subscribeService : SubscribeService,
 		private _fb : FormBuilder,
 		private _routeParams : RouteParams,
+		private _appRef : ApplicationRef,
 		@Inject('config.user') public configUser
 	) {
 		this.searchForm = this._fb.group({
@@ -53,15 +56,36 @@ export class TripsComponent {
 			to_id: '' //['', Validators.required]
 		});
 		
+		this.subModel = {
+			email: '',
+			recaptcha: ''
+		}
+		
 		this.subForm = this._fb.group({
-			email: configUser.id ? '' : [/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i, Validators.pattern]
+			email: configUser.id ? '' : ['', Validators.compose([
+					(ctrl) => {
+		console.log(Validators.nullValidator)
+		console.log(ctrl.value, /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value))					
+						if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
+							return {invalidEmail: true}
+						}
+						
+						return null;
+					},
+					Validators.required
+				]
+			)],
+			recaptcha: configUser.id ? '' : ['', Validators.required]
 		});
+		
+
 		
 		this.init();
 		
 		this._location.subscribe(() => {
 			this.init();
 		});
+		
 	}
 	
 	public init() {
@@ -72,7 +96,7 @@ export class TripsComponent {
 			to_id: this._routeParams.get('to_id') || this.searchModel.to_id
 		}
 		
-		this.onSubmit();		
+		this.search();
 	}
 	
 	public serialize(obj) : string {
@@ -80,7 +104,7 @@ export class TripsComponent {
 	}
 
 	public lastId : string = '';
-	public limit : number = 5;
+	public limit : number = 2;
 	private _busy : boolean = false;
 
 	public loadNext() : void {
@@ -97,6 +121,8 @@ export class TripsComponent {
 				this.trips.push(trip);
 			});
 			
+			this.subscribe = data.subscribe || {};
+			
 			this.lastId = (data.trips[this.limit - 1] || {})._id || '';
 
 			// this.isSearch = false;
@@ -109,8 +135,24 @@ export class TripsComponent {
 	private _inited : boolean = false;
 	
 	public onSubmit($event, $form, $thanx) : void {
+		
+		
+		//setTimeout( ()=> this.search($event, $form, $thanx), 1 );
+		
+		this.search($event, $form, $thanx)
+	}
+	
+	public search($event, $form, $thanx) : void {
 		if (!this.searchForm.valid) {			
 			return false;
+		}
+		
+		if (!this.searchModel.from_id) {
+			this.searchModel.from = '';
+		}
+		
+		if (!this.searchModel.to_id) {
+			this.searchModel.to = '';
 		}
 
 		if ($event) {
@@ -133,6 +175,7 @@ export class TripsComponent {
 		
 		if (!this.searchModel.from_id && !this.searchModel.to_id) {
 			this.trips = [];
+			this.subscribe = {};
 			this.lastId = '';
 			
 			return;
@@ -141,6 +184,7 @@ export class TripsComponent {
 		this._tripService.search(this.searchModel, this.limit).subscribe(data => {
 			this.trips = data.trips || [];
 			this.lastId = (data.trips[this.limit - 1] || {})._id || '';
+			this.subscribe = data.subscribe || {};
 			
 			this._inited = true;
 		}, err => {
@@ -150,8 +194,21 @@ export class TripsComponent {
 
 	private _subBusy : boolean = false;
 	private _subsFinished : boolean = false;
+	private _subSubmitted : boolean = false;
 	
-	public onSubscribe(/*$form, $thanx*/) : void {
+	public onSubscribe($event, $form) : void {
+		let $email = $form.querySelector('input[type="email"]');
+
+		// if (this.subForm.controls.email.errors.required) {
+		// if (!this.subForm.controls.email.valid) {
+		if ($email && $email.value === '') {
+			$email.focus();
+			
+			return false;
+		}
+		
+		this._subSubmitted = true;
+		
 		if (!this.subForm.valid) {
 			return false;
 		}
@@ -162,12 +219,20 @@ export class TripsComponent {
 			// $form.style.display = 'none';
 			// $thanx.style.display = 'inherit';
 			this._subsFinished = true;
-			
+			this._subSubmitted = false;
 			this._subBusy = false;
+			
+			this._appRef.tick();
 		}, err => {
+
 			this._subBusy = false;
 		});
 	}
+	
+	
+	/*public onCaptcha(response) : void {
+		this.subModel.recaptcha = response;
+	}*/
 	
 	public onRequest(trip) : void {
 		this._modalService.show(OrderAddComponent, Injector.resolve([
@@ -176,6 +241,17 @@ export class TripsComponent {
 			provide(Location, {useValue: this._location}),
 			provide('trip', {useValue: trip})
 		]));
+	}
+	
+	public unsubscribe($link) : void {
+		this._subscribeService.cancel(this.subscribe._id).subscribe(data => {
+			$link.innerHTML = '<i>You have successfully unsubscribed!</i>';
+			this._subsFinished = false;
+		}, err => {
+			$link.innerHTML = '<i>Something went wrong. Try again later.</i>';
+		});
+		
+		return false;
 	}
 }
 

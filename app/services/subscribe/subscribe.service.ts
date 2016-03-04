@@ -16,6 +16,17 @@ export class SubscribeService {
 		}).map( res => <any[]> res.json() );
 	}
 	
+	public cancel(id) {
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.get('/subscribes/cancel/' + id, {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
+	
+	
 /*
 	public getByOrderId(id) {	
 		let headers = new Headers();

@@ -47,7 +47,7 @@ router.get('/', function(req, res, next) {
 			order.trip.user = order.tripUser;
 		});	
 		
-		User.setOrderReaded(req.session.uid);
+		User.setReaded('newOrders', req.session.uid);
 		
 		res.type('json').json({
 			orders: orders
@@ -101,7 +101,7 @@ router.get('/', function(req, res, next) {
 				}
 			});
 			
-			User.setOrderReaded(req.session.uid);
+			User.setReaded('newOrders', req.session.uid);
 			
 			res.type('json').json({
 				orders: orders
@@ -199,7 +199,7 @@ router.get('/', function(req, res, next) {
 					}
 				});
 				
-				User.setOrderReaded(req.session.uid);
+				User.setReaded('newOrders', req.session.uid);
 				
 				res.type('json').json({
 					orders: orders
@@ -495,7 +495,7 @@ router.post('/add', function(req, res, next) {
 				return;
 			}			
 			
-			User.setOrderUnreaded(order.tripUser, order.id);
+			User.setUnreaded('newOrders', order.tripUser, order.id);
 			
 			Order.find({
 				user: order.user
@@ -542,7 +542,7 @@ router.post('/add', function(req, res, next) {
 		}
 		
 		Trip.findById(req.body.trip).select('user').exec(function(error, trip) {
-			User.setOrderUnreaded(trip.user, order.id);
+			User.setUnreaded('newOrders', trip.user, order.id);
 		});
 		
 		User.stats(req.session.uid, 'r_cnt', 1);

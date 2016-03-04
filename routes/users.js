@@ -7,11 +7,11 @@ var crypto = require('crypto');
 
 var User = require('../models/user');
 var Token = require('../models/token');
-
+var Subscribe = require('../models/subscribe');
 
 router.get('/notifications/:timestamp?', function(req, res, next) {
 	User.findById(req.session.uid)
-		.select('needEmailNotification newMessages newOrders newPrivMessages updated_at')
+		.select('needEmailNotification newOrders newTrips newMessages newPrivMessages updated_at')
 		.exec(function(err, user) {
 			if (err || !user) {
 				res.status(500)
@@ -26,8 +26,9 @@ router.get('/notifications/:timestamp?', function(req, res, next) {
 			};
 	
 			if (/*true || */Number(req.params.timestamp) !== user.updated_at.getTime() ) {
-				out.newMessages = user.newMessages;
 				out.newOrders = user.newOrders;
+				out.newTrips = user.newTrips;
+				out.newMessages = user.newMessages;
 				out.newPrivMessages = user.newPrivMessages;
 			}
 /*console.dir(out)*/
@@ -79,7 +80,7 @@ function proceedEmail(callback) {
 		
 		User.findOne({
 			email: req.body.email.toLowerCase()
-		}).exec(function(err, user) {
+		}).select('email').exec(function(err, user) {
 			if (err) {
 				res.status(500)
 					.type('json')
@@ -107,7 +108,7 @@ router.post('/signup', function(req, res, next) {
 	
 	User.findOne({
 		name: new RegExp('^' + req.body.username + '$', 'i') // безопасно потому что до этого проверяем регекспом
-	}, function(err, user) {
+	}).select('name').exec(function(err, user) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -230,22 +231,21 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 	res.render('index', { message: 'sent', session: JSON.stringify(req.session) });
 });
 
-router.get('/logged_in', loggedInAlready, passwordless.acceptToken({
+router.get('/logged_in', /*loggedInAlready, */passwordless.acceptToken({
 	// successRedirect: '/', //'/если норм залогинелся редиректит сюда',
 	//enableOriginRedirect: true
 }), function(req, res) {
 	if (req.session.passwordless) {
-		if (req.session.uid) {	
-			res.render('index', {message: 'Welcommen', session: JSON.stringify(req.session)});
+		if (req.session.passwordless === req.session.uid) {	
+res.render('index', {message: 'Welcommen', session: JSON.stringify(req.session)});
 			
 			return;
 		}
 console.log('req.session.passwordless');
 console.log(req.session.passwordless);
-		User.findById(req.session.passwordless, function(err, user) {
+		User.findById(req.session.passwordless).select('name email is_approved').exec(function(err, user) {
 			if (err) {
-				res.status(500)
-					.type('json')
+				res.status(500).type('json')
 					.json({error: err});
 					
 				return
@@ -258,8 +258,9 @@ console.log(req.session.passwordless);
 			if (!user.is_approved) {
 				user.is_approved = true;
 console.log('save for approve');
-				//
+				
 				user.save(function(err, user) {
+					console.dir(err);
 					//LOG !!!!!!
 					/*if (err) {
 						res.status(500)
@@ -268,6 +269,29 @@ console.log('save for approve');
 							
 						return
 					}*/
+				});
+				
+				Subscribe.find({
+					email: user.email
+				}).select('user').exec(function(err, subscribes) {
+					if (err) {
+						//log
+						console.dir(err);
+						return;
+					}
+					
+					subscribes.forEach(function(subscribe) {
+						if (!subscribe.user) {
+							subscribe.user = user._id;
+							subscribe.save(function(err, subscribe) {
+								if (err) {
+									//log
+									console.dir(err);
+									return;
+								}
+							});
+						}
+					});
 				});
 			}	
 console.log('Welcommen')

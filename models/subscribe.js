@@ -31,10 +31,15 @@ var schema = mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
+	user: {
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	},
 	email: {
 		type: String,
 		validate: [emailValidator, 'Invalid email'],
 		trim: true,
+		select: false,
 		required: true
 	},
 	created_at: { type: Date },

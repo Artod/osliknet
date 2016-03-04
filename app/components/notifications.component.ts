@@ -13,6 +13,7 @@ import {NotificationService} from '../services/notification/notification.service
 
 export class NotificationsComponent {
 	public newOrders : string[] = [];
+	public newTrips : string[] = [];
 	public newMessages : Dictionary;
 	public newMessagesKeys : string[] = [];
 	public newPrivMessages : Dictionary;
@@ -27,6 +28,7 @@ export class NotificationsComponent {
 console.log('NotificationsComponent subscribe')
 console.dir(data);
 			this.newOrders = data.newOrders;
+			this.newTrips = data.newTrips;
 			this.newMessages = data.newMessages;
 			this.newMessagesKeys = this.getKeys(data.newMessages);
 			this.newPrivMessages = data.newPrivMessages;

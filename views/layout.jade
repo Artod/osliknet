@@ -22,6 +22,8 @@ html
 		script(src='/modules/angular2/angular2.dev.js')
 		script(src='/modules/angular2/router.dev.js')
 		script(src='/modules/angular2/http.dev.js')
+		
+		script(src='https://www.google.com/recaptcha/api.js?onload=googleRecaptcha&render=explicit', async, defer)
 
 		//script(src='/modules/ng2-datepicker/ng2-datepicker.js')		
 		//script(src='/modules/moment/moment.js')		
@@ -36,7 +38,43 @@ html
 
 				
 				
-				
+		script.
+			// System.import('bootstrap');
+			
+			window.user = {
+				id: '#{user.id}',
+				name: '#{user.name}'
+			};
+			/*window.user = {
+				id: '',
+				name: ''
+			};*/
+			window.googleRecaptcha = function() {
+				window.googleRecaptcha.loaded = true;
+			};			
+			window.googleRecaptcha.key = '6LcR3hkTAAAAAOYXPgZ4UsPhUo0P3ie6MRlTgbyp';
+			window.googleRecaptcha.loaded = false;
+
+			System.config({
+				baseURL: '/',
+				// transpiler: 'typescript', 
+				packages: {
+					app: {
+						format: 'register',
+						defaultExtension: 'js'
+					}
+				}/*,
+				map: {
+				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
+				  "moment": "modules/moment/moment.js"
+				}*/
+			});
+			
+			
+			System.import('/app/boot')
+				.then(null, console.error.bind(console));
+
+	
 				
 				
 				
@@ -86,84 +124,4 @@ html
 			// button Get token
 		
 		// br				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-		script.
-			// System.import('bootstrap');
-			
-			window.user = {
-				id: '#{user.id}',
-				name: '#{user.name}'
-			};
-			
-			
-			System.config({
-				baseURL: '/',
-				// transpiler: 'typescript', 
-				packages: {
-					app: {
-						format: 'register',
-						defaultExtension: 'js'
-					}
-				}/*,
-				map: {
-				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
-				  "moment": "modules/moment/moment.js"
-				}*/
-			});
-			
-			
-			System.import('/app/boot')
-				.then(null, console.error.bind(console));
-
-
-
-
-			/*transpiler: 'typescript',
-				baseURL: "/dist",
-				typescriptOptions: {
-					emitDecoratorMetadata: true,
-					module: "commonjs",
-					experimentalDecorators: true
-				},
-				map: {
-					app: 'src',
-					typescript: 'node_modules/typescript/lib/typescript.js',
-					angular2: 'node_modules/angular2',
-					rxjs: 'node_modules/rxjs'
-				},
-				packages: {
-					app: {
-						defaultExtension: 'ts',
-						main: 'app.ts'
-					},
-					angular2: {
-						defaultExtension: 'js'
-					},
-					rxjs: {
-						
-						defaultExtension: 'js'
-					}
-				}
-			});*/
 				

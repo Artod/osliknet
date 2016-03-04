@@ -5,6 +5,10 @@
 <p *ngIf="!_inited">Loading...</p>
 
 <div *ngIf="trip && trip.user">
+	<p *ngIf="subscribe && subscribe._id" class="text-right" #link>
+		<a href="#" (click)="unsubscribe(link)">Unsubscribe from notifications about new trips in the direction.</a>
+	</p>
+	
 	<trip-card [trip]="trip" [user]="trip.user"></trip-card>
 
 	<br />

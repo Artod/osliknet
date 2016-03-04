@@ -48,7 +48,7 @@ router.get('/', function(req, res, next) {
 	var limit = Number(req.query.limit);	
 	limit = (limit && limit < 30 ? limit : 30);
 	
-	Trip.find(query).sort('-_id').limit(limit).populate('user').exec(function (err, trips) {
+	Trip.find(query).sort('-_id').limit(limit).populate('user').exec(function(err, trips) {
 		if (err) {
 			res.status(500)
 				.type('json')
@@ -57,8 +57,32 @@ router.get('/', function(req, res, next) {
 			return;
 		}
 		
-		res.type('json')
-			.json({trips: trips});
+		if (req.session.uid) {
+			Subscribe.findOne({
+				from_id: req.query.from_id,
+				to_id: req.query.to_id,
+				is_unsubed: false,
+				user: req.session.uid
+			}).select('_id').exec(function(err, subscribe) {
+				if (err) {
+					res.status(500).type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				res.type('json').json({
+					trips: trips,
+					subscribe: subscribe
+				});
+			});			
+		} else {
+			res.type('json')
+				.json({trips: trips});			
+		}
+		
+		
+
 			
 		// res.render('trips/index', { trips: trips });
 			
@@ -87,7 +111,7 @@ if (!req.session.uid) {
 	
 	Trip.find({
 		user: req.session.uid
-	}).sort('-when').skip(page * limit).limit(limit).exec(function(err, trips) {
+	}).sort('-_id').skip(page * limit).limit(limit).exec(function(err, trips) {
 		if (err) {
 			res.status(500).type('json')
 				.json({error: err});
@@ -131,7 +155,6 @@ router.get('/add', function(req, res, next) {
 });
 	
 router.post('/add', function(req, res, next) {
-	
 	req.body.is_removed = false;	
 	req.body.user = req.session.uid;
 	
@@ -139,7 +162,7 @@ router.post('/add', function(req, res, next) {
 	
 	trip.save(function(err, trip) {
 		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500)				
+			res.status(err.name === 'ValidationError' ? 400 : 500)			
 			
 			res.type('json')
 				.json({error: err});
@@ -161,7 +184,7 @@ router.post('/add', function(req, res, next) {
 			from_id: trip.from_id,
 			to_id: trip.to_id,
 			is_unsubed: false
-		}).exec(function(err, subscribes) {
+		}).select('+email').exec(function(err, subscribes) {
 			if (err) {
 				res.status(500).type('json')
 					.json({error: err});
@@ -170,25 +193,33 @@ router.post('/add', function(req, res, next) {
 			}
 			
 			subscribes.forEach(function(subscribe) {
-				var email = new sendgrid.Email();
+				if (subscribe.email === req.session.email) {					
+					return;
+				}
 				
-				email.addTo(subscribe.email);
-				email.subject = 'New trip on Osliki.Net';
-				email.from = 'osliknet@gmail.com';
-				
-				email.text += 'Hello!\n\r\n\r';
-				email.text += 'We have new trip from ' + subscribe.from + ' to ' + subscribe.to + ' http://osliki.net/trips/' + trip.id + '.\n\r';
-				email.text += 'Unsubscribe: http://osliki.net/subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
-				email.text += 'Team http://Osliki.Net .';
-console.log(email.text);
-				sendgrid.send(email, function(err, json) {
-					if (err) {
-						console.log(err);
-					}
+				if (subscribe.user) {
+					User.setUnreaded('newTrips', subscribe.user, trip.id);					
+				} else {
+					var email = new sendgrid.Email();
 					
-					console.dir(json);
-				});
-				
+					email.addTo(subscribe.email);
+					email.subject = 'New trip on Osliki.Net';
+					email.from = 'osliknet@gmail.com';
+					
+					email.text += 'Hello!\n\r\n\r';
+					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' http://osliki.net/trips/' + trip.id + '.\n\r';
+					email.text += 'Unsubscribe: http://osliki.net/subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
+					email.text += 'Team http://Osliki.Net .';
+	console.log(subscribe.email);
+	console.log(email.text);
+					sendgrid.send(email, function(err, json) {
+						if (err) {
+							console.log(err);
+						}
+						
+						console.dir(json);
+					});
+				}
 			});
 		});		
 		
@@ -249,7 +280,11 @@ if (!req.xhr) {
 			return
 		}
 		
-		if (!trip || trip.user.id !== req.session.uid) {
+		if (req.session.uid) {
+			User.setReaded('newTrips', req.session.uid, trip.id);			
+		}
+		
+		if (!req.session.uid || !trip) {
 			res.type('json')
 				.json({trip: trip});
 
@@ -272,6 +307,25 @@ if (!req.xhr) {
 					orders: orders
 				});
 			});		
+		} else {
+			Subscribe.findOne({
+				from_id: trip.from_id,
+				to_id: trip.to_id,
+				is_unsubed: false,
+				user: req.session.uid
+			}).select('_id').exec(function(err, subscribe) {
+				if (err) {
+					res.status(500).type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				res.type('json').json({
+					trip: trip,
+					subscribe: subscribe
+				});
+			});
 		}
 
 	});

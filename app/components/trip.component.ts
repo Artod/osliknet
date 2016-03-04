@@ -4,6 +4,7 @@ import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router'
 
 import {TripService} from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
+import {SubscribeService} from '../services/subscribe/subscribe.service';
 import {ModalService} from '../services/modal/modal.service';
 import {NotificationService} from '../services/notification/notification.service';
 
@@ -23,6 +24,7 @@ export class TripComponent implements OnDestroy {
 	public tripId : string = '';
 	
 	public trip : any = {};
+	public subscribe : any = {};
 	public orders : any[] = [];
 
 	public formModel : any = {};
@@ -38,9 +40,10 @@ export class TripComponent implements OnDestroy {
 		private _location: Location,
 		// private _renderer : Renderer,
 		private _modalService : ModalService,
-		private _orderService : OrderService,
 		private _notificationService : NotificationService,
+		private _orderService : OrderService,
 		private _tripService : TripService,
+		private _subscribeService : SubscribeService,
 		
 		private _routeParams : RouteParams,
 		private _fb : FormBuilder,
@@ -57,8 +60,9 @@ export class TripComponent implements OnDestroy {
 		this.formModel.id = this.tripId;
 		
 		this._tripService.getById(this.tripId).subscribe(res => {
-			this.trip = <any>res.trip;
-			this.orders = <any[]>res.orders;
+			this.trip = res.trip || {};
+			this.orders = res.orders || [];
+			this.subscribe = res.subscribe || {};
 			
 			this.trip && ( this.formModel.description = (this.trip.description || '') );
 			
@@ -73,6 +77,10 @@ export class TripComponent implements OnDestroy {
 			this.newMessages = data.newMessages || {};
 			this._appRef.tick();
 		});
+	}
+	
+	public ngOnDestroy() : void {
+		this._notifSub.unsubscribe();
 	}
 	
 	private _busy = false;
@@ -110,8 +118,13 @@ export class TripComponent implements OnDestroy {
 		});
 	}
 	
-	
-	public ngOnDestroy() : void {
-		this._notifSub.unsubscribe();
+	public unsubscribe($link) : void {
+		this._subscribeService.cancel(this.subscribe._id).subscribe(data => {
+			$link.innerHTML = '<i>You have successfully unsubscribed!</i>';
+		}, err => {
+			$link.innerHTML = '<i>Something went wrong. Try again later.</i>';
+		});
+		
+		return false;
 	}
 }

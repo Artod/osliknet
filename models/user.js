@@ -81,6 +81,11 @@ var schema = mongoose.Schema({
 		select: false,
 		default: []
 	},
+	newTrips: {
+		type: Array,
+		select: false,
+		default: []
+	},
 	newMessages: {
 		type: {},
 		select: false,
@@ -95,7 +100,7 @@ var schema = mongoose.Schema({
 		type: Boolean,
 		select: false,
 		default: false
-	},	
+	},
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
@@ -147,46 +152,46 @@ console.dir(user._doc)
 	});
 };
 
-schema.statics.setOrderUnreaded = function(uid, oid, cb) {
-	this.findById(uid).select('newOrders needEmailNotification').exec(function(err, user) {
-		user.newOrders.push(oid);
+schema.statics.setUnreaded = function(field, uid, id) {
+	this.findById(uid).select(field + ' needEmailNotification').exec(function(err, user) {
+		user[field].push(id);
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
 			//log errors
-			cb && cb(err, user);
 		});
 	});
 };
 
-schema.statics.setOrderReaded = function(uid, oid, cb) {
-	this.findById(uid).select('newOrders needEmailNotification').exec(function(err, user) {
+schema.statics.setReaded = function(field, uid, id) {
+	this.findById(uid).select(field + ' needEmailNotification').exec(function(err, user) {
 		if (err) {
-			cb && cb(err, user);
+			//log errors
+			// cb && cb(err, user);
 			return;
 		}
 		
-		var indexOf = user.newOrders.indexOf(oid); // if length == 0 or undefined oid then -1 
+		var indexOf = user[field].indexOf(id); // if length == 0 or undefined id then -1 
 		
 		if (indexOf === -1 && !user.needEmailNotification) {
-			cb && cb(err, user);
+			//cb && cb(err, user);
 			
 			return;
 		}		
 		
-		if (oid) {
+		if (id) {
 			if (indexOf > -1) {
-				user.newOrders.splice(indexOf, 1);
+				user[field].splice(indexOf, 1);
 			}
 		} else {
-			user.newOrders = [];
+			user[field] = [];
 		}
 		
 		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
 			//log errors
-			cb && cb(err, user);
+			//cb && cb(err, user);
 		});
 	});
 };
@@ -325,12 +330,14 @@ setInterval(function() {
 		newMessages: 1,
 		newPrivMessages: 1,
 		newOrders: 1,
+		newTrips: 1,
 		needEmailNotification: 1
 	}).exec(function(err, users) {
 		users.forEach(function(user) {
 			user.needEmailNotification = false;
 			
 			var newOrders = user.newOrders;
+			var newTrips = user.newTrips;
 			
 			var msgsInOrder = Object.keys(user.newMessages).filter(function(oid) {
 				if (!user.newMessages[oid][0]) {
@@ -363,15 +370,19 @@ setInterval(function() {
 				var text = '<h1>Hello, ' + user.name + '!</h1>';
 				
 				if (newOrders.length) {
-					text += '<p>You have new ' + ( newOrders.length > 1 ? '<a href="http://osliki.net/orders">orders</a>' : '<a href="http://osliki.net/messages/order/' + newOrders[0] + '">order</a>') + '.</p>'
+					text += '<p>You have new ' + ( newOrders.length > 1 ? '<a href="http://osliki.net/orders">orders</a>' : '<a href="http://osliki.net/messages/order/' + newOrders[0] + '">order</a>') + '.</p>';
 				}
 				
 				if (msgsInOrder.length) {
-					text += '<p>You have new ' + (msgsInOrder.length > 1 ? '<a href="http://osliki.net/orders">messages</a>' : '<a href="http://osliki.net/messages/order/' + msgsInOrder[0] + '">message</a>') + '.</p>'
-				}			
+					text += '<p>You have new ' + (msgsInOrder.length > 1 ? '<a href="http://osliki.net/orders">messages</a>' : '<a href="http://osliki.net/messages/order/' + msgsInOrder[0] + '">message</a>') + '.</p>';
+				}
+				
+				if (newTrips.length) {
+					text += '<p>We have new <a href="http://osliki.net/trips">trip' + (newTrips.length > 1 ? 's' : '') + '</a> you are waiting for.</p>';
+				}
 				
 				if (msgsInDialog.length) {
-					text += '<p>You have new ' + (msgsInDialog.length > 1 ? '<a href="http://osliki.net/messages">private messages</a>' : '<a href="http://osliki.net/messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</p>'
+					text += '<p>You have new ' + (msgsInDialog.length > 1 ? '<a href="http://osliki.net/messages">private messages</a>' : '<a href="http://osliki.net/messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</p>';
 				}
 				
 console.log(text);
@@ -381,7 +392,7 @@ console.log(text);
 				email.addTo(user.email);
 				email.subject = 'Notifications from Osliki.Net';
 				email.from = 'osliknet@gmail.com';
-				email.text = text;
+				// email.text = text;
 				email.html = text;
 				
 				sendgrid.send(email, function(err, json) {
@@ -430,6 +441,13 @@ User.find().select('stats.t_rate stats.r_rate').exec(function(err, user) {
 });
 */
 
+/*User.find().exec(function(err, users) {
+	users.forEach(function(user) {
+		user.is_approved = false;
+		user.save();
+	});
+	
+})*/
 
 
 

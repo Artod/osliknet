@@ -6,8 +6,7 @@ declare var google: any;
 
 @Component({
 	selector: 'gm-autocomplite',
-	templateUrl: '/app/tmpls/gm-autocomplite.html'//,
-	// inputs: ['name', 'model', 'class', 'form']
+	templateUrl: '/app/tmpls/gm-autocomplite.html'
 })
 
 export class GmAutocompliteComponent implements OnInit {
@@ -42,7 +41,7 @@ export class GmAutocompliteComponent implements OnInit {
 	}
 
 	
-	init($place: HTMLElement, $place_id: HTMLElement): void {
+	init($place : HTMLElement, $place_id : HTMLElement): void {
 		let autocomplete = new google.maps.places.Autocomplete($place, {
 			types: ['(cities)']
 		});
@@ -60,22 +59,21 @@ export class GmAutocompliteComponent implements OnInit {
 		});
 	}
 	
-	check(value: String): void {
+	check(value : String) : void {
 		if (this._currentCity && value !== this._currentCity) {
+
 			this._currentCity = '';
 			// this._place = '';
 			this.model[this.name_place] = '';
 			this.model[this.name_id] = '';
-
 		}
 	}
-	
-	onChange(value: String): void {
-		this.check(value);
-	}
-	
-	onBlur(value: String): void {
-		
+
+	onEnter ($event, value) {
+		if (value && value !== this._currentCity) {
+			$event.preventDefault();
+			this.check();
+		}
 	}
 }
 
