@@ -10,9 +10,7 @@
 		<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>
 	</div>
 	<div class="col-xs-12">
-		<p class="order-message">
-			{{ order.message }}
-		</p>
+		<p class="order-message pre-wrap">{{ order.message }}</p>
 		
 		<div *ngIf="configUser.id === order.user._id" [ngSwitch]="order.status" class="text-center">
 			<p>

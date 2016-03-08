@@ -13,9 +13,7 @@
 
 	<br />
 
-	<p *ngIf="!editMode">
-		{{ trip.description }}
-	</p>
+	<p *ngIf="!editMode" class="pre-wrap">{{ trip.description }}</p>
 	
 	<form *ngIf="editMode" action="/trips/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
 	
@@ -56,9 +54,10 @@
 					{{ order.message }}
 				</p>
 				
-				<p class="text-right">
-					<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-				</p>					
+				<goto [order]="order" [newMessages]="newMessages"></goto>
+				<!-- <p class="text-right">
+					<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> <!- <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> -></a>
+				</p>	 	-->			
 			</td>
 		</tr>
 	</table>

@@ -39,9 +39,12 @@
 							{{ order.message }}
 						</p>
 						
-						<p class="text-right">
-							<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-						</p>
+						<goto [order]="order" [newMessages]="newMessages"></goto>
+						<!--
+						 <p class="text-right">
+							<span *ngIf="newMessages[order._id] && newMessages[order._id][0]" class="label label-danger">{{newMessages[order._id][0]}} new</span>
+							<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span>  <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> </a>
+						</p> -->
 					</td>
 				</tr>
 			</table>

@@ -2,6 +2,8 @@ node_modules/
 app/**/*.js
 app/**/*.map
 
+config.js
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

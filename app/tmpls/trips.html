@@ -1,86 +1,89 @@
-<div class="page-header">
-	<h2>Find a Trip</h2>
+<div class="container-trips-find container">
+	<div class="page-header">
+		<h2>Find a Trip</h2>
+	</div>
+
+	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
+		<!-- <label class="control-label input-lg">Trip</label> -->
+		
+		<div class="form-group">
+			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
+		</div>
+		
+		<div class="arrow-right form-group">
+			<span class="glyphicon glyphicon-arrow-right"></span>
+		</div>
+
+		<div class="form-group">	
+			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" placeholder="To"></gm-autocomplite>
+		</div>
+		
+		<div class="form-group">
+			<button type="submit" class="btn btn-warning btn-lg">Find</button>
+		</div>
+	</form>
 </div>
 
-<form class="text-center form-inline" action="/search" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
-	<!-- <label class="control-label input-lg">Trip</label> -->
-	
-	<div class="form-group">
-		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
-	</div>
-	
-	<div class="form-group">
-		<span class="glyphicon glyphicon-arrow-right"></span>
-	</div>
-
-	<div class="form-group">	
-		<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" placeholder="To"></gm-autocomplite>
-	</div>
-
-	<button type="submit" class="btn btn-warning btn-lg">Find</button>
-</form>
-
 <br />
 <br />
 
-<table class="table">
-	<tr *ngFor="#trip of trips">
-		<td>
-			<trip-card [trip]="trip" [user]="trip.user"></trip-card>
-			<br />
-			<p>
-				{{ trip.description }}
-			</p>
-			<p class="text-right" *ngIf="trip.user._id != configUser.id">
-				<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request a delivery</button>
-			</p>
-		</td>
-	</tr>
-</table>
+<div class="container">
+	<table class="table">
+		<tr *ngFor="#trip of trips">
+			<td>
+				<trip-card [trip]="trip" [user]="trip.user"></trip-card>
 
-<p *ngIf="lastId" class="text-center">
-	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
-	<br />
-	<br />
-</p>
+				<p>
+					{{ trip.description }}
+				</p>
+				<p class="text-right" *ngIf="trip.user._id != configUser.id">
+					<button class="btn btn-default btn-lg1" (click)="onRequest(trip)">Request a delivery</button>
+				</p>
+			</td>
+		</tr>
+	</table>
 
-
-
-<div *ngIf="_inited && (subModel.from_id || subModel.to_id)" class="text-center">
-	<p *ngIf="!trips || !trips.length">
-		<i>Trips in this direction are not presented at the moment.</i>
+	<p *ngIf="lastId" class="text-center">
+		<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+		<br />
+		<br />
 	</p>
 
-	<p *ngIf="subscribe && subscribe._id" #linkUnsubscribe>
-		<a href="#" (click)="unsubscribe(linkUnsubscribe)">Unsubscribe from notifications about new trips in the direction.</a>
-	</p>
-
-	<div *ngIf="(!subscribe || !subscribe._id) && (subModel.from_id && subModel.to_id)" class="subscribe-form">		
-		<p [hidden]="!_subsFinished" #thanx>
-			<i>Subscribed. Thank you!</i> 
+	<div *ngIf="_inited && (subModel.from_id || subModel.to_id)" class="text-center">
+		<p *ngIf="!trips || !trips.length">
+			<i>Trips in this direction are not presented at the moment.</i>
 		</p>
 
-		<form *ngIf="!_subsFinished" method="post" [ngFormModel]="subForm" (submit)="_subBusy ? false : onSubscribe($event, form)" novalidate #form>
-			<p>
-				<!-- <i>We'll let you know when a new trip from «<big>{{subModel.from}}</big>» to «<big>{{subModel.to}}</big>» will appear:</i>	<br />	<br /> -->
-				<i>We'll let you know when a new trip from «<big>{{subModel.from}}</big>» to «<big>{{subModel.to}}</big>» will appear:</i>
-				
-				<br />
+		<p *ngIf="subscribe && subscribe._id" #linkUnsubscribe>
+			<a href="#" (click)="unsubscribe(linkUnsubscribe)">Unsubscribe from notifications about new trips in the direction.</a>
+		</p>
+
+		<div *ngIf="(!subscribe || !subscribe._id) && (subModel.from_id && subModel.to_id)" class="subscribe-form">		
+			<p [hidden]="!_subsFinished" #thanx>
+				<i>Subscribed. Thank you!</i> 
 			</p>
-			
-			<div class="form-group {{_subSubmitted && !subForm.controls.email.valid ? 'has-error' : ''}}">
-				<input *ngIf="!configUser.id" class="form-control subscribe-email" type="email" name="email" [(ngModel)]="subModel.email" [ngFormControl]="subForm.controls.email" placeholder="E-mail"  />		
 
-				<button type="submit" class="btn btn-warning btn-lg1">{{ _subBusy ? 'Wait...' : 'Subscribe' }}</button>
-			</div>	
+			<form *ngIf="!_subsFinished" method="post" [ngFormModel]="subForm" (submit)="_subBusy ? false : onSubscribe($event, form)" novalidate #form>
+				<p>
+					<!-- <i>We'll let you know when a new trip from «<big>{{subModel.from}}</big>» to «<big>{{subModel.to}}</big>» will appear:</i>	<br />	<br /> -->
+					<i>We can let you know when a new trip from «{{subModel.from}}» to «{{subModel.to}}» will appear:</i>
+					
+					<br />
+				</p>
+				
+				<div class="form-group {{_subSubmitted && !subForm.controls.email.valid ? 'has-error' : ''}}">
+					<input *ngIf="!configUser.id" class="form-control subscribe-email" type="email" name="email" [(ngModel)]="subModel.email" [ngFormControl]="subForm.controls.email" placeholder="E-mail"  />		
 
-			<div *ngIf="!configUser.id" class="form-group {{_subSubmitted && subModel.recaptcha === '' ? 'has-error' : ''}}">
-				<captcha [ctrl]="subForm.controls.recaptcha" [(model)]="subModel.recaptcha"></captcha>
-			</div>
+					<button type="submit" class="btn btn-warning btn-lg1">{{ _subBusy ? 'Wait...' : 'Subscribe' }}</button>
+				</div>	
 
-		</form> 
-	
+				<div *ngIf="!configUser.id" class="form-group {{_subSubmitted && subModel.recaptcha === '' ? 'has-error' : ''}}">
+					<captcha [ctrl]="subForm.controls.recaptcha" [(model)]="subModel.recaptcha"></captcha>
+				</div>
+
+			</form> 
+		
+		</div>
+		
 	</div>
-	
 </div>
-

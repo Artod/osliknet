@@ -1,0 +1,48 @@
+<div class="container container-join">
+	<div class="page-header">
+		<h2>Sign up</h2>
+	</div>
+	
+	<p *ngIf="success">
+		<i>A link to access has been sent to your email address. Please check your email inbox.</i>
+	</p>
+
+	<form *ngIf="!success" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(name, email)" novalidate>
+		<div class="form-group {{!form.controls.name.pristine && !form.controls.name.valid ? 'has-error' : ''}}">
+			<label class="sr-only">Name</label>
+			
+			<input class="form-control input-lg" type="text" name="name" [(ngModel)]="model.name" [ngFormControl]="form.controls.name" placeholder="Name (latin letters only)" maxlength="50" #name />
+			
+			<p *ngIf="form.controls.name.errors && form.controls.name.errors.invalidName" class="help-block">
+				Latin letters only.
+			</p>
+			
+			<p *ngIf="form.controls.name.errors && form.controls.name.errors.emptyName" class="help-block">
+				Empty name
+			</p>
+			
+		</div>
+		
+		<div class="form-group {{form.controls.email.touched && !form.controls.email.valid ? 'has-error' : ''}}">
+			<label class="sr-only">E-mail</label>
+
+			<input class="form-control input-lg" type="email" name="email" [(ngModel)]="model.email" [ngFormControl]="form.controls.email" placeholder="E-mail" #email />
+			
+			<p *ngIf="form.controls.email.touched && form.controls.email.errors && form.controls.email.errors.invalidEmail" class="help-block">
+				E-mail is not valid.
+			</p>
+		</div>
+		
+		<div class="form-group text-right {{submitted && model.recaptcha === '' ? 'has-error' : ''}}">
+			<captcha [ctrl]="form.controls.recaptcha" [(model)]="model.recaptcha"></captcha>
+		</div>
+		
+		<div class="form-group text-right">
+			<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait..' : 'Log in' }}</button>
+		</div>
+		
+		<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+			{{ error }}
+		</div>
+	</form>
+</div>

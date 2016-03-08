@@ -1,13 +1,9 @@
 var https = require('https');
-
-var params = {
-	key   : '6LcR3hkTAAAAAOYXPgZ4UsPhUo0P3ie6MRlTgbyp',
-	secret: '6LcR3hkTAAAAAF_8EwMH0N3N4JqjeqnaxvCRuze6'
-};
+var config = require('../config');
 
 function verify(response, callback) {
-console.log('https://www.google.com/recaptcha/api/siteverify?secret=' + params.secret + '&response=' + response)
-    https.get('https://www.google.com/recaptcha/api/siteverify?secret=' + params.secret + '&response=' + response, function(res) {
+console.log('https://www.google.com/recaptcha/api/siteverify?secret=' + config.recaptcha.secret + '&response=' + response)
+    https.get('https://www.google.com/recaptcha/api/siteverify?secret=' + config.recaptcha.secret + '&response=' + response, function(res) {
         var data = '';
 		
         res.on('data', function(chunk) {
@@ -26,5 +22,5 @@ console.log('parsedDataCaptcha = ', parsedData);
     });
 }
 
-module.exports.params = params;
+module.exports.params = config.recaptcha;
 module.exports.verify = verify;

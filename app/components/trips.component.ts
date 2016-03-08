@@ -62,18 +62,14 @@ export class TripsComponent {
 		}
 		
 		this.subForm = this._fb.group({
-			email: configUser.id ? '' : ['', Validators.compose([
-					(ctrl) => {
-		console.log(Validators.nullValidator)
-		console.log(ctrl.value, /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value))					
-						if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
-							return {invalidEmail: true}
-						}
-						
-						return null;
-					},
-					Validators.required
-				]
+		email: configUser.id ? '' : ['', Validators.compose([(ctrl) => {
+					if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
+						return {invalidEmail: true}
+					}
+					
+					return null;
+				},
+				Validators.required]
 			)],
 			recaptcha: configUser.id ? '' : ['', Validators.required]
 		});
@@ -135,7 +131,7 @@ export class TripsComponent {
 	private _inited : boolean = false;
 	
 	public onSubmit($event, $form, $thanx) : void {
-		
+
 		
 		//setTimeout( ()=> this.search($event, $form, $thanx), 1 );
 		

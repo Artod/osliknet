@@ -42,7 +42,7 @@ export class NotificationService {
 			return this._http.get('/users/notifications/' + this.updated/*, {
 				headers: this._headers
 			}*/);
-		} ).map( res => res.json() ).catch(this._handleError).subscribe(res => {
+		} ).map( res => res.json() )./*catch(this._handleError).*/subscribe(res => {
 			var serverUpdated = new Date(res.updated_at).getTime();
 			
 			if (serverUpdated !== this.updated) {
@@ -52,7 +52,7 @@ console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
 				
 				this.subject.next(this.data);
 			}			
-		});
+		}, (err) => {});
 		
 		return this.subject;
 	}

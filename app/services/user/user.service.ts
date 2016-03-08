@@ -23,4 +23,23 @@ export class UserService {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
+	
+	public login(data) {		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+	
+		return this.http.post('/users/login', JSON.stringify(data), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
+	public signup(data) {		
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+	
+		return this.http.post('/users/signup', JSON.stringify(data), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
 }

@@ -56,6 +56,14 @@ schema.statics.sts = {
 	FINISHED: 25
 };
 
+schema.statics.stsInv = {
+	5: 'Negotiation',
+	10: 'Processing',
+	15: 'Refused',
+	20: 'Cancelled',
+	25: 'Finished'
+};
+
 var Order = mongoose.model('Order', schema);
 
 /* Order.find(function(err, orders){

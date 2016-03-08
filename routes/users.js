@@ -4,18 +4,27 @@ var router = express.Router();
 
 var passwordless = require('passwordless');
 var crypto = require('crypto');
+var config = require('../config');
+var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
 var User = require('../models/user');
 var Token = require('../models/token');
 var Subscribe = require('../models/subscribe');
 
-router.get('/notifications/:timestamp?', function(req, res, next) {
+router.get('/notifications/:timestamp?', function(req, res, next) {		
+if (!req.session.uid) {
+	res.status(401)
+			.type('json')
+			.json({error: 'Unauthorized'});
+			return
+}
+
+	
 	User.findById(req.session.uid)
 		.select('needEmailNotification newOrders newTrips newMessages newPrivMessages updated_at')
 		.exec(function(err, user) {
 			if (err || !user) {
-				res.status(500)
-					.type('json')
+				res.status(500).type('json')
 					.json({error: err});
 					
 				return
@@ -51,28 +60,27 @@ console.log('needEmailNotification false save done');
 		});
 });
 
-router.get('/logout', passwordless.logout(/*{successFlash: 'Hope to see you soon!'}*/), function(req, res) {
+router.get('/logout', passwordless.logout(), function(req, res) {
 	/*delete req.session.uid;
 	delete req.session.name;
 	delete req.session.email;
 	*/
 	
+	res.locals.user = {};
+	
 	req.session.destroy(function(err) {
 	  // cannot access session here
 	});
 	
-	res.render('index', {
-		session: JSON.stringify(req.session)
-	});
+	res.redirect('/trips');
 });
 
 function proceedEmail(callback) {
 	return function (req, res, next) {
 		var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-		
+
 		if ( !re.test(req.body.email) ) {
-			res.status(400)			
-				.type('json')
+			res.status(400).type('json')
 				.json({error: 'Invalide email'});
 				
 			return;
@@ -96,28 +104,24 @@ function proceedEmail(callback) {
 
 /* POST login details. */
 router.post('/signup', function(req, res, next) {
-	// не убирать отсюда
-	if ( !/^[a-z0-9-_]+$/i.test(req.body.username) ) {
-		res.status(400)	;			
-		
-		res.type('json')
-			.json({error: 'Invalid user name'});
+	req.body.username = req.body.name.trim();
+	
+	if ( !/^[a-z0-9-_ ]+$/i.test(req.body.username) ) {
+		res.status(400).type('json')
+			.json({error: 'Invalid user name.'});
 		
 		return;		
 	}
 	
 	User.findOne({
-		name: new RegExp('^' + req.body.username + '$', 'i') // безопасно потому что до этого проверяем регекспом
+		name: new RegExp('^' + req.body.username + '$', 'i') 
 	}).select('name').exec(function(err, user) {
 		if (err) {
-			res.status(500)
-				.type('json')
+			res.status(500).type('json')
 				.json({error: err});
 				
 			return
 		}
-		
-		console.dir(user)
 		
 		if (user) {
 			res.status(400).type('json')
@@ -128,8 +132,7 @@ router.post('/signup', function(req, res, next) {
 	});
 }, proceedEmail(function(user, req, res, next) {
 	if (user) {
-		res.status(400)	
-			.type('json')
+		res.status(400).type('json')
 			.json({error: 'Email is registered already.'});
 	} else {
 		req.body.email = req.body.email.trim().toLowerCase();
@@ -139,11 +142,10 @@ router.post('/signup', function(req, res, next) {
 			email: req.body.email,
 			gravatar_hash: require('crypto').createHash('md5').update(req.body.email).digest('hex')
 		});
-		
+
 		user.save(function(err, user) {
 			if (err) {
-				res.status(500)
-					.type('json')
+				res.status(500).type('json')
 					.json({error: err});
 					
 				return
@@ -157,12 +159,8 @@ router.post('/signup', function(req, res, next) {
 }), passwordless.requestToken(function(email, delivery, callback, req) {
 	callback(null, req.userId);
 }, {
-	//failureRedirect: '/failureRedirecsendtokent111',
 	userField: 'email'
- }), function(req, res) { // файлуре срабатывает сук
-	// success!
-	res.render('index', { message: 'sent', session: JSON.stringify(req.session) });
-});
+ }), deliveryToken);
 
 function loggedInAlready(req, res, next) {
 	if (req.session.passwordless) {
@@ -171,6 +169,43 @@ function loggedInAlready(req, res, next) {
 	} else {
 		next();
 	}
+}
+
+function deliveryToken(req, res, next) {
+	if (!req || !req.passwordless || !req.passwordless.tokenToSend || !req.passwordless.uidToSend || !req.passwordless.recipient) {
+		res.status(500).type('json')
+			.json({error: 'Unexpected server error.'});
+			
+		return;
+	}
+	
+	var link = config.host + 'users/logged_in?token=' + req.passwordless.tokenToSend + '&uid=' + encodeURIComponent(req.passwordless.uidToSend);
+	/*
+console.log('link = ', link);
+	callback();
+	return;*/
+	
+	var email = new sendgrid.Email();
+	
+	email.addTo(req.passwordless.recipient);
+	email.subject = 'Token for ' + config.host;
+	email.from = config.email;
+	email.text = 'Hello! \n You can now access your account here: ' + link + '\n Team of OsLiKi.Net';
+	email.html = '<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team of OsLiKi.Net</p>';
+
+res.status(500).type('json').json({error: email.html});
+return
+
+	sendgrid.send(email, function(err, json) {
+		if (err) {
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+			
+			return;
+		}
+		
+		res.type('json').json({msg: 'sent'});
+	});
 }
 
 /* POST login details. */
@@ -183,20 +218,16 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 			.json({error: 'Email not found.'});
 	}
 }), function(req, res, next) {
-	console.log(req.uid);
-	console.log( req.app.get('passwordlessTTL') );
 
 	Token.findOne({
 		uid: req.userId
 	}, 'ttl', function(err, token) {
 		if (err) {
-			res.status(500)
-				.type('json')
+			res.status(500).type('json')
 				.json({error: err});
 				
 			return
 		}
-		
 		
 		if (!token || !token.ttl) {
 			next();
@@ -205,13 +236,10 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 		}
 		
 		var now = new Date().getTime();		
-		var lastTokenTime = ( now - token.ttl.getTime() + req.app.get('passwordlessTTL') );
-		
-		console.log('token old')
-		console.log(lastTokenTime);
+		var lastTokenTime = ( now - token.ttl.getTime() + config.passwordless.ttl );
 		
 		if (lastTokenTime < 1000 * 30) {
-			res.status(429)
+			res.status(429) //429 Too Many Requests
 				.type('json')
 				.json({error: 'We have already sent you a link to access. The new token can be sent only after 30 seconds.'});
 		} else {
@@ -222,53 +250,46 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 	});	
 	
 }, passwordless.requestToken(function(email, delivery, callback, req) {
-	callback(null, req.userId);
-}, {
-	// failureRedirect: '/failureRedirecsendtokent2222',
-	userField: 'email'
-}), function(req, res) {
-	// success!
-	res.render('index', { message: 'sent', session: JSON.stringify(req.session) });
-});
+		callback(null, req.userId);
+	}, {
+		userField: 'email'
+	}
+), deliveryToken);
 
-router.get('/logged_in', /*loggedInAlready, */passwordless.acceptToken({
-	// successRedirect: '/', //'/если норм залогинелся редиректит сюда',
+router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
+	//successRedirect: '/users/my',
 	//enableOriginRedirect: true
 }), function(req, res) {
 	if (req.session.passwordless) {
 		if (req.session.passwordless === req.session.uid) {	
-res.render('index', {message: 'Welcommen', session: JSON.stringify(req.session)});
+			res.redirect('/users/my');
 			
 			return;
 		}
-console.log('req.session.passwordless');
-console.log(req.session.passwordless);
-		User.findById(req.session.passwordless).select('name email is_approved').exec(function(err, user) {
+
+		User.findById(req.session.passwordless).select('name email is_approved gravatar_hash').exec(function(err, user) {
 			if (err) {
-				res.status(500).type('json')
-					.json({error: err});
-					
+				res.status(500).type('text').send('Unexpected server error.');
+				
 				return
+			}
+			
+			if (!user) {
+				res.status(500).type('text').send('User not found.');
+				
+				return;
 			}
 			
 			req.session.uid = user.id;
 			req.session.name = user.name;
 			req.session.email = user.email;
+			req.session.gravatar_hash = user.gravatar_hash;
 
 			if (!user.is_approved) {
 				user.is_approved = true;
-console.log('save for approve');
 				
 				user.save(function(err, user) {
-					console.dir(err);
 					//LOG !!!!!!
-					/*if (err) {
-						res.status(500)
-							.type('json')
-							.json({error: err});
-							
-						return
-					}*/
 				});
 				
 				Subscribe.find({
@@ -293,18 +314,14 @@ console.log('save for approve');
 						}
 					});
 				});
-			}	
-console.log('Welcommen')
-console.dir(req.session)
-			res.render('index', {message: 'Welcommen', session: JSON.stringify(req.session)});				
+			}
+
+			res.redirect('/users/my');				
 			
 			return;
 		});
-
-		return;
 	} else {
-console.log('Возможно токен протух')
-		res.render('index', {message: 'Возможно токен протух', session: JSON.stringify(req.session)});		
+		res.type('text').send('The request token is invalid. It may have already been used, or expired because it is too old.');
 	}
 });
 
@@ -347,6 +364,12 @@ function getUser(req, res, next) {
 
 		return;
 	}
+if (!req.session.uid) {
+	res.status(401)
+			.type('json')
+			.json({error: 'Unauthorized'});
+			return;
+}
 	
 	User.findById(req.params.id || req.session.uid)
 		.select('created_at name gravatar_hash about stats')
@@ -362,6 +385,14 @@ function getUser(req, res, next) {
 				.json({user: user});
 		});	
 }
+
+router.get('/login', function(req, res, next) {
+	res.render('index');
+});
+
+router.get('/join', function(req, res, next) {
+	res.render('index');
+});
 
 router.get('/my', getUser);
 

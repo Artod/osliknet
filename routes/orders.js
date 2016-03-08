@@ -620,9 +620,9 @@ router.post('/status', function(req, res, next) {
 					order: order.id,
 					user: req.session.uid,
 					corr: corr,
-					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+					message: 'I changed the order status from ' + Order.stsInv[oldStatus] + ' to ' + Order.stsInv[newStatus] + '.'
 				}, function(err, message) {
-					if (err) {// log error							
+					if (err) { // log error							
 						return;
 					}
 				});
@@ -659,10 +659,6 @@ router.post('/status', function(req, res, next) {
 						});
 					});
 				});*/
-				
-				
-				
-				
 
 				if (newStatus === sts.FINISHED) {					
 					Order.find({

@@ -1,41 +1,43 @@
-<div *ngIf="!_checked">
-	Loading...
-</div>
-
-<div *ngIf="_checked && order && order._id">
-	<div class="page-header">
-		<h2>Request for delivery</h2>
-	</div>
-	<p>
-		<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</span>
-	</p>	
-	
-	<p class="order-message">
-		{{ order.message }}
-	</p>
-	
-	<div class="text-right">
-		<a href="#" (click)="onClick()">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> </a>
-	</div>
-</div>
-
-<div *ngIf="_checked && !order">
-	<div class="page-header">
-		<h2>Add a Request for delivery</h2>
+<div (window:keydown)="$event.keyCode == 27 ? closeModal() : true">
+	<div *ngIf="!_checked">
+		Loading...
 	</div>
 
-	<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
-		<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
-
-		<div class="form-group">	
-			<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description" maxlength="2000"></textarea>
+	<div *ngIf="_checked && order && order._id">
+		<div class="page-header">
+			<h2>Request for delivery</h2>
 		</div>
+		<p>
+			<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</span>
+		</p>	
 		
-		<br />
-		
-		<p class="text-right">
-			<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button>
-			<button class="btn btn-default btn-lg" [disabled]="_busy" (click)="closeModal()">Cancel</button>
+		<p class="order-message">
+			{{ order.message }}
 		</p>
-	</form>
+		
+		<div class="text-right">
+			<a href="#" (click)="onClick()">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> </a>
+		</div>
+	</div>
+
+	<div *ngIf="_checked && (!order || !order._id)">
+		<div class="page-header">
+			<h2>Add a Request for delivery</h2>
+		</div>
+
+		<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
+			<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
+
+			<div class="form-group">	
+				<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description" maxlength="2000"></textarea>
+			</div>
+			
+			<br />
+			
+			<p class="text-right">
+				<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button>
+				<button class="btn btn-default btn-lg" [disabled]="_busy" (click)="closeModal()">Cancel</button>
+			</p>
+		</form>
+	</div>
 </div>

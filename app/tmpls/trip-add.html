@@ -1,45 +1,46 @@
-<div class="page-header">
-	<h2>Add a Trip</h2>
-</div>
+<div class="container container-trips-add">
+	<div class="page-header">
+		<h2>Add a Trip</h2>
+	</div>
 
-<form class="trips-add-form" action="/trips/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit()">
-	
-	<div class="form-group">
-		<label>Trip:</label>
+	<form class="trips-add-form" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit()">
+		
+		<div class="form-group">
+			<label>Trip:</label>
 
-		<div class="form-inline">		
+			<div class="form-inline">		
 
-			
-			<div class="form-group">
-				<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="form" [model]="formModel" placeholder="From"></gm-autocomplite>
+				<div class="form-group">
+					<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="form" [model]="formModel" placeholder="From"></gm-autocomplite>
+				</div>
+				
+				<div class="arrow-right form-group">
+					<span class="glyphicon glyphicon-arrow-right"></span>
+				</div>
+
+				<div class="form-group">	
+					<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="form" [model]="formModel" placeholder="To"></gm-autocomplite>
+				</div>	
 			</div>
-			
-			<div class="form-group">
-				<span class="glyphicon glyphicon-arrow-right"></span>
-			</div>
-
-			<div class="form-group">	
-				<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="form" [model]="formModel" placeholder="To"></gm-autocomplite>
-			</div>	
 		</div>
-	</div>
-	
-	<div class="form-group">	
-		<label>When:</label>
-		<br />
-		<my-date-picker [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
 		
-		<input type="hidden" [(ngModel)]="formModel.when" [ngFormControl]="form.controls.when" />
-	</div>
+		<div class="form-group">	
+			<label>When:</label>
+			<br />
+			<my-date-picker [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event)" [selDate]="selectedDate"></my-date-picker>
+			
+			<input type="hidden" [(ngModel)]="formModel.when" [ngFormControl]="form.controls.when" />
+		</div>
 
-	<div class="form-group">	
-		<label>Description:</label>
+		<div class="form-group">	
+			<label>Description:</label>
+			
+			<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description" maxlength="1000"></textarea>
+		</div>
 		
-		<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description" maxlength="1000"></textarea>
-	</div>
-	
-	<p class="text-right">
-		<button type="submit" class="btn btn-warning input-lg">{{ _busy ? 'Wait...' : 'Add' }}</button>
-	</p>
-	
-</form>
+		<p class="text-right">
+			<button type="submit" class="btn btn-warning input-lg">{{ _busy ? 'Wait...' : 'Add' }}</button>
+		</p>
+		
+	</form>
+</div>

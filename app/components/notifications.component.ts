@@ -35,7 +35,7 @@ console.dir(data);
 			this.newPrivMessagesKeys = this.getKeys(data.newPrivMessages);
 console.log('this.newPrivMessagesKeys', this.newPrivMessagesKeys);
 			this._appRef.tick();
-		});
+		}, (err) => {});
 	}
 	
 	public onClick($event) {

@@ -1,5 +1,7 @@
-<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
 
+<div class="page-header">
+	<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
+</div>
 <p *ngIf="!_inited">Loading...</p>
 
 <div *ngIf="user && user._id" class="row">
@@ -77,9 +79,7 @@
 	<div class="col-xs-12">
 		<h3 *ngIf="user && user._id && (user.about || configUser.id === user._id)">About me</h3>
 		
-		<div *ngIf="!editMode">
-			{{ user.about }}
-		</div>
+		<p *ngIf="!editMode" class="pre-wrap">{{ user.about }}</p>
 		
 		<form *ngIf="editMode" action="/users/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
 			<div class="form-group">				
@@ -128,9 +128,7 @@
 					
 					<span class="text-muted">{{ review.created_at | toDate | date: 'longDate' }}</span>			
 
-					<p>
-						{{ review.comment }}
-					</p>
+					<p class="pre-wrap">{{ review.comment }}</p>
 					
 					<p *ngIf="configUser.id === user._id">
 						<a [routerLink]="['Order', {id: review.order}]"> Go to the order</a>

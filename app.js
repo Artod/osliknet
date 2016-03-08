@@ -28,16 +28,21 @@ TODO:
 
 \- Subscribe on new trips
 \/- капча
-	субскрайб по емайл
-	перенос субскрайбов при авторизации
-	нотификации
-- login + sign in page + validation add trip form
+	\/субскрайб по емайл
+	\/перенос субскрайбов при авторизации
+	\/нотификации
+	
+\/- login + sign in page + капча
+\/- text pipe to br 
+\/- logged in already убрать 
 
-- text pipe to br + msg about new review to link
-- Logging errors
+
++ validation add trip form
++ msg about new review to link
+
 - unauth middleware
 - beforeRouterFilter !req.xhr ? res.render('index')
-- logged in already убрать 
+- Logging errors
 - not found error on query
 
 
@@ -104,13 +109,15 @@ var messages = require('./routes/messages');
 var reviews = require('./routes/reviews');
 var subscribes = require('./routes/subscribes');
 
+var config = require('./config');
+
 var app = express();
 
 var mongoose = require('mongoose');
 // TODO: MongoDB setup (given default can be used)
-var pathToMongoDb = 'mongodb://localhost/osliknet';
+// var pathToMongoDb = 'mongodb://localhost/osliknet';
 
-mongoose.connect(pathToMongoDb);
+mongoose.connect(config.mongo.path);
 //We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
 
 var db = mongoose.connection;
@@ -119,7 +126,7 @@ db.once('open', function(callback) {
   // yay!
 });
 
-
+app.set('env', 'production')
 
 
 
@@ -132,11 +139,12 @@ var passwordless = require('passwordless');
 var MongoStorePasswordless = require('passwordless-mongostore-bcrypt-node');
 
 
-var sendgrid_api_key = 'v ftp';
-var sendgrid  = require('sendgrid')(sendgrid_api_key);
+// var sendgrid_api_key = 'v ftp'config.sendgrid.key;
+// var sendgrid  = require('sendgrid')(config.sendgrid.key);
+// var sendgrid  = require('sendgrid')('hjhh');
 
 
-var yourEmail = 'osliknet@gmail.com';
+// var yourEmail = config.email;
 /*
 // TODO: email setup (has to be changed)
 
@@ -166,7 +174,7 @@ var smtpServer = email.server.connect({
 
 
 // TODO: Path to be send via email
-var host = 'http://localhost:3000/';
+// var host = 'http://localhost:3000/'config.host;
 
 // Setup of Passwordless
 /*
@@ -182,58 +190,25 @@ mongoStorePasswordlessInst._db = db;
 //TODO: Поправить сделать чтоб один коннект был монгусовский щас нельзя моотому что другой обьект использует
 
 
-app.set('passwordlessTTL', 1000*60*30);
-
-passwordless.init(new MongoStorePasswordless(pathToMongoDb, {
+// app.set('passwordlessTTL', config.passwordless.ttl);
+ 
+passwordless.init(new MongoStorePasswordless(config.mongo.path, {
     mongostore: {
-        collection: 'token'
+        collection: config.passwordless.collection
 	}
 }), {
-	userProperty: 'uid'	
+	userProperty: config.passwordless.userProperty
 });
 
-passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
-	var link = host + 'users/logged_in?token=' + tokenToSend + '&uid=' + encodeURIComponent(uidToSend);
-	
-	console.log(link);
-	
-	return;
-	
-	var email = new sendgrid.Email();
-	
-	email.addTo(recipient);
-	email.subject = 'Token for ' + host;
-	email.from = yourEmail;
-	email.text = 'Hello!\nYou can now access your account here: ' + link;
-	email.html = '<h1>Hello!</h1> \n <p>You can now access your account here: ' + '<a href="' + link + '">' + link + '</a></p>';
-	
-	sendgrid.send(email, function(err, json) {
-		if (err) {
-			console.log(err);
-		}
-		console.log(json);
-		callback(err);
-	});
-	
-	
-	/*
-	// Send out token
-	smtpServer.send({
-	   text: 'Hello!\nYou can now access your account here: ' 
-			+ host + 'users/logged_in?token=' + tokenToSend + '&uid=' + encodeURIComponent(uidToSend), 
-	   from: yourEmail, 
-	   to: recipient,
-	   subject: 'Token for ' + host
-	}, function(err, message) { 
-		if (err) {
-			console.log(err);
-		}
-		
-		callback(err);
-	});
-	*/
+passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback, req) {
+	req.passwordless = req.passwordless || {};
+	req.passwordless.tokenToSend = tokenToSend;
+	req.passwordless.uidToSend = uidToSend;
+	req.passwordless.recipient = recipient;
+console.dir(req.passwordless)
+	callback();
 }, {
-	ttl: app.get('passwordlessTTL')	
+	ttl: config.passwordless.ttl //app.get('passwordlessTTL')	
 });
 
 
@@ -245,31 +220,29 @@ passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback) {
 
 app.locals.title = 'OslikNet';
 //app.locals.strftime = require('strftime');
-app.locals.email = 'osliknet@gmail.com';
+app.locals.email = config.email;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-
-
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+/* !!!!!extended */app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 
 /*** Session */
 var sessionParam = {
-	secret: '42secret!!!!!!!!!!!!!!!!!!!!!',
+	secret: config.session.secret,
 	cookie: {
-		maxAge: 1000 * 60 * 60 * 24 * 30
+		maxAge: config.cookie.maxAge
 	},
 	store: new MongoStoreSession({
 		mongooseConnection: db,
-		touchAfter: 24 * 3600 // time period in seconds. To be updated only one time in a period of 24 hours	
+		touchAfter: config.session.touchAfter //24 * 3600 // time period in seconds. To be updated only one time in a period of 24 hours	
 	}),
 	saveUninitialized: false,
 	resave: false
@@ -300,27 +273,31 @@ app.use('/app', express.static(__dirname + '/app'));
 app.use(passwordless.sessionSupport());
 // app.use(passwordless.acceptToken({ successRedirect: '/successRedirect', failureRedirect: '/errorredir' }));
  
-app.set('orderStatus', {
+/*app.set('orderStatus', {
 	5: 'Negotiation',
 	10: 'Processing',
 	15: 'Refused',
 	20: 'Cancelled',
 	25: 'Finished'
-});
+});*/
 
-app.set('orderStatusConst', require('./models/order').sts);
+// app.set('orderStatusConst', require('./models/order').sts);
+
+var Order = require('./models/order');
 
 app.use(function (req, res, next) {
 	res.locals = {
 		user: {
 			id: req.session.uid,
-			name: req.session.name
+			name: req.session.name,
+			gravatar_hash: req.session.gravatar_hash
 		},
-		orderStatus: app.get('orderStatus'),
-		orderStatusConst: app.get('orderStatusConst')
+		orderStatus: Order.stsInv,
+		orderStatusConst: Order.sts,
+		recaptcha: config.recaptcha
 	};
-   
-   next();
+
+	next();
 });
 
 

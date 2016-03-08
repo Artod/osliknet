@@ -6,12 +6,13 @@ import {NotificationService} from '../services/notification/notification.service
 
 import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
+import {GotoComponent} from './goto-card.component';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/trips-my.html',
-	directives: [ROUTER_DIRECTIVES, TripCardComponent, OrderCardComponent],
+	directives: [ROUTER_DIRECTIVES, TripCardComponent, OrderCardComponent, GotoComponent],
 	pipes: [ToDatePipe]
 })
 
@@ -80,7 +81,7 @@ export class TripsMyComponent implements OnDestroy {
 			this._busy = false;
 			this._inited = true;
 		}, error => {
-			
+			this.fullPage = true;
 			this._busy = false;
 			this._inited = true;
 		});

@@ -8,8 +8,8 @@ var Subscribe = require('../models/subscribe');
 
 var ObjectId = require('mongoose').Types.ObjectId;
 
-var sendgrid_api_key = 'v ftp';
-var sendgrid  = require('sendgrid')(sendgrid_api_key);
+var config = require('../config');
+var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
 router.get('/', function(req, res, next) {
 	if (!req.xhr) {

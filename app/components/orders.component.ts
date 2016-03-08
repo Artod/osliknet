@@ -4,6 +4,7 @@ import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 // import {ChatComponent} from './chat.component';
 import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
+import {GotoComponent} from './goto-card.component';
 
 import {OrderService} from '../services/order/order.service';
 import {NotificationService} from '../services/notification/notification.service';
@@ -12,7 +13,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/orders.html',
-	directives: [ROUTER_DIRECTIVES, /*ChatComponent, */TripCardComponent, OrderCardComponent],
+	directives: [ROUTER_DIRECTIVES, /*ChatComponent, */TripCardComponent, OrderCardComponent, GotoComponent],
 	pipes: [ToDatePipe]
 })
 
@@ -70,7 +71,7 @@ export class OrdersComponent implements OnDestroy {
 			this._busy = false;
 			this._inited = true;
 		}, error => {
-			
+			this.fullPage = true;
 			this._busy = false;
 			this._inited = true;
 		});

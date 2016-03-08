@@ -1,5 +1,7 @@
-<h2>Requests</h2>
 
+<div class="page-header">
+	<h2>Requests</h2>
+</div>
 <p *ngIf="!_inited">Loading...</p>
 
 <p *ngIf="_inited && orders && !orders.length"><i>There are no requests yet.</i></p>
@@ -13,9 +15,7 @@
 				{{ order.message }}
 			</p>
 			
-			<div class="text-right">
-				<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span>  <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span></a>
-			</div>				
+			<goto [order]="order" [newMessages]="newMessages"></goto>
 		</td>
 		<td class="col-xs-4">
 			<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				

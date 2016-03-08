@@ -25,7 +25,7 @@ export class ModalService {
 			// let tripProvider = Injector.resolve([provide(Trip, {useValue: trip})]);			
 			// var tripProvider = Injector.resolve([bind(Trip).toValue(trip)]);
 			
-			this._modalService.bind(Component, modalComponentRef, providers).then(componentRef => {				
+			return this.bind(Component, modalComponentRef, providers).then(componentRef => {				
 				// let component: RequestAddComponent = componentRef.instance;
 				// component.ref = componentRef;				
 				// res.instance.formModel.trip_id = trip._id;
@@ -51,6 +51,8 @@ export class ModalService {
 		
 		promise.then(modalComponentRef => {
 			modalComponentRef.instance._ref = modalComponentRef;
+			
+			return modalComponentRef;
 		});	
 		
 		return promise;

@@ -10,13 +10,15 @@ import {NotificationService} from '../services/notification/notification.service
 
 import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
+import {GotoComponent} from './goto-card.component';
+
 import {OrderAddComponent} from './order-add.component';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
 @Component({
 	templateUrl: '/app/tmpls/trip.html',
-	directives: [ROUTER_DIRECTIVES, TripCardComponent, OrderCardComponent],
+	directives: [ROUTER_DIRECTIVES, TripCardComponent, OrderCardComponent, GotoComponent],
 	pipes: [ToDatePipe]
 })
 

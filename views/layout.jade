@@ -23,15 +23,13 @@ html
 		script(src='/modules/angular2/router.dev.js')
 		script(src='/modules/angular2/http.dev.js')
 		
-		script(src='https://www.google.com/recaptcha/api.js?onload=googleRecaptcha&render=explicit', async, defer)
+		
 
 		//script(src='/modules/ng2-datepicker/ng2-datepicker.js')		
 		//script(src='/modules/moment/moment.js')		
 		
-	body(class="modal-open1")
-		
+	body
 
-			
 			
 		app
 			block content
@@ -43,16 +41,19 @@ html
 			
 			window.user = {
 				id: '#{user.id}',
-				name: '#{user.name}'
+				name: '#{user.name}',
+				gravatar_hash: '#{user.gravatar_hash}'
 			};
+			
 			/*window.user = {
 				id: '',
 				name: ''
 			};*/
+			
 			window.googleRecaptcha = function() {
 				window.googleRecaptcha.loaded = true;
 			};			
-			window.googleRecaptcha.key = '6LcR3hkTAAAAAOYXPgZ4UsPhUo0P3ie6MRlTgbyp';
+			window.googleRecaptcha.key = '#{recaptcha.key}';
 			window.googleRecaptcha.loaded = false;
 
 			System.config({
@@ -75,27 +76,9 @@ html
 				.then(null, console.error.bind(console));
 
 	
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
+		if !user.id
+			script(src='https://www.google.com/recaptcha/api.js?onload=googleRecaptcha&render=explicit', async, defer)
+
 				
 		// a(href="/users/logout") logout
 		

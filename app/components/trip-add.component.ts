@@ -55,7 +55,7 @@ description:""*/
 		
 	}
 	
-	private _busy : boolean;
+	private _busy : boolean = false;
 	
 	public onSubmit(value:Object) : void {
 		if (this.form.valid) {

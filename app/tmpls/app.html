@@ -1,25 +1,48 @@
 <!-- <button (click)="openModal()">open test modal</button> -->
-<div class="container-fluid">
+<div class="container-fluid head" (document:click)="isVisible = false; true;">
 	<nav class="navbar navbar-default">
-		<div class="container">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">Osliki.Net</a>
-			</div>
-			<ul class="nav navbar-nav">
-				<li><a [routerLink]="['Trips']">Trips</a></li>
-				<li><a [routerLink]="['TripAdd']">Add Trip</a></li>
-				<li><a [routerLink]="['TripsMy']">My Trips</a></li>
-				<li><a [routerLink]="['Orders']">Requests</a></li>
-			</ul>
-			<ul class="nav navbar-nav">
-				<li class="notifications" notifications></li>
-			</ul>
-			
+		<button class="btn btn-default navbar-toggle" type="button" (click)="isVisible = !isVisible; $event.stopPropagation()">
+			 <span class="glyphicon glyphicon-menu-hamburger"> </span> 
+		</button>	
+	
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">OsLiKi.Net</a>
 		</div>
+
+		<ul class="nav navbar-nav navbar-right">
+			<li *ngIf="configUser && configUser.id" class="notifications" notifications></li>
+			<li *ngIf="!configUser || !configUser.id" class="navbar-right">
+				<button class="btn btn-warning join" [routerLink]="['Join']">Join</button>
+			</li>
+			<li *ngIf="!configUser || !configUser.id">
+				<a [routerLink]="['Login']">Log in</a>
+			</li>
+			<li *ngIf="configUser && configUser.id">
+				<user-card [user]="configUser"></user-card>
+			</li>
+			<li *ngIf="configUser && configUser.id">
+				<a href="/users/logout"><span class="glyphicon glyphicon-log-out"></span></a>
+			</li>
+		</ul>
+
+		<ul class="nav navbar-nav navbar-invtoggle">
+			<li><a [routerLink]="['Trips']">Trips</a></li>
+			<li><a [routerLink]="['TripAdd']">Add a Trip</a></li> 
+			<li><a [routerLink]="['TripsMy']">My Trips</a></li>
+			<li><a [routerLink]="['Orders']">Requests</a></li>
+		</ul>
 	</nav>
 </div>
 
-<div class="container">
-	<router-outlet></router-outlet>
-</div>
+<ul class="nav navbar-nav navbar-invtoggle toggle-menu {{isVisible ? 'menu-opened' : ''}}" (click)="isVisible = !isVisible">
+	<li><a [routerLink]="['Trips']">Trips</a></li>
+	<li><a [routerLink]="['TripAdd']">Add a Trip</a></li>
+	<li><a [routerLink]="['TripsMy']">My Trips</a></li>
+	<li><a [routerLink]="['Orders']">Requests</a></li>
+</ul> 
+
+
+
+<router-outlet></router-outlet>
+
 
