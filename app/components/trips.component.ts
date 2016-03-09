@@ -74,8 +74,6 @@ export class TripsComponent {
 			recaptcha: configUser.id ? '' : ['', Validators.required]
 		});
 		
-
-		
 		this.init();
 		
 		this._location.subscribe(() => {

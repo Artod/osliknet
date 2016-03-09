@@ -29,7 +29,7 @@ export class TripComponent implements OnDestroy {
 	public subscribe : any = {};
 	public orders : any[] = [];
 
-	public formModel : any = {};
+	public model : any = {};
 	public form : ControlGroup;
 	
 	public newMessages : any = {};
@@ -56,17 +56,17 @@ export class TripComponent implements OnDestroy {
 		
 		this.form = this._fb.group({ 
 			id: ['', Validators.required],
-			description: ''//['', Validators.required]
+			description: ['', Validators.required]
 		});
 		
-		this.formModel.id = this.tripId;
+		this.model.id = this.tripId;
 		
 		this._tripService.getById(this.tripId).subscribe(res => {
 			this.trip = res.trip || {};
 			this.orders = res.orders || [];
 			this.subscribe = res.subscribe || {};
 			
-			this.trip && ( this.formModel.description = (this.trip.description || '') );
+			this.trip && ( this.model.description = (this.trip.description || '') );
 			
 			this._inited = true;
 		}, error => {
@@ -88,11 +88,17 @@ export class TripComponent implements OnDestroy {
 	private _busy = false;
 	private editMode = false;
 	
-	public onSubmit() : void {	
+	public onSubmit($textarea) : void {
+		if (!this.form.controls.description.valid) {
+			$textarea.focus();
+			
+			return;
+		}
+		
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
 
-			this._tripService.update(this.formModel).subscribe(data => {
+			this._tripService.update(this.model).subscribe(data => {
 				if (data.trip) {
 					this.trip.description = data.trip.description;
 				}

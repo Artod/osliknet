@@ -2,23 +2,18 @@ var express = require('express');
 var router = express.Router();
 var async = require('async');
 
+var mdlwares = require('../libs/mdlwares');
+
 var Trip = require('../models/trip');
 var Message = require('../models/message');
 var Order = require('../models/order');
 var User = require('../models/user');
 
-var ObjectId = require('mongoose').Types.ObjectId;
 
-router.get('/', function(req, res, next) {
-if (!req.xhr) {
-	res.render('index');
-
-	return;
-}
+router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
 	Message.find({
 		order: null,
-		// user: req.session.uid
 		$or: [{
 			user: req.session.uid
 		}, {
@@ -26,26 +21,24 @@ if (!req.xhr) {
 		}]
 	}).distinct('user').distinct('corr').exec(function(err, users) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+				// .json({error: err});
 				
 			return;
 		}
 		
 		/*users = users.map(function(user) {
 			return user.toString();
-		});
-console.dir(users)*/
+		});*/
 		
 		User.find({
 			_id: {$in: users}
 		}).exec(function(err, users) {
-console.dir(users)
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
+					// .json({error: err});
 					
 				return;
 			}
@@ -53,18 +46,16 @@ console.dir(users)
 			res.type('json')
 				.json({users: users});
 		});
-		
-
 	});
 });
 
-router.get('/last/:lastId/order/:orderId', function(req, res, next) {
-	//?????????????????????????? populate vs paralell
+router.get('/last/:lastId/order/:orderId', mdlwares.restricted, function(req, res, next) {
+	// ? populate vs paralell
 	Order.findById(req.params.orderId)./*populate('trip').*/exec(function(err, order) {			
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+				// .json({error: err});
 				/*{"error":{"message":"Cast to ObjectId failed for value \"33\" at path \"_id\"","name":"CastError","kind":"ObjectId","value":"33","path":"_id"}}*/
 			return;
 		}		
@@ -95,17 +86,15 @@ router.get('/last/:lastId/order/:orderId', function(req, res, next) {
 			},                    
 		}, function(err, asyncRes) {
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
+					// .json({error: err});
 					
 				return
 			}
 			
 			if (req.session.uid !== order.user.toString() && req.session.uid !== asyncRes.trip.user.toString()) {
-				res.status(401)
-					.type('json')
-					.json({error: 'Unauthorized'});
+				res.status(401).type('json').json({error: 'Unauthorized'});
 					
 				return;
 			}
@@ -121,7 +110,7 @@ router.get('/last/:lastId/order/:orderId', function(req, res, next) {
 	});
 });
 
-router.get('/last/:lastId/user/:corrId', function(req, res, next) {
+router.get('/last/:lastId/user/:corrId', mdlwares.restricted, function(req, res, next) {
 	if (req.session.uid === req.params.corrId) {
 		res.type('json').json({});
 		
@@ -130,9 +119,8 @@ router.get('/last/:lastId/user/:corrId', function(req, res, next) {
 	
 	User.findById(req.params.corrId).exec(function(err, user) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -157,14 +145,11 @@ router.get('/last/:lastId/user/:corrId', function(req, res, next) {
 		if (req.params.lastId != 0) {
 			conds._id = { $gt: req.params.lastId }
 		}
-		
-console.log('condscondscondscondscondsconds');
-console.dir(conds);
+
 		Message.find(conds).populate('user').sort('created_at').exec(function(err, messages) {			
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -178,12 +163,7 @@ console.dir(conds);
 	});
 });
 
-router.get('/order/:id', function(req, res, next) {	
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
+router.get('/order/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 
 	async.parallel({
 		order: function(callback) {
@@ -213,17 +193,14 @@ router.get('/order/:id', function(req, res, next) {
 		},
 	}, function(err, asyncRes) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
 				
 			return
-		} 
+		}
 		
 		if (req.session.uid !== asyncRes.order.user.id && req.session.uid !== asyncRes.order.trip.user.id) {
-			res.status(401)
-				.type('json')
-				.json({error: 'Unauthorized'});
+			res.status(401).type('json').json({error: 'Unauthorized'});
 				
 			return;
 		}	
@@ -234,24 +211,12 @@ router.get('/order/:id', function(req, res, next) {
 	});
 });
 
-router.get('/user/:id', function(req, res, next) {	
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
-	
-	if (req.session.uid === req.params.id) {
-		res.type('json').json({});
-		
-		return;
-	}
+router.get('/user/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
 	User.findById(req.params.id).exec(function(err, user) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -273,9 +238,8 @@ router.get('/user/:id', function(req, res, next) {
 			}]
 		}).populate('user').sort('created_at').exec(function(err, messages) {			
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -289,32 +253,10 @@ router.get('/user/:id', function(req, res, next) {
 			
 		});
 	});
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 
 });
 
-router.post('/add', function(req, res, next) {
-if (!req.session.uid) {
-	res.status(401).type('json').json({});
-
-	return;
-}
-	
+router.post('/add', mdlwares.restricted, function(req, res, next) {
 	if (!req.body.order && !req.body.corr) {
 		res.status(400).type('json').json({});
 
@@ -324,9 +266,8 @@ if (!req.session.uid) {
 	if (req.body.order) {
 		Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -341,9 +282,7 @@ if (!req.session.uid) {
 				tripUser = order.trip.user.toString();
 				
 			if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
-				res.status(401)
-					.type('json')
-					.json({error: 'Unauthorized'});
+				res.status(401).type('json').json({error: 'Unauthorized'});
 				
 				return;
 			}
@@ -357,10 +296,8 @@ if (!req.session.uid) {
 				message: req.body.message
 			}, function(err, message) {
 				if (err) {
-					res.status(err.name == 'ValidationError' ? 400 : 500);
-					
-					res.type('json')
-						.json({error: err});
+					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+						.json({error: 'Unexpected server error.'});
 						
 					return;
 				}
@@ -368,60 +305,18 @@ if (!req.session.uid) {
 				res.type('json')
 					.json({message: message});
 			});
-			
-			/*var message = new Message({
-				order: order._id,
-				user: req.session.uid,
-				corr: corr,
-				message: req.body.message
-			});		
-			
-			message.save(function(err, message) {
-				if (err) {
-					res.status(err.name == 'ValidationError' ? 400 : 500);
-					
-					res.type('json')
-						.json({error: err});
-						
-					return;
-				}
-
-				User.setMessagesUnreaded(corr, order.id, message.id);
-				
-				Message.find({
-					order: order._id
-				}).count().exec(function(err, count) {
-					if (err) {
-						//log
-						
-						return;
-					}
-					
-					order.msg_cnt = count;
-
-					order.save(function(err, order) {
-						if (err) {
-							//log
-						}						
-					});
-				});
-				
-				res.type('json')
-					.json({message: message});
-			});*/
 		});
 	} else {
 		if (req.session.uid === req.body.corr) {
-			res.status(400).type('json').json({error: 'Message to yourself'});
+			res.status(400).type('json').json({error: 'Message to yourself.'});
 
 			return;
 		}
 		
 		User.findById(req.body.corr).exec(function(err, user) {
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -432,26 +327,6 @@ if (!req.session.uid) {
 				return;
 			}
 			
-			// var corr = user.id;
-			
-			/*Message.addToOrder({
-				user: req.session.uid,
-				corr: user.id,
-				message: req.body.message
-			}, function(err, message) {
-				if (err) {
-					res.status(err.name == 'ValidationError' ? 400 : 500);
-					
-					res.type('json')
-						.json({error: err});
-						
-					return;
-				}
-
-				res.type('json')
-					.json({message: message});
-			});*/
-			
 			var message = new Message({
 				user: req.session.uid,
 				corr: user.id,
@@ -460,10 +335,8 @@ if (!req.session.uid) {
 			
 			message.save(function(err, message) {
 				if (err) {
-					res.status(err.name == 'ValidationError' ? 400 : 500);
-					
-					res.type('json')
-						.json({error: err});
+					res.status(err.name == 'ValidationError' ? 400 : 500).type('json')
+						.json({error: 'Unexpected server error.'});
 						
 					return;
 				}

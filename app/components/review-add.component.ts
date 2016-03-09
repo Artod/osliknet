@@ -51,11 +51,17 @@ export class ReviewAddComponent {
 		});
 	}
 	
+	public closeModal() : void {
+		this._modalComponent && this._modalComponent.close();
+	}
+	
 	public onChangeRating(el) : void {
 		if (el.checked) {
 			this.formModel.rating = el.value;
 		}
 	}
+	
+	public error : string = '';
 	
 	public onSubmit(elComment) : void {
 		if (!this.form.valid) {
@@ -66,12 +72,20 @@ export class ReviewAddComponent {
 			this._busy = true;
 
 			this._reviewService.add(this.formModel).subscribe(data => {				
-				this._modalComponent && this._modalComponent.close();
+				this.closeModal();
 
 				this.onReviewAdd();
 				
 				this._busy = false;
 			}, err => {
+				this.error = 'Unexpected error. Try again later.';
+
+				try {
+					this.error = err.json().error || this.error;
+				} catch(e) {
+					this.error = err.text() || this.error;
+				}
+				
 				this._busy = false;
 			});
 		}

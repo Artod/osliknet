@@ -49,11 +49,13 @@ export class LoginComponent {
 
 				this._busy = false;
 			}, err => {
-				this.error = 'Unexpected server error. Try later.';
+				this.error = 'Unexpected error. Try again later.';
 
 				try {
 					this.error = err.json().error || this.error;
-				} catch(e) {}
+				} catch(e) {
+					this.error = err.text() || this.error;
+				}
 				
 				this._busy = false;
 			});

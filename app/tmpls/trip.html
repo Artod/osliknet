@@ -1,64 +1,66 @@
-<div class="page-header">
-	<h2>Trip</h2>
-</div>
+<div class="container">
+	<div class="page-header">
+		<h2>Trip</h2>
+	</div>
 
-<p *ngIf="!_inited">Loading...</p>
+	<p *ngIf="!_inited">Loading...</p>
 
-<div *ngIf="trip && trip.user">
-	<p *ngIf="subscribe && subscribe._id" class="text-right" #link>
-		<a href="#" (click)="unsubscribe(link)">Unsubscribe from notifications about new trips in the direction.</a>
-	</p>
-	
-	<trip-card [trip]="trip" [user]="trip.user"></trip-card>
-
-	<br />
-
-	<p *ngIf="!editMode" class="pre-wrap">{{ trip.description }}</p>
-	
-	<form *ngIf="editMode" action="/trips/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
-	
-		<input type="hidden" name="id" [(ngModel)]="formModel.id" [ngFormControl]="form.controls.id" />
-		
-		<div class="form-group">
-			<textarea class="form-control" name="description" [(ngModel)]="formModel.description" [ngFormControl]="form.controls.description" maxlength="2000" placeholder="Description"></textarea>
-		</div>
-		
-		<p class="text-right">
-			<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Update' }}</button>
-			<button type="submit" class="btn btn-default btn-lg" (click)="editMode = false" [disabled]="_busy">Cancel</button>
+	<div *ngIf="trip && trip.user">
+		<p *ngIf="subscribe && subscribe._id" class="text-right" #link>
+			<a href="#" (click)="unsubscribe(link)">Unsubscribe from notifications about new trips in the direction.</a>
 		</p>
-	</form>	
-	
-	<p *ngIf="!editMode && configUser.id === trip.user._id" class="text-right">
-		<button class="btn btn-default btn-lg" (click)="editMode = true">Edit</button>
-	</p>
+		
+		<trip-card [trip]="trip" [user]="trip.user"></trip-card>
 
-	<p *ngIf="trip.user._id != configUser.id" class="text-right">
-		<button class="btn btn-default btn-lg" (click)="onRequest(trip)">Request Delivery</button>
-	</p>
-</div>
+		<br />
 
-<div *ngIf="trip && trip.user && configUser.id === trip.user._id">
-<br />
-<br />
-	<h4>Requests for shipping:</h4>
+		<p *ngIf="!editMode" class="pre-wrap">{{ trip.description }}</p>
+		
+		<form *ngIf="editMode" action="/trips/edit" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(textarea)">
+		
+			<input type="hidden" name="id" [(ngModel)]="model.id" [ngFormControl]="form.controls.id" />
+			
+			<div class="form-group">
+				<textarea class="form-control" name="description" [(ngModel)]="model.description" [ngFormControl]="form.controls.description" maxlength="2000" placeholder="Description" #textarea></textarea>
+			</div>
+			
+			<p class="text-right">
+				<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Update' }}</button>
+				<button type="submit" class="btn btn-default btn-lg" (click)="editMode = false" [disabled]="_busy">Cancel</button>
+			</p>
+		</form>	
+		
+		<p *ngIf="!editMode && configUser.id === trip.user._id" class="text-right">
+			<button class="btn btn-default btn-lg" (click)="editMode = true">Edit</button>
+		</p>
 
-	<p *ngIf="orders && !orders.length"><i>There are no requests yet.</i></p>
+		<p *ngIf="trip.user._id != configUser.id" class="text-right">
+			<button class="btn btn-default btn-lg" (click)="onRequest(trip)">Request Delivery</button>
+		</p>
+	</div>
 
-	<table class="table trips-my-requests">
-		<tr *ngFor="#order of orders">
-			<td>
-				<order-card [order]="order" [user]="order.user"></order-card>
-				
-				<p class="order-message">
-					{{ order.message }}
-				</p>
-				
-				<goto [order]="order" [newMessages]="newMessages"></goto>
-				<!-- <p class="text-right">
-					<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> <!- <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> -></a>
-				</p>	 	-->			
-			</td>
-		</tr>
-	</table>
+	<div *ngIf="trip && trip.user && configUser.id === trip.user._id">
+		<br />
+		<br />
+		<h4>Requests for shipping:</h4>
+
+		<p *ngIf="orders && !orders.length"><i>There are no requests yet.</i></p>
+
+		<table class="table trips-my-requests">
+			<tr *ngFor="#order of orders">
+				<td>
+					<order-card [order]="order" [user]="order.user"></order-card>
+					
+					<p class="order-message">
+						{{ order.message }}
+					</p>
+					
+					<goto [order]="order" [newMessages]="newMessages"></goto>
+					<!-- <p class="text-right">
+						<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> <!- <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> -></a>
+					</p> -->			
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>

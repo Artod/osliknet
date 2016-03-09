@@ -1,7 +1,7 @@
 <div class="mydp">
 	<!-- [ngStyle]="{'height': height, 'width': width}" -->
 	<div class="input-group">
-		<input readonly class="form-control input-lg" type="text" value="{{selectionDayTxt}}" (click)="openBtnClicked()" />
+		<input readonly class="form-control input-lg" type="text" value="{{selectionDayTxt}}" (focus)="openBtnClicked()" placeholder="Date" />
 		
 		<div class="input-group-btn">
 			<button type="button" class="btn btn-default input-lg" *ngIf="selectionDayTxt.length>0" (click)="removeBtnClicked()">

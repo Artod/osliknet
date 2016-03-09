@@ -1,9 +1,9 @@
 import {Component, ElementRef} from 'angular2/core';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FormBuilder, ControlGroup, Validators} from 'angular2/common';
+import {Router} from 'angular2/router';
 
-// import {DatePicker} from 'ng2-datepicker';
 import {MyDatePicker} from '../services/datepicker/mydatepicker';
-// import {Trip} from '../services/trip/trip';
+
 import {TripService} from '../services/trip/trip.service';
 
 import {GmAutocompliteComponent} from './gm-autocomplite.component';
@@ -15,14 +15,14 @@ import {GmAutocompliteComponent} from './gm-autocomplite.component';
 
 export class TripAddComponent {
 	public trips : any[];
-	public formModel = {
+	public model = {
 /*from: "Montreal, QC, Canada",
 from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU",
 to:	"Montreal East, QC, Canada",
 to_id:	"ChIJndvyLgHiyEwREdLOpOC4H6k",
 when:	1453957200000,
 description:""*/		
-	};	
+	};
 	public form: ControlGroup;
 	
     public myDatePickerOptions = {
@@ -38,8 +38,9 @@ description:""*/
     public selectedDate: string = '';
 	
 	constructor(
-		private _fb: FormBuilder,
-		private _tripService: TripService
+		private _fb : FormBuilder,
+		private _router : Router,
+		private _tripService : TripService
 	) {
 		
 		// console.dir(Validators);
@@ -50,21 +51,61 @@ description:""*/
 			to: ['', Validators.required],
 			to_id: ['', Validators.required],
 			when: ['', Validators.required],
-			description: ''
+			description: ['', Validators.required]
 		});
 		
 	}
 	
 	private _busy : boolean = false;
+	public error : string = '';
 	
-	public onSubmit(value:Object) : void {
-		if (this.form.valid) {
+	public onSubmit($from, $to, $when, $description) : void {
+		
+		
+		console.dir($from)
+		if (!this.model.from_id) {
+			$from.querySelector('input[type="text"]').focus();
 			
+			return;
+		}
+		
+		if (!this.model.to_id) {
+			$to.querySelector('input[type="text"]').focus();
+			
+			return;
+		}
+		
+		if (!this.model.when) {
+			$when.querySelector('input[type="text"]').focus();
+			
+			return;
+		}
+		
+		if (!this.model.description) {
+			$description.focus();
+			
+			return;
+		}
+		
+		if (this.form.valid) {			
 			this._busy = true;
 			
-			this._tripService.addTrips(this.formModel).subscribe(res => {
+			this._tripService.addTrips(this.model).subscribe(res => {
+				if (res.trip && res.trip._id) 
+					this._router.navigate(['Trip', {id: res.trip._id}]);
+				else
+					this.error = 'Unexpected error. Try again later.';
+				
 				this._busy = false;
 			}, err => {
+				this.error = 'Unexpected error. Try again later.';
+
+				try {
+					this.error = err.json().error || this.error;
+				} catch(e) {
+					this.error = err.text() || this.error;
+				}
+				
 				this._busy = false;
 			});
 		}
@@ -74,6 +115,6 @@ description:""*/
         // console.log('onDateChanged(): ', event.date, ' - formatted: ', event.formatted, ' - epoc timestamp: ', event.epoc);
 
 		this.form.controls.when._touched = true;
-		this.formModel.when = event.epoc * 1000;
+		this.model.when = event.epoc * 1000;
     }
 }

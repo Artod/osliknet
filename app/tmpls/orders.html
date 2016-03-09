@@ -1,109 +1,30 @@
+<div class="container">
+	<div class="page-header">
+		<h2>Requests</h2>
+	</div>
 
-<div class="page-header">
-	<h2>Requests</h2>
-</div>
-<p *ngIf="!_inited">Loading...</p>
+	<p *ngIf="!_inited">Loading...</p>
 
-<p *ngIf="_inited && orders && !orders.length"><i>There are no requests yet.</i></p>
+	<p *ngIf="_inited && orders && !orders.length"><i>There are no requests yet.</i></p>
 
-<table class="table">
-	<tr *ngFor="#order of orders; #idx = index">
-		<td class="col-xs-8">
-			<order-card [order]="order" [user]="order.user"></order-card>
-			
-			<p class="order-message">
-				{{ order.message }}
-			</p>
-			
-			<goto [order]="order" [newMessages]="newMessages"></goto>
-		</td>
-		<td class="col-xs-4">
-			<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				
-		</td>
-	</tr>
-</table>
-
-<p *ngIf="_inited && !fullPage" class="text-center">
-	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
-</p>
-
-
-	<!-- 	<div class="row"  *ngFor="#order of orders; #idx = index">
-			<div class="col-xs-8">
-
-			
-			</div>
-			<div class="col-xs-4">
-
-			</div>			
-		</div> -->
-
-
-
-
-<!-- 
-<div class="row requests-chat-wrap">
-	<div class="col-xs-5 requests-wrap">
-		<ul class="requests-list">
-			<li *ngFor="#order of orders; #idx = index" (click)="onClick(order._id)" class="{{ orderId  === order._id ? 'current-chat' : ''}}">				
-				{{ order.created_at | toDate | date: 'longDate' }} | 
-				Status: <b>{{ configOrderStatus[order.status] }}</b>
+	<table class="table">
+		<tr *ngFor="#order of orders; #idx = index">
+			<td class="col-xs-8">
+				<order-card [order]="order" [user]="order.user"></order-card>
 				
-				<table class="table">
-					<tr>
-						<td>
-							<img src="http://gravatar.com/avatar/{{ order.user.gravatar_hash }}?d=retro" alt="{{ order.user.name }}" width="40px" height="40px" />
-							<a href="/users/{{ order.user._id }}">{{ order.user.name }}</a>	
-<br />
-							<div>
-								{{ order.trip.from }}
-								<span class="glyphicon glyphicon-arrow-right"></span>
-								{{ order.trip.to }}
-								
-								<br />
-								
-								<i>{{ order.trip.when | toDate | date: 'longDate' }}</i>
-							</div>							
-						</td>
-					</tr>
-				</table>
+				<p class="order-message">
+					{{ order.message }}
+				</p>
+				
+				<goto [order]="order" [newMessages]="newMessages"></goto>
+			</td>
+			<td class="col-xs-4">
+				<trip-card [trip]="order.trip" [user]="order.trip.user"></trip-card>				
+			</td>
+		</tr>
+	</table>
 
-			</li>			
-		</ul>
-	</div>
-	<div class="col-xs-7 chat-wrap">
-		<chat *ngIf="orderId" [orderId]="orderId"></chat>
-	</div>
-</div> -->
-
-			
-			
-			
-			
-
-			
-			
-
-<!-- <table>
-	<tr>
-		<th>User</th>
-		<th>Trip</th>
-		<th>UID</th>
-		<th>Status</th>
-	</tr>
-	<tr *ngFor="#trip of trips; #idx = index">
-		<td>
-			Trip by <a href="/users/{{ trip.user._id }}">{{ trip.user.name }}</a>
-		</td>
-		<td>
-			{{ trip.from }} -> {{ trip.to }}
-			<br />
-			{{ trip.when | date: 'longDate' }}
-		</td>
-		
-		<td>
-			<a [routerLink]="['RequestsId', {id: trip.orders._id}]">Chat</a>
-		</td>
-		<td>{{ trip.orders.status }}</td>
-	</tr>
-</table> -->
+	<p *ngIf="_inited && !fullPage" class="text-center">
+		<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+	</p>
+</div>

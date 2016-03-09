@@ -25,19 +25,23 @@
 			<h2>Add a Request for delivery</h2>
 		</div>
 
-		<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="onSubmit(form.value)">
-			<input type="hidden" name="trip" value="" [(ngModel)]="formModel.trip" [ngFormControl]="form.controls.trip" />
+		<form action="/orders/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(textarea)">
+			<input type="hidden" name="trip" value="" [(ngModel)]="model.trip" [ngFormControl]="form.controls.trip" />
 
 			<div class="form-group">	
-				<textarea class="form-control" name="message" [(ngModel)]="formModel.message" [ngFormControl]="form.controls.message" placeholder="Description" maxlength="2000"></textarea>
+				<textarea class="form-control" name="message" [(ngModel)]="model.message" [ngFormControl]="form.controls.message" placeholder="Description" maxlength="2000" #textarea></textarea>
 			</div>
 			
 			<br />
 			
 			<p class="text-right">
-				<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button>
-				<button class="btn btn-default btn-lg" [disabled]="_busy" (click)="closeModal()">Cancel</button>
+				<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button>
+				<button class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
 			</p>
+			
+			<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+				{{ error }}
+			</div>
 		</form>
 	</div>
 </div>

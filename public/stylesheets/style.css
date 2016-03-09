@@ -58,7 +58,7 @@ textarea.form-control {
 }
 
 .trips-my .requests-table {
-	padding-left: 20px;
+	padding-left: 25px;
 }
 /*
 .trips-add-form {
@@ -83,20 +83,20 @@ textarea.form-control {
 }
 
 @media (min-width: 460px) {
-	.trips-add-form.form-inline .form-control/*, .login-form .form-control*/ {
+	.trips-add-form .form-inline .form-control/*, .login-form .form-control*/ {
 
 		display: inline-block ;
 		width: auto;
 		vertical-align: middle;
 	}
 
-	.trips-add-form.form-inline .form-group/*, .login-form .form-group */{
+	.trips-add-form .form-inline .form-group/*, .login-form .form-group */{
 		display: inline-block;
 		margin-bottom: 0;
 		vertical-align: middle;
 	}
 	
-	.trips-add-form.form-inline .form-control.autocomplite {
+	.trips-add-form .form-inline .form-control.autocomplite {
 		width: 204px;
 	}
 	

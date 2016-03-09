@@ -326,7 +326,7 @@ var User = mongoose.model('User', schema);
 setInterval(function() {
 	User.find({
 		needEmailNotification: true,
-		updated_at: { $lt: ( new Date() ).getTime() - 1000*/*60**/5 }
+		updated_at: { $lt: ( new Date() ).getTime() - config.emailNotifyInterval }
 	}).select({
 		name: 1,
 		email: 1,
@@ -370,47 +370,45 @@ setInterval(function() {
 			});
 			
 			if (newOrders.length || msgsInOrder.length) {
-				var text = '<h1>Hello, ' + user.name + '!</h1>';
+				var text = '<h1>Hello, ' + user.name + '!</h1><ul>';
 				
 				if (newOrders.length) {
-					text += '<p>You have new ' + ( newOrders.length > 1 ? '<a href="http://osliki.net/orders">orders</a>' : '<a href="http://osliki.net/messages/order/' + newOrders[0] + '">order</a>') + '.</p>';
+					text += '<li>You have new ' + ( newOrders.length > 1 ? '<a href="' + config.host + 'orders">orders</a>' : '<a href="' + config.host + 'messages/order/' + newOrders[0] + '">order</a>') + '.</li>';
 				}
 				
 				if (msgsInOrder.length) {
-					text += '<p>You have new ' + (msgsInOrder.length > 1 ? '<a href="http://osliki.net/orders">messages</a>' : '<a href="http://osliki.net/messages/order/' + msgsInOrder[0] + '">message</a>') + '.</p>';
+					text += '<li>You have new ' + (msgsInOrder.length > 1 ? '<a href="' + config.host + 'orders">messages</a>' : '<a href="' + config.host + 'messages/order/' + msgsInOrder[0] + '">message</a>') + '.</li>';
 				}
 				
 				if (newTrips.length) {
-					text += '<p>We have new <a href="http://osliki.net/trips">trip' + (newTrips.length > 1 ? 's' : '') + '</a> you are waiting for.</p>';
+					text += '<li>We have new <a href="' + config.host + 'trips">trip' + (newTrips.length > 1 ? 's' : '') + '</a> you are waiting for.</li>';
 				}
 				
 				if (msgsInDialog.length) {
-					text += '<p>You have new ' + (msgsInDialog.length > 1 ? '<a href="http://osliki.net/messages">private messages</a>' : '<a href="http://osliki.net/messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</p>';
+					text += '<li>You have new ' + (msgsInDialog.length > 1 ? '<a href="' + config.host + 'messages">private messages</a>' : '<a href="' + config.host + 'messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</li>';
 				}
 				
-console.log(text);
+				text += '</ul> <p>Team <a href="http://Osliki.Net">Osliki.Net</a> .</p>';
 				
 				var email = new sendgrid.Email();
 				
 				email.addTo(user.email);
 				email.subject = 'Notifications from Osliki.Net';
-				email.from = 'osliknet@gmail.com';
+				email.from = config.email;
 				// email.text = text;
 				email.html = text;
 				
 				sendgrid.send(email, function(err, json) {
 					if (err) {
-						console.log(err);
+						//log
 					}
-					
-					console.dir(json);
 				});
 			}
 		});			
 		
 	});
 // }, 1000*60*5);
-}, 1000*20);
+}, config.emailNotifyInterval);
 
 module.exports = User;
 

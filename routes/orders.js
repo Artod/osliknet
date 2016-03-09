@@ -2,27 +2,15 @@ var express = require('express');
 var router = express.Router();
 var async = require('async');
 
+var mdlwares = require('../libs/mdlwares');
+
 var Trip = require('../models/trip');
 var Message = require('../models/message');
 var Order = require('../models/order');
 var User = require('../models/user');
 
-var ObjectId = require('mongoose').Types.ObjectId;
 
-router.get('/', function(req, res, next) {
-	
-
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
-	
-	if (!req.session.uid) {
-		res.status(401).json({error: 'Unauthorized'});
-
-		return;
-	}
+router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 
 	var limit = Number(req.query.limit);	
 	limit = (limit && limit < 30 ? limit : 30);
@@ -38,7 +26,7 @@ router.get('/', function(req, res, next) {
 	}).sort('status -created_at').skip(page * limit).limit(limit).populate('user tripUser trip').exec(function(err, orders) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -52,389 +40,10 @@ router.get('/', function(req, res, next) {
 		res.type('json').json({
 			orders: orders
 		});
-		
-		
-		return;
-		
-		/*var tripUids = [];
-		
-		orders.forEach(function(order) {
-			var uid = order.trip.user.toString();
-			
-			if (tripUids.indexOf(uid) === -1) {
-				tripUids.push(uid);
-			}
-		});*/
-		
-		// console.log(tripUids.length);
-		// console.dir(tripUids);
-		
-		/*
-		var _tripUids = [];
-		var tripUids = orders.filter(function(order) {
-			_tripUids.push( order.trip.user.toString() );
-			return order.trip.user;
-			// return ObjectId(order.trip.user);
-			
-			blockedTile.indexOf("118") != -1
-		});
-		
-		User.find({
-			_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
-		}).select('name gravatar_hash').exec(function(err, users) {
-			if (err) {
-				res.status(500).type('json')
-					.json({error: err});
-					
-				return;
-			}
-			
-			var usersIndex = {};
-			
-			users.forEach(function(user) {				
-				usersIndex[user.id] = user
-			});
-
-			orders.forEach(function(order) {
-				if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
-					order.trip.user = usersIndex[ order.trip.user.toString() ];
-				}
-			});
-			
-			User.setReaded('newOrders', req.session.uid);
-			
-			res.type('json').json({
-				orders: orders
-			});
-		});*/
-	});
-	
-	
-	
-	return;
-	
-	
-	
-	
-	
-	
-	
-	
-	Trip.find({
-		user: req.session.uid
-	}).select({ _id: 1}).exec(function(err, trips) {
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return;
-		}
-		
-		var tids = trips.map(function(trip) {
-			return trip.id;
-		});
-		
-		Order.find({
-			$or: [{
-				trip: {$in: tids}
-			}, {
-				user: ObjectId(req.session.uid)
-			}]			
-		}).sort({
-			status: 1,
-			created_at: -1
-		}).populate('user trip').exec(function(err, orders) {
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-					
-				return;
-			}
-			
-			var tripUids = [];
-			
-			orders.forEach(function(order) {
-				var uid = order.trip.user.toString();
-				
-				if (tripUids.indexOf(uid) === -1) {
-					tripUids.push(uid);
-				}
-			});
-			
-			// console.log(tripUids.length);
-			// console.dir(tripUids);
-			
-			/*
-			var _tripUids = [];
-			var tripUids = orders.filter(function(order) {
-				_tripUids.push( order.trip.user.toString() );
-				return order.trip.user;
-				// return ObjectId(order.trip.user);
-				
-				blockedTile.indexOf("118") != -1
-			});*/
-			
-			User.find({
-				_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
-			}).select('name gravatar_hash').exec(function(err, users) {
-				if (err) {
-					res.status(500)
-						.type('json')
-						.json({error: err});
-						
-					return;
-				}
-				
-				var usersIndex = {};
-				
-				users.forEach(function(user) {				
-					usersIndex[user.id] = user
-				});
-
-				orders.forEach(function(order) {
-					if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
-						order.trip.user = usersIndex[ order.trip.user.toString() ];
-					}
-				});
-				
-				User.setReaded('newOrders', req.session.uid);
-				
-				res.type('json').json({
-					orders: orders
-				});
-			});
-		});
-	});
-
-	
-	return;
-	
-
-	async.parallel({
-		orders: function(callback) {	
-			Trip.find({
-				user: ObjectId(req.session.uid),
-				is_removed: false
-			}).select({ _id: 1}).exec(function(err, trips) {
-				if (err) {
-					callback(err, trips);
-						
-					return;
-				}
-				
-				var tids = trips.map(function(trip) {
-					return trip._id;
-				});
-				
-				Order.find({
-					trip: {$in: tids}
-				}).sort({
-					created_at: -1
-				})/*.populate('user')*/.exec(function(err, orders) {
-					if (err) {
-						callback(err, trips);
-							
-						return;
-					}
-					
-					callback(err, orders);
-				});
-			});		
-		},
-		myOrders: function(callback){
-			Order.find({
-				user: ObjectId(req.session.uid)
-			}, function (err, orders) {
-				if (err) {
-					callback(err, orders);
-					
-					return;
-				}
-				
-				callback(err, orders);
-			});
-		}
-	}, function(err, asyncRes){
-		// can use res.team and res.games as you wish
-		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
-				
-			return
-		}
-		
-		var orders = asyncRes.orders.concat(asyncRes.myOrders);
-		
-		Order.populate(orders, {path: 'user trip'}, function(err, orders) {
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-					
-				return;
-			}
-			
-			/*
-			res.type('json').json({
-				orders: orders
-			});return;
-			*/
-			
-			var tripUids = orders.map(function(order) {
-				return ObjectId(order.trip.user);
-			});
-			
-			
-// console.log('tripUidstripUidstripUidstripUidstripUids');
-// console.dir(tripUids);
-			
-			User.find({
-				_id: {$in: tripUids}
-			}).exec(function (err, users) {
-				if (err) {
-					res.status(500)
-						.type('json')
-						.json({error: err});
-						
-					return;
-				}
-				
-				var usersIndex = {};
-				
-				users.forEach(function(user) {					
-					usersIndex[user._id] = user
-				});
-
-				orders.forEach(function(order) {
-					order.trip.user = usersIndex[order.trip.user];
-				});
-				
-				res.type('json').json({
-					orders: orders
-				});
-			});
-		});	
-	});
-	
-	
-	
-
-
-	
-	
-
-	
-	
-	
-	
-	
-	
-});
-
-/*
-router.get('/my', function(req, res, next) {
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
-	
-	if (!req.session.uid) {
-		res.status(401).json({error: 'Unauthorized'});
-
-		return;
-	}
-
-	// 
-	// .find({
-		// 'orders.uid': mongoose.Types.ObjectId(req.session.uid)
-	// }).select({'orders.$': 1}).populate('uid')
-	// 
-
-	// 
-	// aggregate([
-	// {
-		// $match: {
-            // 'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
-			// 'orders': { 
-               // '$elemMatch': { 
-                   // "uid": req.session.uid
-				// }
-			// }
-        // }
-	// }, {
-		// $unwind: "$orders"
-	// }]).
-	// 
-	
-	
-	
-	
-
-	Trip.aggregate([{
-		$match: {
-            'orders.user': ObjectId(req.session.uid)
-        }
-	}, {
-		$unwind: "$orders"
-	}, {
-		$match: {
-            'orders.user': ObjectId(req.session.uid)
-        }
-	}, {
-		$sort : {
-			'orders.status': 1,
-			'orders.created_at' : -1
-		}
-	}]).exec(function(err, trips) {
-		if (err) {
-			res.status(500).type('json')
-				.json({error: err});
-				
-			return;
-		}
-		
-		// var res = {}
-		
-		// var out = trips.map(function(trip) {	
-			// var order = trip.orders.id();
-			
-			// return {
-				
-			// };			
-		// });
-		
-		Trip.populate(trips, {path: 'user'}, function(err, trips) {
-			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
-					
-				return;
-			}
-			
-			res.type('json')
-				.json({trips: trips});
-		});
-		
-		// res.type('json')
-			// .json({trips: trips});
-		
-		// res.render('orders/index', {
-			// orders:orders,
-			// session: JSON.stringify(req.session)
-		// });
-			
-		// console.log('%s --- %s.', trips.name, trips.from)
-		// res.render('index', { title:trips[1].to + trips[0].from });
 	});
 });
-*/
 
-router.post('/add', function(req, res, next) {
+router.post('/add', mdlwares.restricted, function(req, res, next) {
 	async.parallel({
 		trip: function(callback) {	
 			Trip.findById(req.body.trip).exec(function(err, trip) {
@@ -452,7 +61,7 @@ router.post('/add', function(req, res, next) {
 	}, function(err, asyncRes){
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return
 		}
@@ -487,10 +96,8 @@ router.post('/add', function(req, res, next) {
 		
 		order.save(function(err, order) {
 			if (err) {
-				res.status(err.name === 'ValidationError' ? 400 : 500);
-				
-				res.type('json')
-					.json({error: err});
+				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}			
@@ -523,52 +130,22 @@ router.post('/add', function(req, res, next) {
 				.json({order: order});
 		});	
 	});
-	
-	
-	/*var order = new Order({
-		trip: req.body.trip,
-		user: req.session.uid,
-		message: req.body.message
-	});
-
-	order.save(function(err, order) {
-		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500);
-			
-			res.type('json')
-				.json({error: err});
-				
-			return;
-		}
-		
-		Trip.findById(req.body.trip).select('user').exec(function(error, trip) {
-			User.setUnreaded('newOrders', trip.user, order.id);
-		});
-		
-		User.stats(req.session.uid, 'r_cnt', 1);
-		User.stats(req.session.uid, 't_order', 1);
-		
-		res.type('json')
-			.json({order: order});
-	});	*/
 
 });
 
-router.post('/status', function(req, res, next) {
+router.post('/status', mdlwares.restricted, function(req, res, next) {
 	var newStatus = Number(req.body.status);
 	
 	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
 
 		if (!order) {
-			res.status(400)
-				.type('json')
+			res.status(400).type('json')
 				.json({error: 'Order not found'});
 				
 			return;
@@ -609,7 +186,7 @@ router.post('/status', function(req, res, next) {
 			order.save(function(err, order) {
 				if (err) {
 					res.status(500).type('json')
-						.json({error: err});
+						.json({error: 'Unexpected server error.'});
 						
 					return;
 				}
@@ -626,39 +203,6 @@ router.post('/status', function(req, res, next) {
 						return;
 					}
 				});
-				
-				/*var message = new Message({
-					order: order.id,
-					user: req.session.uid,
-					corr: corr,
-					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
-				});		
-				
-				message.save(function(err, message) {
-					if (err) {// log error							
-						return;
-					}
-
-					User.setMessagesUnreaded(corr, order.id, message.id);
-					
-					Message.find({
-						order: message.order
-					}).count().exec(function(err, count) {
-						if (err) {
-							//log
-							
-							return;
-						}
-						
-						order.msg_cnt = count;
-
-						order.save(function(err, order) {
-							if (err) {
-								//log
-							}						
-						});
-					});
-				});*/
 
 				if (newStatus === sts.FINISHED) {					
 					Order.find({
@@ -725,20 +269,18 @@ router.post('/status', function(req, res, next) {
 			}
 		}
 		
-		res.status(401).json({error: 'Unauthorized'});
-
+		res.status(401).type('json').json({error: 'Unauthorized'});
 	});
 });
 
-router.get('/trip/:id', function(req, res, next) {
+router.get('/trip/:id', mdlwares.restricted, function(req, res, next) {
 	Order.findOne({
 		trip: req.params.id,
 		user: req.session.uid
 	}).exec(function(err, order) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -747,6 +289,335 @@ router.get('/trip/:id', function(req, res, next) {
 			.json({order: order});
 	});
 });
+
+module.exports = router;
+
+
+				
+				/*var message = new Message({
+					order: order.id,
+					user: req.session.uid,
+					corr: corr,
+					message: 'I changed the order status from ' + res.locals.orderStatus[oldStatus] + ' to ' + res.locals.orderStatus[newStatus] + '.'
+				});		
+				
+				message.save(function(err, message) {
+					if (err) {// log error							
+						return;
+					}
+
+					User.setMessagesUnreaded(corr, order.id, message.id);
+					
+					Message.find({
+						order: message.order
+					}).count().exec(function(err, count) {
+						if (err) {
+							//log
+							
+							return;
+						}
+						
+						order.msg_cnt = count;
+
+						order.save(function(err, order) {
+							if (err) {
+								//log
+							}						
+						});
+					});
+				});*/
+	
+	/*var order = new Order({
+		trip: req.body.trip,
+		user: req.session.uid,
+		message: req.body.message
+	});
+
+	order.save(function(err, order) {
+		if (err) {
+			res.status(err.name === 'ValidationError' ? 400 : 500);
+			
+			res.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		Trip.findById(req.body.trip).select('user').exec(function(error, trip) {
+			User.setUnreaded('newOrders', trip.user, order.id);
+		});
+		
+		User.stats(req.session.uid, 'r_cnt', 1);
+		User.stats(req.session.uid, 't_order', 1);
+		
+		res.type('json')
+			.json({order: order});
+	});	*/
+	
+	/*var tripUids = [];
+		
+		orders.forEach(function(order) {
+			var uid = order.trip.user.toString();
+			
+			if (tripUids.indexOf(uid) === -1) {
+				tripUids.push(uid);
+			}
+		});*/
+		
+		// console.log(tripUids.length);
+		// console.dir(tripUids);
+		
+		/*
+		var _tripUids = [];
+		var tripUids = orders.filter(function(order) {
+			_tripUids.push( order.trip.user.toString() );
+			return order.trip.user;
+			// return ObjectId(order.trip.user);
+			
+			blockedTile.indexOf("118") != -1
+		});
+		
+		User.find({
+			_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
+		}).select('name gravatar_hash').exec(function(err, users) {
+			if (err) {
+				res.status(500).type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			var usersIndex = {};
+			
+			users.forEach(function(user) {				
+				usersIndex[user.id] = user
+			});
+
+			orders.forEach(function(order) {
+				if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
+					order.trip.user = usersIndex[ order.trip.user.toString() ];
+				}
+			});
+			
+			User.setReaded('newOrders', req.session.uid);
+			
+			res.type('json').json({
+				orders: orders
+			});
+		});*/
+		
+/*
+	
+	
+	
+	
+	
+	
+	
+	Trip.find({
+		user: req.session.uid
+	}).select({ _id: 1}).exec(function(err, trips) {
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		var tids = trips.map(function(trip) {
+			return trip.id;
+		});
+		
+		Order.find({
+			$or: [{
+				trip: {$in: tids}
+			}, {
+				user: ObjectId(req.session.uid)
+			}]			
+		}).sort({
+			status: 1,
+			created_at: -1
+		}).populate('user trip').exec(function(err, orders) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			var tripUids = [];
+			
+			orders.forEach(function(order) {
+				var uid = order.trip.user.toString();
+				
+				if (tripUids.indexOf(uid) === -1) {
+					tripUids.push(uid);
+				}
+			});
+			
+			// console.log(tripUids.length);
+			// console.dir(tripUids);
+			
+			
+			// var _tripUids = [];
+			// var tripUids = orders.filter(function(order) {
+				// _tripUids.push( order.trip.user.toString() );
+				// return order.trip.user;
+				return ObjectId(order.trip.user);
+				
+				// blockedTile.indexOf("118") != -1
+			// });
+			
+			User.find({
+				_id: {$in: tripUids} // можно дублировать все равно вернет уникальных юзеров
+			}).select('name gravatar_hash').exec(function(err, users) {
+				if (err) {
+					res.status(500)
+						.type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				var usersIndex = {};
+				
+				users.forEach(function(user) {				
+					usersIndex[user.id] = user
+				});
+
+				orders.forEach(function(order) {
+					if (order.trip.user instanceof ObjectId) { // заполняет другие user магией если одинаковые uid
+						order.trip.user = usersIndex[ order.trip.user.toString() ];
+					}
+				});
+				
+				User.setReaded('newOrders', req.session.uid);
+				
+				res.type('json').json({
+					orders: orders
+				});
+			});
+		});
+	});
+
+	
+	return;
+	
+
+	async.parallel({
+		orders: function(callback) {	
+			Trip.find({
+				user: ObjectId(req.session.uid),
+				is_removed: false
+			}).select({ _id: 1}).exec(function(err, trips) {
+				if (err) {
+					callback(err, trips);
+						
+					return;
+				}
+				
+				var tids = trips.map(function(trip) {
+					return trip._id;
+				});
+				
+				Order.find({
+					trip: {$in: tids}
+				}).sort({
+					created_at: -1
+				})
+				// .populate('user')
+				.exec(function(err, orders) {
+					if (err) {
+						callback(err, trips);
+							
+						return;
+					}
+					
+					callback(err, orders);
+				});
+			});		
+		},
+		myOrders: function(callback){
+			Order.find({
+				user: ObjectId(req.session.uid)
+			}, function (err, orders) {
+				if (err) {
+					callback(err, orders);
+					
+					return;
+				}
+				
+				callback(err, orders);
+			});
+		}
+	}, function(err, asyncRes){
+		// can use res.team and res.games as you wish
+		if (err) {
+			res.status(500)
+				.type('json')
+				.json({error: err});
+				
+			return
+		}
+		
+		var orders = asyncRes.orders.concat(asyncRes.myOrders);
+		
+		Order.populate(orders, {path: 'user trip'}, function(err, orders) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			
+			// res.type('json').json({
+				// orders: orders
+			// });return;
+			
+			
+			var tripUids = orders.map(function(order) {
+				return ObjectId(order.trip.user);
+			});
+			
+			
+// console.log('tripUidstripUidstripUidstripUidstripUids');
+// console.dir(tripUids);
+			
+			User.find({
+				_id: {$in: tripUids}
+			}).exec(function (err, users) {
+				if (err) {
+					res.status(500)
+						.type('json')
+						.json({error: err});
+						
+					return;
+				}
+				
+				var usersIndex = {};
+				
+				users.forEach(function(user) {					
+					usersIndex[user._id] = user
+				});
+
+				orders.forEach(function(order) {
+					order.trip.user = usersIndex[order.trip.user];
+				});
+				
+				res.type('json').json({
+					orders: orders
+				});
+			});
+		});	
+	});
+	
+	
+	
+*/
 
 /*router.get('/:id', function(req, res, next) {	
 	if (!req.xhr) {
@@ -859,7 +730,105 @@ router.get('/trip/:id', function(req, res, next) {
     ); 
 });*/
 
-module.exports = router;
+/*
+router.get('/my', function(req, res, next) {
+	if (!req.xhr) {
+		res.render('index');
+
+		return;
+	}
+	
+	if (!req.session.uid) {
+		res.status(401).json({error: 'Unauthorized'});
+
+		return;
+	}
+
+	// 
+	// .find({
+		// 'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+	// }).select({'orders.$': 1}).populate('uid')
+	// 
+
+	// 
+	// aggregate([
+	// {
+		// $match: {
+            // 'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
+			// 'orders': { 
+               // '$elemMatch': { 
+                   // "uid": req.session.uid
+				// }
+			// }
+        // }
+	// }, {
+		// $unwind: "$orders"
+	// }]).
+	// 
+	
+	
+	
+	
+
+	Trip.aggregate([{
+		$match: {
+            'orders.user': ObjectId(req.session.uid)
+        }
+	}, {
+		$unwind: "$orders"
+	}, {
+		$match: {
+            'orders.user': ObjectId(req.session.uid)
+        }
+	}, {
+		$sort : {
+			'orders.status': 1,
+			'orders.created_at' : -1
+		}
+	}]).exec(function(err, trips) {
+		if (err) {
+			res.status(500).type('json')
+				.json({error: err});
+				
+			return;
+		}
+		
+		// var res = {}
+		
+		// var out = trips.map(function(trip) {	
+			// var order = trip.orders.id();
+			
+			// return {
+				
+			// };			
+		// });
+		
+		Trip.populate(trips, {path: 'user'}, function(err, trips) {
+			if (err) {
+				res.status(500)
+					.type('json')
+					.json({error: err});
+					
+				return;
+			}
+			
+			res.type('json')
+				.json({trips: trips});
+		});
+		
+		// res.type('json')
+			// .json({trips: trips});
+		
+		// res.render('orders/index', {
+			// orders:orders,
+			// session: JSON.stringify(req.session)
+		// });
+			
+		// console.log('%s --- %s.', trips.name, trips.from)
+		// res.render('index', { title:trips[1].to + trips[0].from });
+	});
+});
+*/
 
 /*
 {"error":{"name":"MongoError","message":"exception: bad query: BadValue unknown top level operator: $orders

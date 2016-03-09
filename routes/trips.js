@@ -1,23 +1,17 @@
 var express = require('express');
 var router = express.Router();
 
+var mdlwares = require('../libs/mdlwares');
+
 var Trip = require('../models/trip');
 var Order = require('../models/order');
 var User = require('../models/user');
 var Subscribe = require('../models/subscribe');
 
-var ObjectId = require('mongoose').Types.ObjectId;
-
 var config = require('../config');
 var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
-router.get('/', function(req, res, next) {
-	if (!req.xhr) {
-		res.render('index');
-
-		return;
-	}
-	
+router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	var query = {};
 	
 	if (req.query.from_id) {		
@@ -50,9 +44,9 @@ router.get('/', function(req, res, next) {
 	
 	Trip.find(query).sort('-_id').limit(limit).populate('user').exec(function(err, trips) {
 		if (err) {
-			res.status(500)
-				.type('json')
-				.json({error: err});
+			res.status(500).type('json')
+				// .json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -66,7 +60,8 @@ router.get('/', function(req, res, next) {
 			}).select('_id').exec(function(err, subscribe) {
 				if (err) {
 					res.status(500).type('json')
-						.json({error: err});
+						// .json({error: err});
+						.json({error: 'Unexpected server error.'});
 						
 					return;
 				}
@@ -92,18 +87,7 @@ router.get('/', function(req, res, next) {
   
 });
 
-router.get('/my', function(req, res, next) {
-if (!req.xhr) {		
-	res.render('index');
-	return;
-}
-	
-if (!req.session.uid) {
-	res.status(401).json({error: 'Unauthorized'});
-
-	return;
-}
-	
+router.get('/my', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	var limit = Number(req.query.limit);	
 	limit = (limit && limit < 30 ? limit : 30);
 	
@@ -114,7 +98,8 @@ if (!req.session.uid) {
 	}).sort('-_id').skip(page * limit).limit(limit).exec(function(err, trips) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Unexpected server error.'});
+				// .json({error: err});
 				
 			return;
 		}
@@ -127,9 +112,9 @@ if (!req.session.uid) {
 			trip: {$in: tids}
 		}).sort('status -created_at').populate('user').exec(function(err, orders) {
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
+					// .json({error: err});
 					
 				return;
 			}
@@ -150,22 +135,20 @@ if (!req.session.uid) {
 	});
 });
 
-router.get('/add', function(req, res, next) {
-	res.render('index');
-});
-	
-router.post('/add', function(req, res, next) {
+router.get('/add', mdlwares.restricted, mdlwares.renderIndexUnlessXhr);	
+
+router.post('/add', mdlwares.restricted, function(req, res, next) {
 	req.body.is_removed = false;	
 	req.body.user = req.session.uid;
-	
+
 	var trip = new Trip(req.body);	
 	
 	trip.save(function(err, trip) {
 		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500)			
-			
+			res.status(err.name === 'ValidationError' ? 400 : 500)
 			res.type('json')
-				.json({error: err});
+				// .json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -186,8 +169,7 @@ router.post('/add', function(req, res, next) {
 			is_unsubed: false
 		}).select('+email').exec(function(err, subscribes) {
 			if (err) {
-				res.status(500).type('json')
-					.json({error: err});
+				//log
 					
 				return;
 			}
@@ -207,32 +189,30 @@ router.post('/add', function(req, res, next) {
 					email.from = 'osliknet@gmail.com';
 					
 					email.text += 'Hello!\n\r\n\r';
-					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' http://osliki.net/trips/' + trip.id + '.\n\r';
-					email.text += 'Unsubscribe: http://osliki.net/subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
+					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' ' + config.host + 'trips/' + trip.id + '.\n\r';
+					email.text += 'Unsubscribe: ' + config.host + 'subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
 					email.text += 'Team http://Osliki.Net .';
-	console.log(subscribe.email);
-	console.log(email.text);
+
 					sendgrid.send(email, function(err, json) {
 						if (err) {
 							console.log(err);
+							//log
 						}
-						
-						console.dir(json);
 					});
 				}
 			});
 		});		
 		
-		res.type('json')
-			.json({trip: trip});
+		res.type('json').json({trip: trip});
 	});  
 });
 
-router.post('/update', function(req, res, next) {
+router.post('/update', mdlwares.restricted, function(req, res, next) {
 	Trip.findById(req.body.id).exec(function(err, trip) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				// .json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -245,7 +225,7 @@ router.post('/update', function(req, res, next) {
 		}
 		
 		if (trip.user.toString() !== req.session.uid) {
-			res.status(401).json({error: 'Unauthorized'});
+			res.status(401).type('json').json({error: 'Unauthorized'});
 				
 			return;
 		}
@@ -266,16 +246,13 @@ router.post('/update', function(req, res, next) {
 	});
 });
 
-router.get('/:id', function(req, res, next) {
-if (!req.xhr) {		
-	res.render('index');
-	return;
-}
+router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
 	Trip.findById(req.params.id).populate('user').exec(function(err, trip) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				// .json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return
 		}
@@ -293,11 +270,13 @@ if (!req.xhr) {
 		
 		if (trip.user.id === req.session.uid) { // my trip
 			Order.find({
+				trip: trip._id,
 				tripUser: req.session.uid
 			}).sort('status -created_at').populate('user').exec(function(err, orders) {
 				if (err) {
 					res.status(500).type('json')
-						.json({error: err});
+						// .json({error: err});
+						.json({error: 'Unexpected server error.'});
 						
 					return
 				}
@@ -316,7 +295,8 @@ if (!req.xhr) {
 			}).select('_id').exec(function(err, subscribe) {
 				if (err) {
 					res.status(500).type('json')
-						.json({error: err});
+						// .json({error: err});
+						.json({error: 'Unexpected server error.'});
 						
 					return;
 				}

@@ -18,7 +18,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 })
 
 export class OrderAddComponent {	
-	public formModel : any = {};
+	public model : any = {};
 	public form : ControlGroup;
 	
 	public order : any = {};
@@ -39,7 +39,7 @@ export class OrderAddComponent {
 			message: ['', Validators.required]
 		});
 		
-		this.formModel.trip = trip._id;
+		this.model.trip = trip._id;
 		
 		this._orderService.getByTripId(trip._id).subscribe(data => {					
 			this.order = data.order || {};
@@ -73,14 +73,33 @@ export class OrderAddComponent {
 	}
 	
 	private _busy = false;
-	public onSubmit(value : Object) : void {
+	public error : string = '';
+	
+	public onSubmit($textarea) : void {
+		if (!this.form.controls.message.valid) {
+			$textarea.focus();
+			
+			return;
+		}
+		
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
 			
-			this._orderService.add(this.formModel).subscribe(data => {					
-				this.closeModal();
+			this._orderService.add(this.model).subscribe(data => {					
+				//this.closeModal();
+				this.error = '';
+				this.order = data.order || {};
+				
 				this._busy = false;				
 			}, err => {
+				this.error = 'Unexpected error. Try again later.';
+
+				try {
+					this.error = err.json().error || this.error;
+				} catch(e) {
+					this.error = err.text() || this.error;
+				}
+				
 				this._busy = false;	
 			});
 		}

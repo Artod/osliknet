@@ -24,8 +24,6 @@ TODO:
 
 \/- pre('save' created_at переделать
 
-
-
 \- Subscribe on new trips
 \/- капча
 	\/субскрайб по емайл
@@ -36,14 +34,19 @@ TODO:
 \/- text pipe to br 
 \/- logged in already убрать 
 
+\/- unauth middleware
+\/- beforeRouterFilter !req.xhr ? res.render('index')
 
-+ validation add trip form
+\/+ validation add trip form
 + msg about new review to link
+?- not found error on query
 
-- unauth middleware
-- beforeRouterFilter !req.xhr ? res.render('index')
+
+- angular beforeRouterFilter
+- ссылка на join в логине
+- request for delivery for unauth users
+
 - Logging errors
-- not found error on query
 
 
 - Calendar css
@@ -55,6 +58,9 @@ TODO:
 
 - hosting 
 - deploy (secret key captcha + sendgrid)
+
+
+
 
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
 - paypal

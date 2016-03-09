@@ -1,11 +1,12 @@
+<div class="container">
+	<div class="page-header">
+		<h2>
+			Dialog with 
+			<user-card [user]="user" *ngIf="user && user._id"></user-card>
+		</h2>		
+	</div>
 
-<div class="page-header">
-	<h2>
-		Dialog with 
-		<user-card [user]="user" *ngIf="user && user._id"></user-card>
-	</h2>		
+
+
+	<chat (user)="user = $event" [(isChatActual)]="isChatActual" [corrId]="corrId"></chat>
 </div>
-
-
-
-<chat (user)="user = $event" [(isChatActual)]="isChatActual" [corrId]="corrId"></chat>

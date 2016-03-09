@@ -1,70 +1,59 @@
-<div class="page-header">
-	<h2>My Trips</h2>
-</div>
-
-<p *ngIf="!_inited">Loading...</p>
-
-<p *ngIf="_inited && trips && !trips.length">
-	<i>There are no trips yet. You can <a [routerLink]="['TripAdd']" href="#">Add a trip</a>.</i>
-</p>
-
-<div class="row trips-my" *ngFor="#trip of trips">
-	<div class="col-lg-4 col-xs-12">
-		<trip-card [trip]="trip"></trip-card>
-
-		<p>
-			{{ trip.description }}
-		</p>
+<div class="container">
+	<div class="page-header">
+		<h2>My Trips</h2>
 	</div>
-	<div class="col-lg-8 col-xs-12">
-		
 
-		<div class="requests-table">
-			<h5>Requests for shipping:</h5>
+	<p *ngIf="!_inited">Loading...</p>
+
+	<p *ngIf="_inited && trips && !trips.length">
+		<i>There are no trips yet. You can <a [routerLink]="['TripAdd']" href="#">Add a trip</a>.</i>
+	</p>
+
+	<div class="row trips-my" *ngFor="#trip of trips">
+		<div class="col-lg-4 col-xs-12">
+			<trip-card [trip]="trip"></trip-card>
+
+			<p>
+				{{ trip.description }}
+			</p>
+		</div>
+		<div class="col-lg-8 col-xs-12">
 			
-			<table *ngIf="!ordersByTrip[trip._id]" class="table">
-				<tr>
-					<td>
-						<i>There are no requests yet.</i>
-					</td>
-				</tr>
-			</table>
-			
-			<table *ngIf="ordersByTrip[trip._id]" class="table">
-				<tr *ngFor="#order of ordersByTrip[trip._id]">
-					<td>
-						<order-card [order]="order" [user]="order.user"></order-card>
-						
-						<p class="order-message">
-							{{ order.message }}
-						</p>
-						
-						<goto [order]="order" [newMessages]="newMessages"></goto>
-						<!--
-						 <p class="text-right">
-							<span *ngIf="newMessages[order._id] && newMessages[order._id][0]" class="label label-danger">{{newMessages[order._id][0]}} new</span>
-							<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span>  <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> </a>
-						</p> -->
-					</td>
-				</tr>
-			</table>
+
+			<div class="requests-table">
+				<h5>Requests for shipping:</h5>
+				
+				<table *ngIf="!ordersByTrip[trip._id]" class="table">
+					<tr>
+						<td>
+							<i>There are no requests yet.</i>
+						</td>
+					</tr>
+				</table>
+				
+				<table *ngIf="ordersByTrip[trip._id]" class="table">
+					<tr *ngFor="#order of ordersByTrip[trip._id]">
+						<td>
+							<order-card [order]="order" [user]="order.user"></order-card>
+							
+							<p class="order-message">
+								{{ order.message }}
+							</p>
+							
+							<goto [order]="order" [newMessages]="newMessages"></goto>
+							<!--
+							 <p class="text-right">
+								<span *ngIf="newMessages[order._id] && newMessages[order._id][0]" class="label label-danger">{{newMessages[order._id][0]}} new</span>
+								<a [routerLink]="['Order', {id:order._id}]">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span>  <span class="badge" *ngIf="newMessages[order._id] && newMessages[order._id][0]">{{newMessages[order._id][0]}}</span> </a>
+							</p> -->
+						</td>
+					</tr>
+				</table>
+			</div>
 		</div>
 	</div>
+
+	<p *ngIf="_inited && !fullPage" class="text-center">
+		<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
+	</p>
 </div>
-<!-- <table class="table">
-	<tr *ngFor="#trip of trips">
-		<td class="col-xs-4">			
-
-
-		</td>
-		
-		<td class="col-xs-8">
-	
-		</td>
-	</tr>
-</table> -->
-
-
-<p *ngIf="_inited && !fullPage" class="text-center">
-	<button class="btn btn-default btn-lg" (click)="_busy ? false : loadNext()">{{ _busy ? 'Wait...' : 'Load more' }}</button>
-</p>

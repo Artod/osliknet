@@ -69,33 +69,13 @@ var schema = mongoose.Schema({
 		type: String,
 		default: '',
 		trim: true,
+		required: true,
 		maxlength: 2000
 	},
 	is_removed: {
 		type: Boolean,
 		default: false
 	},
-	/*
-	orders: [orderSchema],
-	comments: [{
-		uid: {
-			type: String,
-			required: true
-		},
-		pid: {
-			type: String,
-			required: true
-		},
-		message: {
-			type: String,
-			default: '',
-			trim: true
-		},
-		created_at: {
-			type: Date,
-			default: Date.now
-		}
-	}],*/
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });

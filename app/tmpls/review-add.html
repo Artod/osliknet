@@ -2,7 +2,7 @@
 	<h2>Review on the delivery</h2>
 </div>
 
-<form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="onSubmit(comment)">
+<form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)">
 	<input type="hidden" name="order" value="" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
 	<!-- http://stackoverflow.com/questions/33986633/angular-2-dependency-injection-error-on-ngfor-in-dynamically-created-component -->
 	<div class="form-group text-center">
@@ -29,6 +29,11 @@
 	</div>
 	
 	<p class="text-right">
-		<button type="submit" class="btn btn-warning btn-lg" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
+		<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
+		<button class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
 	</p>
+	
+	<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+		{{ error }}
+	</div>
 </form>

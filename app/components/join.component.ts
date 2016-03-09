@@ -56,7 +56,6 @@ export class JoinComponent {
 			)],
 			recaptcha: ['', Validators.required]
 		});
-		console.dir(this.form.controls.name)
 	}
 	
 	private _busy : boolean = false;
@@ -88,11 +87,13 @@ export class JoinComponent {
 
 				this._busy = false;
 			}, err => {
-				this.error = 'Unexpected server error. Try later.';
+				this.error = 'Unexpected error. Try again later.';
 
 				try {
 					this.error = err.json().error || this.error;
-				} catch(e) {}
+				} catch(e) {
+					this.error = err.text() || this.error;
+				}
 				
 				this._busy = false;
 			});

@@ -2,6 +2,7 @@ var express = require('express');
 
 var router = express.Router();
 
+var mdlwares = require('../libs/mdlwares');
 var passwordless = require('passwordless');
 var crypto = require('crypto');
 var config = require('../config');
@@ -11,21 +12,13 @@ var User = require('../models/user');
 var Token = require('../models/token');
 var Subscribe = require('../models/subscribe');
 
-router.get('/notifications/:timestamp?', function(req, res, next) {		
-if (!req.session.uid) {
-	res.status(401)
-			.type('json')
-			.json({error: 'Unauthorized'});
-			return
-}
-
-	
+router.get('/notifications/:timestamp?', mdlwares.restricted, function(req, res, next) {
 	User.findById(req.session.uid)
 		.select('needEmailNotification newOrders newTrips newMessages newPrivMessages updated_at')
 		.exec(function(err, user) {
 			if (err || !user) {
 				res.status(500).type('json')
-					.json({error: err});
+					.json({error: 'Unexpected server error.'});
 					
 				return
 			}
@@ -34,19 +27,18 @@ if (!req.session.uid) {
 				updated_at: user.updated_at
 			};
 	
-			if (/*true || */Number(req.params.timestamp) !== user.updated_at.getTime() ) {
+			if ( Number(req.params.timestamp) !== user.updated_at.getTime() ) {
 				out.newOrders = user.newOrders;
 				out.newTrips = user.newTrips;
 				out.newMessages = user.newMessages;
 				out.newPrivMessages = user.newPrivMessages;
 			}
-/*console.dir(out)*/
+
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
-console.log('needEmailNotification false save');
+
 				user.save(function(err, user) {
-					//log errors
-console.log('needEmailNotification false save done');
+					//log errors without return!!!
 					
 					out.updated_at = user.updated_at;
 					
@@ -60,12 +52,7 @@ console.log('needEmailNotification false save done');
 		});
 });
 
-router.get('/logout', passwordless.logout(), function(req, res) {
-	/*delete req.session.uid;
-	delete req.session.name;
-	delete req.session.email;
-	*/
-	
+router.get('/logout', mdlwares.restricted, passwordless.logout(), function(req, res) {
 	res.locals.user = {};
 	
 	req.session.destroy(function(err) {
@@ -90,9 +77,8 @@ function proceedEmail(callback) {
 			email: req.body.email.toLowerCase()
 		}).select('email').exec(function(err, user) {
 			if (err) {
-				res.status(500)
-					.type('json')
-					.json({error: err});
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return
 			}
@@ -102,8 +88,7 @@ function proceedEmail(callback) {
 	}
 }
 
-/* POST login details. */
-router.post('/signup', function(req, res, next) {
+router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
 	req.body.username = req.body.name.trim();
 	
 	if ( !/^[a-z0-9-_ ]+$/i.test(req.body.username) ) {
@@ -118,7 +103,8 @@ router.post('/signup', function(req, res, next) {
 	}).select('name').exec(function(err, user) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Username is occupied.'});
+				// .json({error: err});
 				
 			return
 		}
@@ -146,7 +132,7 @@ router.post('/signup', function(req, res, next) {
 		user.save(function(err, user) {
 			if (err) {
 				res.status(500).type('json')
-					.json({error: err});
+					.json({error: 'Unexpected server error.'});
 					
 				return
 			}
@@ -162,15 +148,6 @@ router.post('/signup', function(req, res, next) {
 	userField: 'email'
  }), deliveryToken);
 
-function loggedInAlready(req, res, next) {
-	if (req.session.passwordless) {
-		res.type('json')
-			.json({message: 'Logged in already.'});
-	} else {
-		next();
-	}
-}
-
 function deliveryToken(req, res, next) {
 	if (!req || !req.passwordless || !req.passwordless.tokenToSend || !req.passwordless.uidToSend || !req.passwordless.recipient) {
 		res.status(500).type('json')
@@ -180,10 +157,6 @@ function deliveryToken(req, res, next) {
 	}
 	
 	var link = config.host + 'users/logged_in?token=' + req.passwordless.tokenToSend + '&uid=' + encodeURIComponent(req.passwordless.uidToSend);
-	/*
-console.log('link = ', link);
-	callback();
-	return;*/
 	
 	var email = new sendgrid.Email();
 	
@@ -192,9 +165,6 @@ console.log('link = ', link);
 	email.from = config.email;
 	email.text = 'Hello! \n You can now access your account here: ' + link + '\n Team of OsLiKi.Net';
 	email.html = '<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team of OsLiKi.Net</p>';
-
-res.status(500).type('json').json({error: email.html});
-return
 
 	sendgrid.send(email, function(err, json) {
 		if (err) {
@@ -208,23 +178,22 @@ return
 	});
 }
 
-/* POST login details. */
 router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res, next) {
 	if (user) {
 		req.userId = user.id;
+		
 		next();
 	} else {
 		res.status(400).type('json')
 			.json({error: 'Email not found.'});
 	}
 }), function(req, res, next) {
-
 	Token.findOne({
 		uid: req.userId
 	}, 'ttl', function(err, token) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return
 		}
@@ -239,8 +208,7 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 		var lastTokenTime = ( now - token.ttl.getTime() + config.passwordless.ttl );
 		
 		if (lastTokenTime < 1000 * 30) {
-			res.status(429) //429 Too Many Requests
-				.type('json')
+			res.status(429).type('json') //429 Too Many Requests
 				.json({error: 'We have already sent you a link to access. The new token can be sent only after 30 seconds.'});
 		} else {
 			next();
@@ -269,13 +237,15 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 
 		User.findById(req.session.passwordless).select('name email is_approved gravatar_hash').exec(function(err, user) {
 			if (err) {
-				res.status(500).type('text').send('Unexpected server error.');
+				res.status(500).type('text')
+					.send('Unexpected server error.');
 				
 				return
 			}
 			
 			if (!user) {
-				res.status(500).type('text').send('User not found.');
+				res.status(500).type('text')
+					.send('User not found.');
 				
 				return;
 			}
@@ -297,7 +267,7 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 				}).select('user').exec(function(err, subscribes) {
 					if (err) {
 						//log
-						console.dir(err);
+						
 						return;
 					}
 					
@@ -307,7 +277,7 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 							subscribe.save(function(err, subscribe) {
 								if (err) {
 									//log
-									console.dir(err);
+									
 									return;
 								}
 							});
@@ -325,11 +295,11 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 	}
 });
 
-router.post('/update', function(req, res, next) {
+router.post('/update', mdlwares.restricted, function(req, res, next) {
 	User.findById(req.session.uid).exec(function(err, user) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return;
 		}
@@ -345,9 +315,8 @@ router.post('/update', function(req, res, next) {
 		
 		user.save(function(err, user) {
 			if (err) {
-				res.status(err.name === 'ValidationError' ? 400 : 500);
-				
-				res.type('json').json({error: err});
+				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -358,25 +327,17 @@ router.post('/update', function(req, res, next) {
 	});
 });
 
-function getUser(req, res, next) {
-	if (!req.xhr) {
-		res.render('index');
+router.get('/login', mdlwares.renderIndexUnlessXhr);
 
-		return;
-	}
-if (!req.session.uid) {
-	res.status(401)
-			.type('json')
-			.json({error: 'Unauthorized'});
-			return;
-}
-	
+router.get('/join', mdlwares.renderIndexUnlessXhr);
+
+function getUser(req, res, next) {
 	User.findById(req.params.id || req.session.uid)
 		.select('created_at name gravatar_hash about stats')
 		.exec(function(err, user) {
 			if (err) {
 				res.status(500).type('json')
-					.json({error: err});
+					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
@@ -386,16 +347,8 @@ if (!req.session.uid) {
 		});	
 }
 
-router.get('/login', function(req, res, next) {
-	res.render('index');
-});
+router.get('/my', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, getUser);
 
-router.get('/join', function(req, res, next) {
-	res.render('index');
-});
-
-router.get('/my', getUser);
-
-router.get('/:id', getUser);
+router.get('/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, getUser);
 
 module.exports = router;

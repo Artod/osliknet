@@ -1,144 +1,146 @@
-
-<div class="page-header">
-	<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
-</div>
-<p *ngIf="!_inited">Loading...</p>
-
-<div *ngIf="user && user._id" class="row">
-	<div class="col-sm-3 col-xs-12">	
-		<p>
-			<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=200" alt="{{ user.name }}" width="100%" />
-		</p>
-		<p>
-			<span class="text-muted">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
-		</p>
-		<p *ngIf="configUser.id === user._id">
-			<a href="https://gravatar.com" target="_blank">Change Gravatar</a>
-		</p>
-		
-		<p *ngIf="configUser.id !== user._id">
-			<span class="glyphicon glyphicon-envelope"></span>
-			<a [routerLink]="['Messages', {id: user._id}]"> Send a message</a>
-		</p>
-		
-		<p *ngIf="configUser.id === user._id">
-			<span class="glyphicon glyphicon-envelope"></span>
-			<a [routerLink]="['Dialogs']"> My Dialogs</a>
-		</p>
-
+<div class="container">
+	<div class="page-header">
+		<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
 	</div>
-	<div class="col-sm-9 col-xs-12">
+	
+	<p *ngIf="!_inited">Loading...</p>
 
-		<div *ngIf="user.stats">
-			<h4>Statistic:</h4>
+	<div *ngIf="user && user._id" class="row">
+		<div class="col-sm-3 col-xs-12">	
+			<p>
+				<img src="http://gravatar.com/avatar/{{ user.gravatar_hash }}?d=monsterid&s=200" alt="{{ user.name }}" width="100%" />
+			</p>
+			<p>
+				<span class="text-muted">Joined: {{ user.created_at | toDate | date: 'longDate' }}</span>
+			</p>
+			<p *ngIf="configUser.id === user._id">
+				<a href="https://gravatar.com" target="_blank">Change Gravatar</a>
+			</p>
+			
+			<p *ngIf="configUser.id !== user._id">
+				<span class="glyphicon glyphicon-envelope"></span>
+				<a [routerLink]="['Messages', {id: user._id}]"> Send a message</a>
+			</p>
+			
+			<p *ngIf="configUser.id === user._id">
+				<span class="glyphicon glyphicon-envelope"></span>
+				<a [routerLink]="['Dialogs']"> My Dialogs</a>
+			</p>
 
+		</div>
+		<div class="col-sm-9 col-xs-12">
+
+			<div *ngIf="user.stats">
+				<h4>Statistic:</h4>
+
+				<table class="table">
+					<tr>
+						<th colspan="2">As a traveler:</th>
+					</tr>
+					<tr>
+						<td>Trips</td>
+						<td>{{ user.stats.t_cnt }}</td>
+					</tr>
+					<tr>
+						<td>Requests on delivery</td>
+						<td>{{ user.stats.t_order }}</td>
+					</tr>
+					<tr>
+						<td>Processed requests</td>
+						<td>{{ user.stats.t_proc }}</td>
+					</tr>
+					<tr>
+						<td>Rating</td>
+						<td>
+							 {{tRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{tRating[0]}} rates</small>
+						</td>
+					</tr>
+
+					<tr>
+						<th colspan="2">As a customer:</th>
+					</tr>
+					<tr>
+						<td>Requests on delivery</td>
+						<td>{{ user.stats.r_cnt }}</td>
+					</tr>
+					<tr>
+						<td>Processed requests</td>
+						<td>{{ user.stats.r_proc }}</td>
+					</tr>
+					<tr>
+						<td>Rating</td>
+						<td>
+							{{rRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{rRating[0]}} rates</small>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		<div class="col-xs-12">
+			<h3 *ngIf="user && user._id && (user.about || configUser.id === user._id)">About me</h3>
+			
+			<p *ngIf="!editMode" class="pre-wrap">{{ user.about }}</p>
+			
+			<form *ngIf="editMode" action="/users/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
+				<div class="form-group">				
+					<textarea class="form-control" name="about" [(ngModel)]="formModel.about" [ngFormControl]="form.controls.about"  maxlength="2000" placeholder="About me"></textarea>
+				</div>
+				
+				<p class="text-right">
+					<button class="btn btn-warning btn-lg" type="submit" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Update' }}</button>
+					<button class="btn btn-default btn-lg" type="submit" (click)="editMode = false" [disabled]="_busy">Cancel</button>
+				</p>
+			</form>
+			
+			<p *ngIf="!editMode && configUser.id === user._id" class="text-right">
+				<button class="btn btn-default btn-lg" (click)="editMode = true">Edit</button>
+			</p>
+		
+			<h3>Reviews</h3>
+			
+			<p *ngIf="reviews && !reviews.length">There are no reviews yet.</p>
+			
+			<!-- <div class="row" *ngFor="#review of reviews">
+				<div class="col-xs-12">
+				
+
+					
+				</div>
+			</div> -->
+			
 			<table class="table">
-				<tr>
-					<th colspan="2">As a traveler:</th>
-				</tr>
-				<tr>
-					<td>Trips</td>
-					<td>{{ user.stats.t_cnt }}</td>
-				</tr>
-				<tr>
-					<td>Requests on delivery</td>
-					<td>{{ user.stats.t_order }}</td>
-				</tr>
-				<tr>
-					<td>Processed requests</td>
-					<td>{{ user.stats.t_proc }}</td>
-				</tr>
-				<tr>
-					<td>Rating</td>
+				<tr *ngFor="#review of reviews">
 					<td>
-						 {{tRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{tRating[0]}} rates</small>
-					</td>
-				</tr>
+						<span *ngFor="#rating of _ratings" class="star glyphicon glyphicon-star{{ review.rating >= rating ? '' : '-empty' }}"></span>
+						
+						<p>
+							<user-card [user]="review.user"></user-card>
+							
+							<strong *ngIf="user._id === review.user._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>
+							
+							about 
+							 
+							<user-card [user]="review.corr"></user-card>
+							
+							<strong *ngIf="user._id === review.corr._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>						
+						</p>
+						
+						
+						<span class="text-muted">{{ review.created_at | toDate | date: 'longDate' }}</span>			
 
-				<tr>
-					<th colspan="2">As a customer:</th>
-				</tr>
-				<tr>
-					<td>Requests on delivery</td>
-					<td>{{ user.stats.r_cnt }}</td>
-				</tr>
-				<tr>
-					<td>Processed requests</td>
-					<td>{{ user.stats.r_proc }}</td>
-				</tr>
-				<tr>
-					<td>Rating</td>
-					<td>
-						{{rRating[1]}} <span class="star glyphicon glyphicon-star"></span> <small>from {{rRating[0]}} rates</small>
+						<p class="pre-wrap">{{ review.comment }}</p>
+						
+						<p *ngIf="configUser.id === user._id">
+							<a [routerLink]="['Order', {id: review.order}]"> Go to the order</a>
+						</p>
 					</td>
 				</tr>
 			</table>
-		</div>
-	</div>
-	
-	<div class="col-xs-12">
-		<h3 *ngIf="user && user._id && (user.about || configUser.id === user._id)">About me</h3>
-		
-		<p *ngIf="!editMode" class="pre-wrap">{{ user.about }}</p>
-		
-		<form *ngIf="editMode" action="/users/edit" method="post" [ngFormModel]="form" (submit)="onSubmit()">
-			<div class="form-group">				
-				<textarea class="form-control" name="about" [(ngModel)]="formModel.about" [ngFormControl]="form.controls.about"  maxlength="2000" placeholder="About me"></textarea>
-			</div>
 			
-			<p class="text-right">
-				<button class="btn btn-warning btn-lg" type="submit" [disabled]="_busy">{{ _busy ? 'Wait...' : 'Update' }}</button>
-				<button class="btn btn-default btn-lg" type="submit" (click)="editMode = false" [disabled]="_busy">Cancel</button>
+			<p *ngIf="_inited && !fullPage" class="text-center">
+				<button class="btn btn-default btn-lg" (click)="_busyPaging ? false : loadNext()">{{ _busyPaging ? 'Wait...' : 'Load more' }}</button>
 			</p>
-		</form>
-		
-		<p *ngIf="!editMode && configUser.id === user._id" class="text-right">
-			<button class="btn btn-default btn-lg" (click)="editMode = true">Edit</button>
-		</p>
-	
-		<h3>Reviews</h3>
-		
-		<p *ngIf="reviews && !reviews.length">There are no reviews yet.</p>
-		
-		<!-- <div class="row" *ngFor="#review of reviews">
-			<div class="col-xs-12">
-			
-
-				
-			</div>
-		</div> -->
-		
-		<table class="table">
-			<tr *ngFor="#review of reviews">
-				<td>
-					<span *ngFor="#rating of _ratings" class="star glyphicon glyphicon-star{{ review.rating >= rating ? '' : '-empty' }}"></span>
-					
-					<p>
-						<user-card [user]="review.user"></user-card>
-						
-						<strong *ngIf="user._id === review.user._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>
-						
-						about 
-						 
-						<user-card [user]="review.corr"></user-card>
-						
-						<strong *ngIf="user._id === review.corr._id"> ({{ review.isUserTripper ? 'traveler' : 'customer' }}) </strong>						
-					</p>
-					
-					
-					<span class="text-muted">{{ review.created_at | toDate | date: 'longDate' }}</span>			
-
-					<p class="pre-wrap">{{ review.comment }}</p>
-					
-					<p *ngIf="configUser.id === user._id">
-						<a [routerLink]="['Order', {id: review.order}]"> Go to the order</a>
-					</p>
-				</td>
-			</tr>
-		</table>
-		
-		<p *ngIf="_inited && !fullPage" class="text-center">
-			<button class="btn btn-default btn-lg" (click)="_busyPaging ? false : loadNext()">{{ _busyPaging ? 'Wait...' : 'Load more' }}</button>
-		</p>
+		</div>
 	</div>
 </div>
