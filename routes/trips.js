@@ -11,6 +11,16 @@ var Subscribe = require('../models/subscribe');
 var config = require('../config');
 var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/trips.log'
+		})
+    ],
+	exitOnError: false
+});
+
 router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	var query = {};
 	
@@ -44,8 +54,9 @@ router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
 	Trip.find(query).sort('-_id').limit(limit).populate('user').exec(function(err, trips) {
 		if (err) {
+			logger.error(err, {line: 57});
+			
 			res.status(500).type('json')
-				// .json({error: err});
 				.json({error: 'Unexpected server error.'});
 				
 			return;
@@ -59,8 +70,9 @@ router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 				user: req.session.uid
 			}).select('_id').exec(function(err, subscribe) {
 				if (err) {
+					logger.error(err, {line: 74});
+					
 					res.status(500).type('json')
-						// .json({error: err});
 						.json({error: 'Unexpected server error.'});
 						
 					return;
@@ -97,9 +109,10 @@ router.get('/my', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(r
 		user: req.session.uid
 	}).sort('-_id').skip(page * limit).limit(limit).exec(function(err, trips) {
 		if (err) {
+			logger.error(err, req.session, {line: 112});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
-				// .json({error: err});
 				
 			return;
 		}
@@ -112,6 +125,8 @@ router.get('/my', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(r
 			trip: {$in: tids}
 		}).sort('status -created_at').populate('user').exec(function(err, orders) {
 			if (err) {
+				logger.error(err, {line: 129});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					// .json({error: err});
@@ -145,9 +160,9 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 	
 	trip.save(function(err, trip) {
 		if (err) {
-			res.status(err.name === 'ValidationError' ? 400 : 500)
-			res.type('json')
-				// .json({error: err});
+			logger.error(err, {line: 164});
+			
+			res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
 			return;
@@ -155,7 +170,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		
 		Trip.find({user: trip.user}).count().exec(function(err, count) {
 			if (err) {
-				//log
+				logger.error(err, {line: 174});
 					
 				return;
 			}
@@ -169,7 +184,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			is_unsubed: false
 		}).select('+email').exec(function(err, subscribes) {
 			if (err) {
-				//log
+				logger.error(err, {line: 188});
 					
 				return;
 			}
@@ -195,8 +210,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 
 					sendgrid.send(email, function(err, json) {
 						if (err) {
-							console.log(err);
-							//log
+							logger.error(err, {line: 214});
 						}
 					});
 				}
@@ -210,8 +224,9 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 router.post('/update', mdlwares.restricted, function(req, res, next) {
 	Trip.findById(req.body.id).exec(function(err, trip) {
 		if (err) {
+			logger.error(err, {line: 228});
+			
 			res.status(500).type('json')
-				// .json({error: err});
 				.json({error: 'Unexpected server error.'});
 				
 			return;
@@ -234,8 +249,10 @@ router.post('/update', mdlwares.restricted, function(req, res, next) {
 		
 		trip.save(function(err, trip) {
 			if (err) {
-				res.status(err.name === 'ValidationError' ? 400 : 500);				
-				res.type('json').json({error: err});
+				logger.error(err, {line: 253});
+				
+				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+					.json({error: err});
 					
 				return;
 			}
@@ -250,8 +267,9 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
 	Trip.findById(req.params.id).populate('user').exec(function(err, trip) {
 		if (err) {
+			logger.error(err, {line: 271});
+			
 			res.status(500).type('json')
-				// .json({error: err});
 				.json({error: 'Unexpected server error.'});
 				
 			return
@@ -274,8 +292,9 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 				tripUser: req.session.uid
 			}).sort('status -created_at').populate('user').exec(function(err, orders) {
 				if (err) {
+					logger.error(err, {line: 297});
+					
 					res.status(500).type('json')
-						// .json({error: err});
 						.json({error: 'Unexpected server error.'});
 						
 					return
@@ -294,8 +313,9 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 				user: req.session.uid
 			}).select('_id').exec(function(err, subscribe) {
 				if (err) {
+					logger.error(err, {line: 318});
+					
 					res.status(500).type('json')
-						// .json({error: err});
 						.json({error: 'Unexpected server error.'});
 						
 					return;

@@ -1,4 +1,5 @@
 var captcha = require('../libs/captcha');
+var jade = require('jade');
 
 module.exports.checkCaptcha = function(req, res, next) {
 	if (req.session.uid) {
@@ -31,6 +32,9 @@ module.exports.restricted = function(req, res, next) {
 	}
 };
 
+var templatePath = require.resolve('../views/index.jade');
+var indexCompiled = jade.compileFile(templatePath, {cache: true});
+
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
 	if (req.xhr) {
 		next();
@@ -38,5 +42,8 @@ module.exports.renderIndexUnlessXhr = function(req, res, next) {
 		return;
 	}
 	
-	res.render('index');
+	// res.render('index');
+	
+    res.write( indexCompiled(res.locals) );
+    res.end();
 };

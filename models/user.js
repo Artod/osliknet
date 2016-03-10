@@ -4,6 +4,16 @@ var mongoose = require('mongoose');
 var config = require('../config');
 var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/user.log'
+		})
+    ],
+	exitOnError: false
+});
+
 function emailValidator(email) {
     var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return re.test(email);
@@ -123,7 +133,8 @@ schema.pre('save', function(next) {
 schema.statics.stats = function(uid, param, val, oldVal) {
 	this.findById(uid).select('stats.' + param).exec(function(err, user) {
 		if (err || !user) {
-			//log
+			logger.error(err, uid, param, val, oldVal, {line: 136});
+			
 			return;
 		}
 
@@ -140,28 +151,32 @@ schema.statics.stats = function(uid, param, val, oldVal) {
 		} else {
 			user.stats[param] = user.stats[param] + val;			
 		}*/
-		
-		
-console.log('after user.stats[param]')
-console.dir(user.stats[param])
 
 		user.stats[param] = val;		
 		user.markModified('stats.' + param);
 		user.save(function(err, user) {
-			//log
-console.log('savesavesavesavesavesavesavesave')
-console.dir(user._doc)
+			if (err) {
+				logger.error(err, uid, param, val, oldVal, {line: 159});
+			}
 		});
 	});
 };
 
 schema.statics.setUnreaded = function(field, uid, id) {
 	this.findById(uid).select(field + ' needEmailNotification').exec(function(err, user) {
+		if (err) {
+			logger.error(err, field, uid, id, {line: 168});
+			
+			return;
+		}
+			
 		user[field].push(id);
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
-			//log errors
+			if (err) {
+				logger.error(err, field, uid, id, {line: 172});
+			}
 		});
 	});
 };
@@ -169,16 +184,14 @@ schema.statics.setUnreaded = function(field, uid, id) {
 schema.statics.setReaded = function(field, uid, id) {
 	this.findById(uid).select(field + ' needEmailNotification').exec(function(err, user) {
 		if (err) {
-			//log errors
-			// cb && cb(err, user);
+			logger.error(err, field, uid, id, {line: 181});
+			
 			return;
 		}
 		
 		var indexOf = user[field].indexOf(id); // if length == 0 or undefined id then -1 
 		
-		if (indexOf === -1 && !user.needEmailNotification) {
-			//cb && cb(err, user);
-			
+		if (indexOf === -1 && !user.needEmailNotification) {		
 			return;
 		}		
 		
@@ -193,8 +206,9 @@ schema.statics.setReaded = function(field, uid, id) {
 		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
-			//log errors
-			//cb && cb(err, user);
+			if (err) {
+				logger.error(err, field, uid, id, {line: 210});
+			}
 		});
 	});
 };
@@ -210,10 +224,13 @@ var changeCount = function(obj, setZero, lid) {
 	return [++count, lid];
 };
 
-schema.statics.setMessagesUnreaded = function(uid, oid, lid, cb) {
+schema.statics.setMessagesUnreaded = function(uid, oid, lid) {
 	this.findById(uid).select('newMessages needEmailNotification').exec(function(err, user) {	
-		//user.newMessages[oid] = user.newMessages[oid] || 0;
-		//user.newMessages[oid]++;		
+		if (err) {
+			logger.error(err, uid, oid, lid, {line: 230});
+			
+			return;
+		}	
 		
 		user.newMessages[oid] = changeCount(user.newMessages[oid], false, lid);
 		
@@ -222,40 +239,30 @@ schema.statics.setMessagesUnreaded = function(uid, oid, lid, cb) {
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
-			//log errors
-			cb && cb(err, user);
+			if (err) {
+				logger.error(err, uid, oid, lid, {line: 243});
+			}
 		});
 	});
 };
 
-schema.statics.setMessagesReaded = function(uid, oid, cb) {
+schema.statics.setMessagesReaded = function(uid, oid) {
 	this.findById(uid).select('newMessages newOrders needEmailNotification').exec(function(err, user) {
 		if (err) {
-			cb && cb(err, user);
+			logger.error(err, uid, oid, {line: 252});
+			
 			return;
-		}
+		}	
 
 		var indexOf = user.newOrders.indexOf(oid); // if length == 0 or undefined oid then -1 
-/*console.log('user.newMessages[oid]',user.newMessages[oid]);
-console.log('user.newMessages[oid][0]',user.newMessages[oid][0]);
-console.log('indexOf',indexOf);*/
+
 		if ( (!user.newMessages[oid] || !user.newMessages[oid][0]) && indexOf === -1 && !user.needEmailNotification ) {
-			cb && cb(err, user);
-console.log('cancelcancelcancelcancelcancelcancelcancelcancelcancel');
 			return;
 		}	
 
 		if (indexOf > -1) {
 			user.newOrders.splice(indexOf, 1);
 		}
-		
-	
-		
-		/*if (oid) {
-			// delete user.newMessages[oid];
-		} else {
-			user.newMessages = {};
-		}*/
 
 		user.newMessages[oid] = changeCount(user.newMessages[oid], true);
 		user.markModified('newMessages');
@@ -263,21 +270,22 @@ console.log('cancelcancelcancelcancelcancelcancelcancelcancelcancel');
 		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
-			//log errors
-			cb && cb(err, user);
+			if (err) {
+				logger.error(err, uid, oid, {line: 274});
+			}
 		});
 	});
 };
 
-schema.statics.setPrivMessagesUnreaded = function(uid, cid, lid, cb) {
+schema.statics.setPrivMessagesUnreaded = function(uid, cid, lid) {
 	if (uid === cid) {
-		cb && cb({error: 'Message to yourself'});
 		return;
 	}
 	
 	this.findById(uid).select('newPrivMessages needEmailNotification').exec(function(err, user) {
 		if (err) {
-			cb && cb(err, user);
+			logger.error(err, uid, cid, lid, {line: 287});
+			
 			return;
 		}
 		
@@ -290,22 +298,22 @@ schema.statics.setPrivMessagesUnreaded = function(uid, cid, lid, cb) {
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
-			//log errors
-			cb && cb(err, user);
+			if (err) {
+				logger.error(err, uid, cid, lid, {line: 302});
+			}
 		});
 	});
 };
 
-schema.statics.setPrivMessagesReaded = function(uid, cid, cb) {
+schema.statics.setPrivMessagesReaded = function(uid, cid) {
 	this.findById(uid).select('newPrivMessages needEmailNotification').exec(function(err, user) {
 		if (err) {
-			cb && cb(err, user);
+			logger.error(err, uid, cid, {line: 311});
+			
 			return;
 		}
 
-		if ( (!user.newPrivMessages[cid] || !user.newPrivMessages[cid][0]) && !user.needEmailNotification ) {
-			cb && cb(err, user);
-			
+		if ( (!user.newPrivMessages[cid] || !user.newPrivMessages[cid][0]) && !user.needEmailNotification ) {			
 			return;
 		}
 		
@@ -315,8 +323,9 @@ schema.statics.setPrivMessagesReaded = function(uid, cid, cb) {
 		user.needEmailNotification = false;
 
 		user.save(function(err, user) {
-			//log errors
-			cb && cb(err, user);
+			if (err) {
+				logger.error(err, uid, cid, {line: 327});
+			}
 		});
 	});
 };
@@ -336,6 +345,12 @@ setInterval(function() {
 		newTrips: 1,
 		needEmailNotification: 1
 	}).exec(function(err, users) {
+		if (err) {
+			logger.error(err, {line: 349});
+			
+			return;
+		}
+		
 		users.forEach(function(user) {
 			user.needEmailNotification = false;
 			
@@ -366,7 +381,9 @@ setInterval(function() {
 			user.markModified('newPrivMessages');
 			
 			user.save(function(err, user) {
-				//log errors
+				if (err) {
+					logger.error(err, {line: 385});
+				}
 			});
 			
 			if (newOrders.length || msgsInOrder.length) {
@@ -400,7 +417,7 @@ setInterval(function() {
 				
 				sendgrid.send(email, function(err, json) {
 					if (err) {
-						//log
+						logger.error(err, {line: 420});
 					}
 				});
 			}

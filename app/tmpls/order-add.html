@@ -2,11 +2,17 @@
 	<div *ngIf="!_checked">
 		Loading...
 	</div>
-
-	<div *ngIf="_checked && order && order._id">
+	
+	<div *ngIf="!(configUser && configUser.id)">
 		<div class="page-header">
 			<h2>Request for delivery</h2>
 		</div>
+		<p>
+			You are not authorized. <a [routerLink]="['Join']" (click)="closeModal()">Create An Account</a> or <a [routerLink]="['Login']" (click)="closeModal()">Log in</a> to an existing.
+		</p>
+	</div>
+
+	<div *ngIf="_checked && order && order._id">
 		<p>
 			<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</span>
 		</p>	
@@ -16,11 +22,11 @@
 		</p>
 		
 		<div class="text-right">
-			<a href="#" (click)="onClick()">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> </a>
+			<a [routerLink]="['Order', {id: order._id}]" (click)="closeModal()">Go to negotiation <span *ngIf="order.msg_cnt">({{ order.msg_cnt }})</span> </a>
 		</div>
 	</div>
 
-	<div *ngIf="_checked && (!order || !order._id)">
+	<div *ngIf="(configUser && configUser.id) && _checked && (!order || !order._id)">
 		<div class="page-header">
 			<h2>Add a Request for delivery</h2>
 		</div>

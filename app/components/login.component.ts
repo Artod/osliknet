@@ -1,12 +1,14 @@
 import {Component, ElementRef} from 'angular2/core';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FormBuilder, ControlGroup, Validators} from 'angular2/common'
 
+import {ROUTER_DIRECTIVES} from 'angular2/router';
+
 import {UserService} from '../services/user/user.service';
 
 @Component({
 	selector: 'login',
 	templateUrl: '/app/tmpls/login.html',
-	directives: [],
+	directives: [ROUTER_DIRECTIVES],
 	pipes: []
 })
 

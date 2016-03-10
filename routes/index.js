@@ -1,12 +1,11 @@
 var express = require('express');
 var router = express.Router();
 
+router.get('/', function(req, res, next) {
+	res.render('index');
+});
 
-var Trip = require('../models/trip');
-
-
-
-/* GET home page. */
+/*var Trip = require('../models/trip');
 router.get('/', function(req, res, next) {
 	
 	console.dir(req.cookies)
@@ -33,40 +32,6 @@ router.get('/', function(req, res, next) {
 	  // res.render('index', { title:trips[1].to + trips[0].from });
 	});
   
-});
-
-
-
-
-
-
-
+});*/
 
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

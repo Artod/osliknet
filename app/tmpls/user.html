@@ -1,4 +1,15 @@
-<div class="container">
+
+<div *ngIf="!(configUser && configUser.id)" class="container">
+	<div class="page-header">
+		<h2>User profile</h2>
+	</div>
+	
+	<p>
+		You are not authorized. <a [routerLink]="['Join']">Create An Account</a> or <a [routerLink]="['Login']">Log in</a> to an existing.
+	</p>	
+</div>
+	
+<div *ngIf="(configUser && configUser.id)" class="container">
 	<div class="page-header">
 		<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
 	</div>

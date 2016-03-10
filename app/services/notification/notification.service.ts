@@ -39,9 +39,9 @@ export class NotificationService {
 		this.stop();
 		
 		this._pollSub = Observable.timer(0, this.currentTimeout).switchMap( () => {
-			return this._http.get('/users/notifications/' + this.updated/*, {
+			return this._http.get('/users/notifications/' + this.updated, {
 				headers: this._headers
-			}*/);
+			});
 		} ).map( res => res.json() )./*catch(this._handleError).*/subscribe(res => {
 			var serverUpdated = new Date(res.updated_at).getTime();
 			

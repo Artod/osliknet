@@ -9,6 +9,15 @@ var Message = require('../models/message');
 var Order = require('../models/order');
 var User = require('../models/user');
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/orders.log'
+		})
+    ],
+	exitOnError: false
+});
 
 router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 
@@ -25,6 +34,8 @@ router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req
 		}]			
 	}).sort('status -created_at').skip(page * limit).limit(limit).populate('user tripUser trip').exec(function(err, orders) {
 		if (err) {
+			logger.error(err, {line: 37});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -60,6 +71,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		},                    
 	}, function(err, asyncRes){
 		if (err) {
+			logger.error(err, {line: 74});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -96,6 +109,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		
 		order.save(function(err, order) {
 			if (err) {
+				logger.error(err, {line: 112});
+				
 				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -108,7 +123,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 				user: order.user
 			}).count().exec(function(err, count) {
 				if (err) {
-					//log
+					logger.error(err, {line: 126});
+					
 					return;
 				}
 				
@@ -119,7 +135,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 				tripUser: order.tripUser
 			}).count().exec(function(err, count) {
 				if (err) {
-					//log
+					logger.error(err, {line: 138});
+					
 					return;
 				}
 
@@ -138,6 +155,8 @@ router.post('/status', mdlwares.restricted, function(req, res, next) {
 	
 	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 		if (err) {
+			logger.error(err, {line: 158});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -185,6 +204,8 @@ router.post('/status', mdlwares.restricted, function(req, res, next) {
 			order.status = newStatus;
 			order.save(function(err, order) {
 				if (err) {
+					logger.error(err, {line: 207});
+					
 					res.status(500).type('json')
 						.json({error: 'Unexpected server error.'});
 						
@@ -199,7 +220,9 @@ router.post('/status', mdlwares.restricted, function(req, res, next) {
 					corr: corr,
 					message: 'I changed the order status from ' + Order.stsInv[oldStatus] + ' to ' + Order.stsInv[newStatus] + '.'
 				}, function(err, message) {
-					if (err) { // log error							
+					if (err) {
+						logger.error(err, {line: 224});
+						
 						return;
 					}
 				});
@@ -210,7 +233,8 @@ router.post('/status', mdlwares.restricted, function(req, res, next) {
 						status: sts.FINISHED
 					}).count().exec(function(err, count) {
 						if (err) {
-							//log
+							logger.error(err, {line: 236});
+							
 							return;
 						}
 						
@@ -222,7 +246,8 @@ router.post('/status', mdlwares.restricted, function(req, res, next) {
 						status: sts.FINISHED
 					}).count().exec(function(err, count) {
 						if (err) {
-							//log
+							logger.error(err, {line: 249});
+							
 							return;
 						}
 						
@@ -279,6 +304,8 @@ router.get('/trip/:id', mdlwares.restricted, function(req, res, next) {
 		user: req.session.uid
 	}).exec(function(err, order) {
 		if (err) {
+			logger.error(err, {line: 307});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				

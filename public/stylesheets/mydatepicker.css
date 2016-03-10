@@ -14,14 +14,19 @@
     margin: 0;
 }*/
 
+.mydp {
+    position: relative;
+}
+
 .mydp .selector {
-    margin-top: 2px;
-    margin-left: -1px;
+    margin-top: 0px;
+    /*margin-left: -1px;*/
     position: absolute;
     max-width: 262px;
-    padding: 3px;
-    border-radius: 2px;
+    padding: 1px;
+    border-radius: 0px;
     background-color: #DDD;
+	right:0px;
     z-index: 100;
 }
 
@@ -119,7 +124,7 @@
 .mydp .caltable th,
 .mydp .caltable td {
     border-collapse: collapse;
-    color: #003366;
+    /*color: #003366;*/
     line-height: 1.1;
 }
 
@@ -130,14 +135,16 @@
 }
 
 .mydp .caltable th {
-    background-color: #DDD;
+   /*  background-color: #DDD; */
+    background-color: #F6F6F6;
+	
     font-size: 12px;
     vertical-align: middle;
 }
 
 .mydp .caltable td {
     cursor: pointer;
-    font-weight: bold;
+   /* font-weight: bold;*/
     height: 28px;
 }
 
@@ -156,28 +163,37 @@
 }
 
 .mydp .currmonth {
-    background-color: #F6F6F6;
+    /*background-color: #F6F6F6;*/
     font-weight: bold;
 }
 
 .mydp .currday div {
-    border: 1px solid #004198;
+    /* border: 1px solid #004198; */
+    border: 0px solid #bbb;
     border-radius: 50%;
 }
 
-.mydp .selectedday div {
-    border: 1px solid #004198;
-    background-color: #8EBFFF !important;
-    border-radius: 0;
+.mydp .selectedday {
+	border: 1px solid #bbb;
+    border-radius: 50%;
+   
 }
 
-.mydp .caltable tbody .currmonth:hover {
-    background-color: #6AD0EB;
+.mydp .caltable .currmonth:hover,
+.mydp .caltable .nextmonth:hover,
+.mydp .caltable .prevmonth:hover {
+    /* background-color: #ddd; */
+    background-color: #F6F6F6;
 }
 
-.mydp .caltable tbody .nextmonth:hover {
-    background-color: #6AD0EB;
+.mydp .caltable .disabled.currmonth:hover,
+.mydp .caltable .disabled.nextmonth:hover,
+.mydp .caltable .disabled.prevmonth:hover {
+    background-color: inherit;
+	cursor: inherit;
 }
+
+
 
 .mydp .selectmenu {
     height: 24px;
@@ -199,7 +215,7 @@
 .mydp .table td,
 .mydp .headertodaybtn,
 .mydp .caltable tbody {
-    border: 1px solid #AAA;
+    /*border: 1px solid #AAA;*/
 }
 
 .mydp .btnpicker,

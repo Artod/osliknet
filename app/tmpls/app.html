@@ -20,28 +20,31 @@
 			<li *ngIf="configUser && configUser.id">
 				<user-card [user]="configUser"></user-card>
 			</li>
-			<li *ngIf="configUser && configUser.id">
+			<li *ngIf="configUser && configUser.id" class="navbar-invtoggle">
 				<a href="/users/logout"><span class="glyphicon glyphicon-log-out"></span></a>
 			</li>
 		</ul>
 
 		<ul class="nav navbar-nav navbar-invtoggle">
-			<li><a [routerLink]="['Trips']">Trips</a></li>
-			<li><a [routerLink]="['TripAdd']">Add a Trip</a></li> 
-			<li><a [routerLink]="['TripsMy']">My Trips</a></li>
-			<li><a [routerLink]="['Orders']">Requests</a></li>
+			<li><a [routerLink]="['Trips']">Find Trips</a></li>
+			<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripAdd']">Add a Trip</a></li> 
+			<li *ngIf="!configUser || !configUser.id"><a [routerLink]="['Join']">Add a Trip</a></li> 
+			<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripsMy']">My Trips</a></li>
+			<li *ngIf="configUser && configUser.id"><a [routerLink]="['Orders']">Requests</a></li>
 		</ul>
 	</nav>
 </div>
 
 <ul class="nav navbar-nav navbar-invtoggle toggle-menu {{isVisible ? 'menu-opened' : ''}}" (click)="isVisible = !isVisible">
-	<li><a [routerLink]="['Trips']">Trips</a></li>
-	<li><a [routerLink]="['TripAdd']">Add a Trip</a></li>
-	<li><a [routerLink]="['TripsMy']">My Trips</a></li>
-	<li><a [routerLink]="['Orders']">Requests</a></li>
-</ul> 
-
-
+	<li><a [routerLink]="['Trips']">Find Trips</a></li>
+	<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripAdd']">Add a Trip</a></li> 
+	<li *ngIf="!configUser || !configUser.id"><a [routerLink]="['Join']">Add a Trip</a></li> 
+	<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripsMy']">My Trips</a></li>
+	<li *ngIf="configUser && configUser.id"><a [routerLink]="['Orders']">Requests</a></li>
+	<li *ngIf="configUser && configUser.id">
+		<a href="/users/logout" (click)="$event.stopPropagation()"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
+	</li>
+</ul>
 
 <router-outlet></router-outlet>
 

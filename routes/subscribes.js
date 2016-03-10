@@ -6,10 +6,21 @@ var mdlwares = require('../libs/mdlwares');
 var Trip = require('../models/trip');
 var Subscribe = require('../models/subscribe');
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/subscribes.log'
+		})
+    ],
+	exitOnError: false
+});	
 
 router.get('/cancel/:id', function(req, res, next) {
 	Subscribe.findById(req.params.id).exec(function(err, subscribe) {
 		if (err) {
+			logger.error(err, {line: 22});
+			
 			res.status(500).type('text').send('Unexpected server error.');
 				
 			return;
@@ -19,6 +30,8 @@ router.get('/cancel/:id', function(req, res, next) {
 		
 		subscribe.save(function(err, subscribe) {
 			if (err) {
+				logger.error(err, {line: 33});
+				
 				res.status(500).type('text').send('Unexpected server error.');
 					
 				return;
@@ -44,6 +57,8 @@ router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 		email: req.body.email
 	}).exec(function(err, subscribe) {
 		if (err) {
+			logger.error(err, {line: 60});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -61,6 +76,8 @@ router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 				
 				subscribe.save(function(err, subscribe) {
 					if (err) {
+						logger.error(err, {line: 79});
+						
 						res.status(500).type('json')
 							.json({error: 'Unexpected server error.'});
 							
@@ -82,6 +99,8 @@ router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 			
 			subscribe.save(function(err, subscribe) {
 				if (err) {
+					logger.error(err, {line: 102});
+					
 					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 						.json({error: 'Unexpected server error.'});
 						

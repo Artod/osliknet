@@ -8,7 +8,7 @@
 	</p>
 
 	<form *ngIf="!success" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(name, email)" novalidate>
-		<div class="form-group {{!form.controls.name.pristine && !form.controls.name.valid ? 'has-error' : ''}}">
+		<div class="form-group {{form.controls.name.touched && !form.controls.name.valid ? 'has-error' : ''}}">
 			<label class="sr-only">Name</label>
 			
 			<input class="form-control input-lg" type="text" name="name" [(ngModel)]="model.name" [ngFormControl]="form.controls.name" placeholder="Name (latin letters only)" maxlength="50" #name />
@@ -22,7 +22,7 @@
 			</p>
 			
 		</div>
-		
+
 		<div class="form-group {{form.controls.email.touched && !form.controls.email.valid ? 'has-error' : ''}}">
 			<label class="sr-only">E-mail</label>
 
@@ -36,13 +36,18 @@
 		<div class="form-group text-right {{submitted && model.recaptcha === '' ? 'has-error' : ''}}">
 			<captcha [ctrl]="form.controls.recaptcha" [(model)]="model.recaptcha"></captcha>
 		</div>
-		
+		<div class="help-block text-right">
+			Already have an account? - <a [routerLink]="['Login']">Log in »</a>
+		</div>		
 		<div class="form-group text-right">
-			<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait..' : 'Log in' }}</button>
+			<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait..' : 'Sign up' }}</button>
 		</div>
 		
 		<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
 			{{ error }}
 		</div>
+		
+
+		
 	</form>
 </div>

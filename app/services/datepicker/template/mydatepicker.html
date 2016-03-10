@@ -1,7 +1,7 @@
 <div class="mydp">
 	<!-- [ngStyle]="{'height': height, 'width': width}" -->
 	<div class="input-group">
-		<input readonly class="form-control input-lg" type="text" value="{{selectionDayTxt}}" (focus)="openBtnClicked()" placeholder="Date" />
+		<input readonly class="form-control input-lg" type="text" value="{{selectionDayTxt}}" (focus)="showSelector ? false : openBtnClicked()" placeholder="Date" />
 		
 		<div class="input-group-btn">
 			<button type="button" class="btn btn-default input-lg" *ngIf="selectionDayTxt.length>0" (click)="removeBtnClicked()">
@@ -47,7 +47,7 @@
             <thead><tr><th *ngFor="#d of weekDays">{{d}}</th></tr></thead>
             <tbody>
                 <tr *ngFor="#w of dates">
-                    <td *ngFor="#d of w" [ngClass]="{'disabled': d.isOutOfRange, 'currmonth':d.cmo===CURR_MONTH, 'currday':d.currDay, 'selectedday':selectedDate.day===d.day && selectedDate.month===d.month && selectedDate.year===d.year && d.cmo===CURR_MONTH}" (click)="cellClicked(d)">
+                    <td *ngFor="#d of w"                      [ngClass]="{'disabled': d.isOutOfRange, 'prevmonth':d.cmo===PREV_MONTH,'currmonth':d.cmo===CURR_MONTH,'nextmonth':d.cmo===NEXT_MONTH, 'currday':d.currDay, 'selectedday':selectedDate.day===d.day && selectedDate.month===d.month && selectedDate.year===d.year && d.cmo===CURR_MONTH}" (click)="cellClicked(d)">
                         <div style="background-color:inherit" [ngClass]="{'prevmonth':d.cmo===PREV_MONTH,'currmonth':d.cmo===CURR_MONTH,'nextmonth':d.cmo===NEXT_MONTH,'sunday':d.sun && d.cmo===CURR_MONTH && sunHighlight}">{{d.day}}</div>
                     </td>
                 </tr>

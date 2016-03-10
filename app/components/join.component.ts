@@ -1,6 +1,8 @@
 import {Component, ElementRef} from 'angular2/core';
 import {FORM_DIRECTIVES, CORE_DIRECTIVES, FormBuilder, ControlGroup, Validators} from 'angular2/common'
 
+import {ROUTER_DIRECTIVES} from 'angular2/router';
+
 import {CaptchaComponent} from './captcha.component';
 
 import {UserService} from '../services/user/user.service';
@@ -8,7 +10,7 @@ import {UserService} from '../services/user/user.service';
 @Component({
 	selector: 'join',
 	templateUrl: '/app/tmpls/join.html',
-	directives: [CaptchaComponent],
+	directives: [ROUTER_DIRECTIVES, CaptchaComponent],
 	pipes: []
 })
 
@@ -44,15 +46,15 @@ export class JoinComponent {
 				}
 			])],
 			email: ['', Validators.compose([
+				Validators.required,
 				(ctrl) => {
 					
-					if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
+					if ( ctrl.value && !/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
 						return {invalidEmail: true};
 					}
 					
 					return null;
-				},
-				Validators.required]
+				}]
 			)],
 			recaptcha: ['', Validators.required]
 		});

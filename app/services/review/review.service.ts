@@ -25,7 +25,10 @@ export class ReviewService {
 		}).map( res => <any[]> res.json() );
 	}
 	
-	public get(limit, page) {		
+	public get(limit, page) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
 		let search : URLSearchParams = new URLSearchParams();
 		
 		if (limit)
@@ -35,7 +38,8 @@ export class ReviewService {
 			search.set('page', page);
 		
 		return this.http.get('/reviews', {
-			search: search
+			search: search,
+			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
 	

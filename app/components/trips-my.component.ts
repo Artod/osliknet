@@ -1,5 +1,5 @@
-import {Component, Inject, ApplicationRef, OnDestroy} from 'angular2/core';
-import {ROUTER_DIRECTIVES} from 'angular2/router';
+import {Component, Inject, Injector, ApplicationRef, OnDestroy} from 'angular2/core';
+import {ROUTER_DIRECTIVES, ComponentInstruction} from 'angular2/router';
 
 import {TripService} from '../services/trip/trip.service';
 import {NotificationService} from '../services/notification/notification.service';
@@ -31,6 +31,7 @@ export class TripsMyComponent implements OnDestroy {
 		private _appRef: ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus
 	) {
+		console.log('constructor');
 		/*this._tripService.getMy().subscribe(res => {	
 			this.trips = <any[]>res.trips || [];
 			
@@ -52,6 +53,11 @@ export class TripsMyComponent implements OnDestroy {
 			this.newMessages = data.newMessages || {};
 			this._appRef.tick();
 		});
+	}
+	
+	public routerOnActivate () : void {
+		console.log('routerOnActivate');
+		return false;
 	}
 	
 	public page : number = 0;
@@ -85,9 +91,7 @@ export class TripsMyComponent implements OnDestroy {
 			this._busy = false;
 			this._inited = true;
 		});
-	}
-		
-		
+	}	
 	
 	public ngOnDestroy() : void {
 		this._notifSub.unsubscribe();

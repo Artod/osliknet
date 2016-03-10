@@ -6,8 +6,12 @@
 	<p *ngIf="!_inited">Loading...</p>
 
 	<p *ngIf="_inited && trips && !trips.length">
-		<i>There are no trips yet. You can <a [routerLink]="['TripAdd']" href="#">Add a trip</a>.</i>
+		<i>There are no trips yet. You can <a [routerLink]="['TripAdd']">Add a trip</a>.</i>
 	</p>
+	
+<!--(configUser && configUser.id) &&  	<p *ngIf="_inited && !(configUser && configUser.id)">
+		You are not authorized. <a [routerLink]="['Join']">Create An Account</a> or <a [routerLink]="['Login']">Log in</a> to an existing.
+	</p> -->
 
 	<div class="row trips-my" *ngFor="#trip of trips">
 		<div class="col-lg-4 col-xs-12">

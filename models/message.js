@@ -2,6 +2,16 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 
 var User = require('./user');
+
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/message.log'
+		})
+    ],
+	exitOnError: false
+});
 	
 var schema = mongoose.Schema({
 	order: {
@@ -65,7 +75,7 @@ schema.statics.addToOrder = function(order, data, cb) {
 			order: message.order
 		}).count().exec(function(err, count) {
 			if (err) {
-				//log
+				logger.error(err, {line: 78});
 				
 				return;
 			}
@@ -74,7 +84,7 @@ schema.statics.addToOrder = function(order, data, cb) {
 
 			order.save(function(err, order) {
 				if (err) {
-					//log
+					logger.error(err, {line: 87});
 				}						
 			});
 		});

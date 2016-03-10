@@ -50,12 +50,22 @@ html
 				name: ''
 			};*/
 			
+			window.googleMaps = {
+				apiKey: 'AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ',
+				apiVersion: 3,
+				params: '&libraries=places&signed_in=true&language=en'
+			};
+			
 			window.googleRecaptcha = function() {
 				window.googleRecaptcha.loaded = true;
-			};			
+			};
+			
 			window.googleRecaptcha.key = '#{recaptcha.key}';
 			window.googleRecaptcha.loaded = false;
 
+			window.orderStatus = !{orderStatus};
+			window.orderStatusConst = !{orderStatusConst};
+			
 			System.config({
 				baseURL: '/',
 				// transpiler: 'typescript', 

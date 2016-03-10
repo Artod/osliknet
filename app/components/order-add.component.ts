@@ -32,7 +32,8 @@ export class OrderAddComponent {
 		private _router : Router,
 		private _location : Location,
 		@Inject(FormBuilder) private _fb : FormBuilder,
-		@Inject('trip') public trip
+		@Inject('trip') public trip,
+		@Inject('config.user') public configUser
 	) {
 		this.form = _fb.group({
 			trip: ['', Validators.required],
@@ -65,12 +66,12 @@ export class OrderAddComponent {
 		this._modalComponent && this._modalComponent.close();
 	}
 
-	public onClick() : boolean {
+	/*public onClick() : boolean {
 		this._router.navigate(['Order', {id: this.order._id}]);
 		this.closeModal();
 		
 		return false;
-	}
+	}*/
 	
 	private _busy = false;
 	public error : string = '';

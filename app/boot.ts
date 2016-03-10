@@ -4,6 +4,8 @@ import {APP_BASE_HREF, ROUTER_PROVIDERS} from 'angular2/router';
 import {provide} from 'angular2/core';
 import {Http} from 'angular2/http';
 
+// import {AuthService} from './services/auth/auth.service';
+
 import 'rxjs/Rx' 
 // import 'rxjs/add/operator/map';
 // import 'rxjs/add/operator/catch';
@@ -18,13 +20,9 @@ bootstrap(AppComponent, [
 	// HTTP_PROVIDERS,
 	Http,
 	// provide(window, {useValue: window}),
-	provide(window, {useValue: window}),
+	//provide(window, {useValue: window}),
 	provide(LazyMapsAPILoaderConfig, {useFactory: () => {
-		return {
-			apiKey: 'AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ',
-			apiVersion: 3,
-			params: '&libraries=places&signed_in=true&language=en'
-		};
+		return window.googleMaps;
 	}}),
 	provide('config.user', {useFactory: () => {
 		return window.user;
@@ -33,22 +31,26 @@ bootstrap(AppComponent, [
 		return window.googleRecaptcha;
 	}}),	
 	provide('config.orderStatus', {useFactory: () => {
-		return {
+		return window.orderStatus;
+		
+		/*return {
 			5: 'Negotiation',
 			10: 'Processing',			
 			15: 'Refused',
 			20: 'Cancelled',			
 			25: 'Finished'
-		};
+		};*/
 	}}),
 	provide('config.orderStatusConst', {useFactory: () => {
-		return {
+		return window.orderStatusConst;
+		
+		/*return {
 			NEGOTIATION: 5,
 			PROCESSING: 10,			
 			REFUSED: 15,
 			CANCELLED: 20,			
 			FINISHED: 25
-		};
+		};*/
 	}}),
 	LazyMapsAPILoader
 ]);

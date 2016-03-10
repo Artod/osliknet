@@ -1,4 +1,4 @@
-import {Component, Input} from 'angular2/core';
+import {Component, Input, Inject} from 'angular2/core';
 import {ROUTER_DIRECTIVES} from 'angular2/router';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
@@ -14,9 +14,8 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 export class UserCardComponent {
 	@Input() user: any;
 	
-	
 	constructor(
-		
+		@Inject('config.user') public configUser
 	) {
 		
 	}

@@ -88,7 +88,8 @@ export class TripService {
 	public update(data) {		
 		let headers = new Headers();
 		headers.append('Content-Type', 'application/json');
-	
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+		
 		return this.http.post('/trips/update', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );

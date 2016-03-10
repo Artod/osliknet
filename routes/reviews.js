@@ -9,6 +9,15 @@ var User = require('../models/user');
 var Message = require('../models/message');
 var Review = require('../models/review');
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/reviews.log'
+		})
+    ],
+	exitOnError: false
+});
 
 router.get('/', mdlwares.restricted, function(req, res, next) {
 	var limit = Number(req.query.limit);	
@@ -24,6 +33,8 @@ router.get('/', mdlwares.restricted, function(req, res, next) {
 		}]
 	}).sort('-_id').skip(page * limit).limit(limit).populate('user corr').exec(function(err, reviews) {
 		if (err) {
+			logger.error(err, {line: 36});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -38,6 +49,8 @@ router.get('/', mdlwares.restricted, function(req, res, next) {
 router.post('/add', mdlwares.restricted, function(req, res, next) {
 	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 		if (err) {
+			logger.error(err, {line: 52});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -65,6 +78,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			user: req.session.uid
 		}).exec(function(err, review) {
 			if (err) {
+				logger.error(err, {line: 81});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -87,6 +102,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			
 			review.save(function(err, review) {
 				if (err) {
+					logger.error(err, {line: 105});
+					
 					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 						.json({error: 'Unexpected server error.'});
 						
@@ -99,7 +116,9 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					corr: review.corr,
 					message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' review.'
 				}, function(err, message) {
-					if (err) {// log error							
+					if (err) {
+						logger.error(err, {line: 120});
+						
 						return;
 					}
 				});
@@ -132,9 +151,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 						totalRating: { $sum: "$rating" }*/
 					}
 				}]).exec(function(err, docs) {
-
 					if (err) {
-						//log
+						logger.error(err, {line: 155});
 							
 						return;
 					}
@@ -162,6 +180,8 @@ router.get('/order/:order_id', mdlwares.restricted, function(req, res, next) {
 		user: req.session.uid
 	}).exec(function(err, review) {
 		if (err) {
+			logger.error(err, {line: 183});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				

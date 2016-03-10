@@ -42,15 +42,17 @@ TODO:
 ?- not found error on query
 
 
-- angular beforeRouterFilter
-- ссылка на join в логине
-- request for delivery for unauth users
+\/- angular beforeRouterFilter
+\/- ссылка на join в логине
+\/- request for delivery for unauth users
 
-- Logging errors
+\/- Logging errors
+\/- prerender index
+\/- Calendar css
 
 
-- Calendar css
 - Index page
+
 
 
 - assembling gulp
@@ -99,7 +101,16 @@ TODO:
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var morgan = require('morgan');
+var winston = require('winston');
+ 
+winston.handleExceptions(new winston.transports.File({
+	filename: 'logs/exceptions.log',
+	handleExceptions: true,
+	humanReadableUnhandledException: true,
+	exitOnError: false
+}));
+  
 var cookieParser = require('cookie-parser');
 
 var session = require('express-session');
@@ -117,6 +128,8 @@ var subscribes = require('./routes/subscribes');
 
 var config = require('./config');
 
+
+
 var app = express();
 
 var mongoose = require('mongoose');
@@ -132,7 +145,8 @@ db.once('open', function(callback) {
   // yay!
 });
 
-app.set('env', 'production')
+// app.set('env', 'production')
+app.set('env', 'development')
 
 
 
@@ -234,7 +248,9 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+if (app.get('env') === 'development') {
+	app.use( morgan('dev') );
+}
 app.use(bodyParser.json());
 /* !!!!!extended */app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -298,8 +314,8 @@ app.use(function (req, res, next) {
 			name: req.session.name,
 			gravatar_hash: req.session.gravatar_hash
 		},
-		orderStatus: Order.stsInv,
-		orderStatusConst: Order.sts,
+		orderStatus: JSON.stringify(Order.stsInv),
+		orderStatusConst: JSON.stringify(Order.sts),
 		recaptcha: config.recaptcha
 	};
 

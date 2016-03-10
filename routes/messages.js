@@ -9,6 +9,15 @@ var Message = require('../models/message');
 var Order = require('../models/order');
 var User = require('../models/user');
 
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/messages.log'
+		})
+    ],
+	exitOnError: false
+});
 
 router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 	
@@ -21,6 +30,8 @@ router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req
 		}]
 	}).distinct('user').distinct('corr').exec(function(err, users) {
 		if (err) {
+			logger.error(err, {line: 33});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				// .json({error: err});
@@ -36,6 +47,8 @@ router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req
 			_id: {$in: users}
 		}).exec(function(err, users) {
 			if (err) {
+				logger.error(err, {line: 50});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					// .json({error: err});
@@ -53,6 +66,8 @@ router.get('/last/:lastId/order/:orderId', mdlwares.restricted, function(req, re
 	// ? populate vs paralell
 	Order.findById(req.params.orderId)./*populate('trip').*/exec(function(err, order) {			
 		if (err) {
+			logger.error(err, {line: 69});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				// .json({error: err});
@@ -86,6 +101,8 @@ router.get('/last/:lastId/order/:orderId', mdlwares.restricted, function(req, re
 			},                    
 		}, function(err, asyncRes) {
 			if (err) {
+				logger.error(err, {line: 104});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					// .json({error: err});
@@ -119,6 +136,8 @@ router.get('/last/:lastId/user/:corrId', mdlwares.restricted, function(req, res,
 	
 	User.findById(req.params.corrId).exec(function(err, user) {
 		if (err) {
+			logger.error(err, {line: 139});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -148,6 +167,8 @@ router.get('/last/:lastId/user/:corrId', mdlwares.restricted, function(req, res,
 
 		Message.find(conds).populate('user').sort('created_at').exec(function(err, messages) {			
 			if (err) {
+				logger.error(err, {line: 170});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -193,6 +214,8 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, fun
 		},
 	}, function(err, asyncRes) {
 		if (err) {
+			logger.error(err, {line: 217});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -215,6 +238,8 @@ router.get('/user/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, func
 	
 	User.findById(req.params.id).exec(function(err, user) {
 		if (err) {
+			logger.error(err, {line: 241});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -238,6 +263,8 @@ router.get('/user/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, func
 			}]
 		}).populate('user').sort('created_at').exec(function(err, messages) {			
 			if (err) {
+				logger.error(err, {line: 266});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -266,6 +293,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 	if (req.body.order) {
 		Order.findById(req.body.order).populate('trip').exec(function(err, order) {
 			if (err) {
+				logger.error(err, {line: 296});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -296,6 +325,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 				message: req.body.message
 			}, function(err, message) {
 				if (err) {
+					logger.error(err, {line: 328});
+					
 					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 						.json({error: 'Unexpected server error.'});
 						
@@ -315,6 +346,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		
 		User.findById(req.body.corr).exec(function(err, user) {
 			if (err) {
+				logger.error(err, {line: 349});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -335,6 +368,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			
 			message.save(function(err, message) {
 				if (err) {
+					logger.error(err, {line: 371});
+					
 					res.status(err.name == 'ValidationError' ? 400 : 500).type('json')
 						.json({error: 'Unexpected server error.'});
 						

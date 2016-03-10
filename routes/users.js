@@ -2,6 +2,8 @@ var express = require('express');
 
 var router = express.Router();
 
+var winston = require('winston');
+
 var mdlwares = require('../libs/mdlwares');
 var passwordless = require('passwordless');
 var crypto = require('crypto');
@@ -11,12 +13,38 @@ var sendgrid  = require('sendgrid')(config.sendgrid.key);
 var User = require('../models/user');
 var Token = require('../models/token');
 var Subscribe = require('../models/subscribe');
+/*
+var winston = require('winston');
+var logger = new (winston.Logger)(
+// {
+    // transports: [
+		// new (winston.transports.File)({ filename: '../logs/users.log', level: 'error' })
+    // ]
+// }
+);
+
+logger.log('fdfdfdfdffdfdfdfdffdfdfdfdffdfdfdfdffdfdfdfdf');
+*/
+
+var winston = require('winston');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: 'logs/users.log'
+		})
+    ],
+	exitOnError: false
+});
+
+//logger.error(err, {line: 1});
 
 router.get('/notifications/:timestamp?', mdlwares.restricted, function(req, res, next) {
 	User.findById(req.session.uid)
 		.select('needEmailNotification newOrders newTrips newMessages newPrivMessages updated_at')
 		.exec(function(err, user) {
 			if (err || !user) {
+				logger.error(err, req.session, {line: 47});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -77,6 +105,8 @@ function proceedEmail(callback) {
 			email: req.body.email.toLowerCase()
 		}).select('email').exec(function(err, user) {
 			if (err) {
+				logger.error(err, {line: 109});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -131,6 +161,8 @@ router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
 
 		user.save(function(err, user) {
 			if (err) {
+				logger.error(err, {line: 164});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -149,7 +181,10 @@ router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
  }), deliveryToken);
 
 function deliveryToken(req, res, next) {
-	if (!req || !req.passwordless || !req.passwordless.tokenToSend || !req.passwordless.uidToSend || !req.passwordless.recipient) {
+	if (!req.passwordless || !req.passwordless.tokenToSend || !req.passwordless.uidToSend || !req.passwordless.recipient) {
+		
+		logger.error(req.passwordless, {line: 186});
+		
 		res.status(500).type('json')
 			.json({error: 'Unexpected server error.'});
 			
@@ -158,6 +193,8 @@ function deliveryToken(req, res, next) {
 	
 	var link = config.host + 'users/logged_in?token=' + req.passwordless.tokenToSend + '&uid=' + encodeURIComponent(req.passwordless.uidToSend);
 	
+return res.status(500).type('json').json({error: link});
+
 	var email = new sendgrid.Email();
 	
 	email.addTo(req.passwordless.recipient);
@@ -168,6 +205,8 @@ function deliveryToken(req, res, next) {
 
 	sendgrid.send(email, function(err, json) {
 		if (err) {
+			logger.error(err, {line: 208});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 			
@@ -188,10 +227,13 @@ router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res,
 			.json({error: 'Email not found.'});
 	}
 }), function(req, res, next) {
+	
 	Token.findOne({
 		uid: req.userId
 	}, 'ttl', function(err, token) {
 		if (err) {
+			logger.error(err, {line: 235});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -237,6 +279,8 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 
 		User.findById(req.session.passwordless).select('name email is_approved gravatar_hash').exec(function(err, user) {
 			if (err) {
+				logger.error(err, req.session, {line: 282});
+				
 				res.status(500).type('text')
 					.send('Unexpected server error.');
 				
@@ -244,6 +288,8 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 			}
 			
 			if (!user) {
+				logger.error(err, req.session, {line: 291});
+				
 				res.status(500).type('text')
 					.send('User not found.');
 				
@@ -259,14 +305,16 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 				user.is_approved = true;
 				
 				user.save(function(err, user) {
-					//LOG !!!!!!
+					if (err) {
+						logger.error(err, {line: 309});
+					}
 				});
 				
 				Subscribe.find({
 					email: user.email
 				}).select('user').exec(function(err, subscribes) {
 					if (err) {
-						//log
+						logger.error(err, {line: 317});
 						
 						return;
 					}
@@ -276,7 +324,7 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 							subscribe.user = user._id;
 							subscribe.save(function(err, subscribe) {
 								if (err) {
-									//log
+									logger.error(err, {line: 327});
 									
 									return;
 								}
@@ -298,6 +346,8 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 router.post('/update', mdlwares.restricted, function(req, res, next) {
 	User.findById(req.session.uid).exec(function(err, user) {
 		if (err) {
+			logger.error(err, req.session, {line: 349});
+			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
@@ -305,6 +355,8 @@ router.post('/update', mdlwares.restricted, function(req, res, next) {
 		}
 		
 		if (!user) {
+			logger.error(err, req.session, {line: 358});
+			
 			res.status(400).type('json')
 				.json({error: 'User not found.'});
 				
@@ -315,6 +367,8 @@ router.post('/update', mdlwares.restricted, function(req, res, next) {
 		
 		user.save(function(err, user) {
 			if (err) {
+				logger.error(err, req.session, {line: 370});
+				
 				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
@@ -336,6 +390,8 @@ function getUser(req, res, next) {
 		.select('created_at name gravatar_hash about stats')
 		.exec(function(err, user) {
 			if (err) {
+				logger.error(err, req.session, {line: 393});
+				
 				res.status(500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
