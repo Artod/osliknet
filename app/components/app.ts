@@ -35,8 +35,9 @@ import {UserCardComponent} from './user-card.component';
 })
 
 @RouteConfig([
-	{path:'/trips/:id', name: 'Trip',    component: TripComponent},
+	{path:'/',          name: 'Main',   component: TripsComponent, data: {isMain: true}},
 	{path:'/trips',     name: 'Trips',   component: TripsComponent},
+	{path:'/trips/:id', name: 'Trip',    component: TripComponent},
 	{path:'/trips/add', name: 'TripAdd', component: TripAddComponent},
 	{path:'/trips/my',  name: 'TripsMy', component: TripsMyComponent},
 	{path:'/users/:id', name: 'User',    component: UserComponent},
@@ -48,7 +49,7 @@ import {UserCardComponent} from './user-card.component';
 	{path:'/orders',      name: 'Orders',  component: OrdersComponent},
 	{path:'/messages/order/:id', name: 'Order', component: OrderComponent},
 	{path:'/messages/user/:id', name: 'Messages', component: MessagesComponent},
-	{path:'/messages',  name: 'Dialogs', component: DialogsComponent}
+	{path:'/messages',    name: 'Dialogs', component: DialogsComponent}
 ])
 
 export class AppComponent {

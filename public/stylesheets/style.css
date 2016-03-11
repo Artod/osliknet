@@ -1,9 +1,31 @@
-body {
-  padding: 76px 0px 20px 0px; 
+video#bgvid, .video-overlay  { 
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -100;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    /* background: url(polina.jpg) no-repeat; */
+    background-size: cover; 
+}
 
-  /*font: 18px Tahoma, sans-serif;
-  font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
-  font: 18px Georgia, serif;*/
+.video-overlay {
+	z-index: -99;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+body {
+	padding: 76px 0px 20px 0px; 
+
+	/*font: 18px Tahoma, sans-serif;
+	font: 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font: 18px Georgia, serif;*/
 }
 
 .navbar-brand {
@@ -11,7 +33,7 @@ body {
 }
 
 a:focus, a:hover {
-  text-decoration:none;
+	text-decoration:none;
 }
 
 th {
@@ -122,6 +144,12 @@ textarea.form-control {
 	.trips-find-form .autocomplite {
 		width: 204px;
 	}	
+}
+
+@media (min-width: 768px){
+	.navbar {
+		border-radius: 0px;
+	}
 }
 
 .mydp input[readonly] {
@@ -236,7 +264,7 @@ input.input-lg {
 }
  
 	.head .navbar-default{
-		background-color: rgba(255,255,255,0.9);
+		background-color: rgba(255,255,255,0.85);
 		border: 0px;
 		border-bottom: 1px solid #e7e7e7;
 		
@@ -306,8 +334,8 @@ input.input-lg {
 	display: block;
 	left:-50%;
 	
-	top:49px;
-	background-color: rgba(255,255,255,0.9);
+	top:43px;
+	background-color: rgba(255,255,255,0.85);
 	border-top: 0px solid #e7e7e7;
 	border-right: 1px solid #e7e7e7;
 	height:100%;
@@ -321,6 +349,11 @@ input.input-lg {
 
 	.toggle-menu li {
 		padding-left:20px;
+	}
+	
+	.toggle-menu li>a {
+		
+		color: #777;
 	}
 	
 .menu-opened {
@@ -352,11 +385,18 @@ input.input-lg {
 	}*/
 }
 
+.white-font {
+	color: #FFF;
+}
 
-
+.promo-text {
+	font-size:2em;
+	max-width:700px;
+	margin:0px auto 0px auto;
+}
 
 .popover-my {
-	background-color: rgba(255,255,255,0.9);
+	background-color: rgba(255,255,255,0.85);
 	border-color: #fff;
 	border-radius: 5px;
 	box-shadow: 0 0 5px rgba(0,0,0,0.4);

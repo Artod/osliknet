@@ -1,16 +1,38 @@
-<div class="container-trips-find container">
-	<div class="page-header">
-		<h2>Find a Trip</h2>
+<div *ngIf="isMain">
+	<video *ngIf="isMain" autoplay loop id="bgvid"><!-- poster="polina.jpg" -->
+		<source src="/342960428.mp4" type="video/mp4">
+	</video>
+	
+	<div class="video-overlay"></div>
+	
+	<div class="promo-text white-font text-center">
+		<p>
+			<br />
+			People who travel frequently can deliver anything. For example, you live in the USA and you urgently need any medication or documents from Russia. In our application, you can find someone who is just about to arrive from Moscow to New York. He can help you for money or for free.
+			<br />
+			<br />
+		</p>
 	</div>
+</div>
 
+
+
+<div class="container-trips-find container">
+	<div *ngIf="!isMain" class="page-header">
+		<h2>Find a Trip</h2>
+		
+	</div>
+	
+	<h4 *ngIf="isMain" class="white-font">Find trips</h4>
+	
 	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
-		<!-- <label class="control-label input-lg">Trip</label> -->
+		
 		
 		<div class="form-group">
 			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
 		</div>
 		
-		<div class="arrow-right form-group">
+		<div class="arrow-right form-group {{isMain ? 'white-font' : ''}}">
 			<span class="glyphicon glyphicon-arrow-right"></span>
 		</div>
 
@@ -66,7 +88,7 @@
 			<form *ngIf="!_subsFinished" method="post" [ngFormModel]="subForm" (submit)="_subBusy ? false : onSubscribe($event, form)" novalidate #form>
 				<p>
 					<!-- <i>We'll let you know when a new trip from «<big>{{subModel.from}}</big>» to «<big>{{subModel.to}}</big>» will appear:</i>	<br />	<br /> -->
-					<i>We can let you know when a new trip from «{{subModel.from}}» to «{{subModel.to}}» will appear:</i>
+					<i>We'll let you know when a new trip from «{{subModel.from}}» to «{{subModel.to}}» will appear:</i>
 					
 					<br />
 				</p>

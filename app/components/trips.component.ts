@@ -1,6 +1,6 @@
 import {Component, ElementRef, Injector, Inject, provide, ApplicationRef/*, Renderer*/} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
-import {ROUTER_DIRECTIVES, RouteParams, Router, Location} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteParams, RouteData, Router, Location} from 'angular2/router';
 
 import {TripService}  from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
@@ -19,6 +19,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES, TripCardComponent, CaptchaComponent],
 	pipes: [ToDatePipe]
 })
+
 
 export class TripsComponent {
 	public trips : any[] = [];
@@ -46,9 +47,14 @@ export class TripsComponent {
 		private _subscribeService : SubscribeService,
 		private _fb : FormBuilder,
 		private _routeParams : RouteParams,
+		private _routeData : RouteData,
+		
 		private _appRef : ApplicationRef,
 		@Inject('config.user') public configUser
 	) {
+
+		this.isMain = this._routeData.get('isMain');
+
 		this.searchForm = this._fb.group({
 			from: '', //['', Validators.required],
 			from_id: '', //['', Validators.required],
@@ -62,7 +68,7 @@ export class TripsComponent {
 		}
 		
 		this.subForm = this._fb.group({
-		email: configUser.id ? '' : ['', Validators.compose([(ctrl) => {
+			email: configUser.id ? '' : ['', Validators.compose([(ctrl) => {
 					if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
 						return {invalidEmail: true}
 					}
@@ -82,11 +88,18 @@ export class TripsComponent {
 		
 	}
 	
+	public routerCanReuse(nextInstruction, prevInstruction) {
+		return (nextInstruction.urlPath === prevInstruction.urlPath);
+	}
+	
 	public init() {
+		let from = this._routeParams.get('from'),
+			to = this._routeParams.get('to');
+			
 		this.searchModel = {
-			from: this._routeParams.get('from') ? decodeURIComponent( this._routeParams.get('from') ) : this.searchModel.from,
+			from: from ? decodeURIComponent( from ) : this.searchModel.from,
 			from_id: this._routeParams.get('from_id') || this.searchModel.from_id,
-			to: this._routeParams.get('to') ? decodeURIComponent( this._routeParams.get('to') ) : this.searchModel.to,
+			to: to ? decodeURIComponent( to ) : this.searchModel.to,
 			to_id: this._routeParams.get('to_id') || this.searchModel.to_id
 		}
 		
@@ -133,7 +146,7 @@ export class TripsComponent {
 		
 		//setTimeout( ()=> this.search($event, $form, $thanx), 1 );
 		
-		this.search($event, $form, $thanx)
+		this.search($event, $form, $thanx);
 	}
 	
 	public search($event, $form, $thanx) : void {
@@ -150,12 +163,18 @@ export class TripsComponent {
 		}
 
 		if ($event) {
-			this._location.go('/trips', this.serialize({
+			let params = {
 				from: this.searchModel.from,
 				from_id: this.searchModel.from_id,
 				to: this.searchModel.to,
 				to_id: this.searchModel.to_id
-			}));				
+			};
+			
+			if (this.isMain) {
+				this._router.navigate(['Trips', params]);
+			} else {
+				this._location.go('/trips', this.serialize(params));
+			}
 		}
 		
 		if (this.subModel.from_id !== this.searchModel.from_id || this.subModel.to_id !== this.searchModel.to_id) {

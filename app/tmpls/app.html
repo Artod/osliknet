@@ -2,11 +2,11 @@
 <div class="container-fluid head" (document:click)="isVisible = false; true;">
 	<nav class="navbar navbar-default">
 		<button class="btn btn-default navbar-toggle" type="button" (click)="isVisible = !isVisible; $event.stopPropagation()">
-			 <span class="glyphicon glyphicon-menu-hamburger"> </span> 
+			<span class="glyphicon glyphicon-menu-hamburger"> </span> 
 		</button>	
 	
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#">OsLiKi.Net</a>
+			<a class="navbar-brand" [routerLink]="['Main']">OsLiKi.Net <sup>β</sup></a>
 		</div>
 
 		<ul class="nav navbar-nav navbar-right">
