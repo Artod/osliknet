@@ -1,20 +1,22 @@
-<div class="page-header">
-	<h2>Dialogs</h2>
+<div class="container">
+	<div class="page-header">
+		<h2>Dialogs</h2>
+	</div>
+
+	<p *ngIf="users && !users.length">No dialogs</p>
+
+	<table class="table">
+		<tr *ngFor="#user of users">
+			<td [hidden]="configUser.id === user._id">
+				<user-card [user]="user" *ngIf="user && user._id"></user-card>
+			
+				<p class="text-right">
+					<a [routerLink]="['Messages', {id: user._id}]" >
+						Go to the dialog 
+						<span class="badge" *ngIf="newPrivMessages[user._id] && newPrivMessages[user._id][0]">{{newPrivMessages[user._id][0]}}</span>
+					</a>
+				</p>	
+			</td>
+		</tr>
+	</table>
 </div>
-
-<p *ngIf="users && !users.length">No dialogs</p>
-
-<table class="table">
-	<tr *ngFor="#user of users">
-		<td [hidden]="configUser.id === user._id">
-			<user-card [user]="user" *ngIf="user && user._id"></user-card>
-		
-			<p class="text-right">
-				<a [routerLink]="['Messages', {id: user._id}]" >
-					Go to the dialog 
-					<span class="badge" *ngIf="newPrivMessages[user._id] && newPrivMessages[user._id][0]">{{newPrivMessages[user._id][0]}}</span>
-				</a>
-			</p>	
-		</td>
-	</tr>
-</table>

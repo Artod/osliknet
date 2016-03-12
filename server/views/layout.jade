@@ -11,12 +11,15 @@ html
 		base(href="/")
 
 		
-		link(rel='stylesheet' href='/modules/bootstrap/css/bootstrap.min.css')
-		link(rel='stylesheet', href='/stylesheets/splash.css')
-		link(rel='stylesheet', href='/stylesheets/mydatepicker.css')
-		link(rel='stylesheet', href='/stylesheets/style.css')
+		// link(rel='stylesheet' href='/modules/bootstrap/css/bootstrap.min.css')
+		// link(rel='stylesheet', href='/stylesheets/splash.css')
+		// link(rel='stylesheet', href='/stylesheets/mydatepicker.css')
+		// link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/css/style.css')
 		
-		script(src='/modules/systemjs/system.src.js')
+		// script(src='/modules/systemjs/system.src.js')
+		script(src='/js/system.js')
+		
 		script.
 			System.config({
 				baseURL: '/',
@@ -26,10 +29,10 @@ html
 				},*/
 				defaultJSExtensions: true,
 				packages: {
-					client_dist: {
-						format: 'register'/*,
-						defaultExtension: 'js'*/
-					}
+					/*client_dist: {
+						format: 'register',
+						defaultExtension: 'js'
+					}*/
 				}
 				/*,
 				map: {
@@ -38,12 +41,15 @@ html
 				}
 				*/
 			});
-		 
-		script(src='/modules/angular2/angular2-polyfills.js')
-		script(src='/modules/rxjs/Rx.js')
-		script(src='/modules/angular2/angular2.dev.js')
-		script(src='/modules/angular2/router.dev.js')
-		script(src='/modules/angular2/http.dev.js')
+			
+		// script(src='/modules/angular2/angular2-polyfills.js')
+		// script(src='/modules/rxjs/Rx.js')
+		// script(src='/modules/angular2/angular2.dev.js')
+		// script(src='/modules/angular2/router.dev.js')
+		// script(src='/modules/angular2/http.dev.js')
+		
+		script(src='/js/libs.js')
+		script(src='/js/app.js')
 
 		
 		
@@ -88,7 +94,8 @@ html
 			
 
 
-			System.import('/client_dist/boot')
+			// System.import('/client_dist/boot')
+			System.import('boot')
 				.then( null, console.error.bind(console) );
 	
 		if !user.id

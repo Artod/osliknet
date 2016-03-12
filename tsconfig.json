@@ -1,17 +1,16 @@
 {
-  "compileOnSave": true,
-  "compilerOptions": {
-    "target": "ES5",
-    "module": "system",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "removeComments": true,
-    "noImplicitAny": false,
-	"isolatedModules": true
-  },
-  "exclude": [
-    "node_modules"
-  ]
+	"compileOnSave": true,
+	"compilerOptions": {
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"target": "ES5",
+		"module": "system",
+		"moduleResolution": "node",
+		"removeComments": true,
+		"sourceMap": true,
+		"noImplicitAny": false
+	},
+	"exclude": [
+		"node_modules"
+	]
 }

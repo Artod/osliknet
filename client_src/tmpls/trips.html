@@ -15,19 +15,14 @@
 	</div>
 </div>
 
-
-
 <div class="container-trips-find container">
 	<div *ngIf="!isMain" class="page-header">
 		<h2>Find a Trip</h2>
-		
 	</div>
 	
 	<h4 *ngIf="isMain" class="white-font">Find trips</h4>
 	
 	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
-		
-		
 		<div class="form-group">
 			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
 		</div>

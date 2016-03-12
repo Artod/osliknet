@@ -55,7 +55,7 @@ TODO:
 
 
 
-\- assembling gulp
+\/- assembling gulp
 
 
 - hosting 
@@ -286,11 +286,11 @@ app.use( express.static( path.join(__dirname, '../public') ) );
 // app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));
 // app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
 
-app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
-app.use('/modules/angular2',  express.static(path.join(__dirname, '../node_modules/angular2/bundles')));
-app.use('/modules/systemjs',  express.static(path.join(__dirname, '../node_modules/systemjs/dist')));
-app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));
-app.use('/client_dist',       express.static(path.join(__dirname, '../client_dist')));
+// app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
+// app.use('/modules/angular2',  express.static(path.join(__dirname, '../node_modules/angular2/bundles')));
+// app.use('/modules/systemjs',  express.static(path.join(__dirname, '../node_modules/systemjs/dist')));
+// app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));
+// app.use('/client_dist',       express.static(path.join(__dirname, '../client_dist')));
 // app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
 
 // Passwordless middleware
