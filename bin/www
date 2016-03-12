@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+var app = require('../server/app');
 var debug = require('debug')('osliknet:server');
 var http = require('http');
 

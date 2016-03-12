@@ -1,9 +1,9 @@
 node_modules/
-app/**/*.js
-app/**/*.map
-logs/**/*.log
+client_src/**/*.js
+client_src/**/*.map
+server/logs/**/*.log
 
-config.js
+server/config.js
 
 # Windows image file caches
 Thumbs.db

@@ -1,6 +1,6 @@
 {
-  "name": "osliknet",
-  "version": "0.0.0",
+  "name": "OSLiKi.Net",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "tsc": "tsc",
