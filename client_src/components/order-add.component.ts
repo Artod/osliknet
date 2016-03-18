@@ -1,4 +1,4 @@
-import {Component, Inject} from 'angular2/core';
+import {Component, Inject, OnDestroy} from 'angular2/core';
 import {/*FORM_DIRECTIVES, CORE_DIRECTIVES, */FormBuilder, ControlGroup, Validators} from 'angular2/common';//, FORM_BINDINGS
 import {ROUTER_DIRECTIVES, Router, Location} from 'angular2/router';
 
@@ -17,7 +17,9 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 	// viewBindings: [FORM_BINDINGS],
 })
 
-export class OrderAddComponent {	
+export class OrderAddComponent implements
+	OnDestroy
+{	
 	public model : any = {};
 	public form : ControlGroup;
 	
@@ -50,13 +52,16 @@ export class OrderAddComponent {
 			this._checked = true;	
 		});
 		
-		this._location.subscribe(() => {
+		this._locationSubscribe = this._location.subscribe(() => {
 			this.closeModal();
 		});
 		
 		this.showModal();
 	}
 	
+	public ngOnDestroy() : void {
+		this._locationSubscribe.unsubscribe();
+	}
 	
 	public showModal() : void {
 		this._modalComponent && this._modalComponent.show();
@@ -97,9 +102,7 @@ export class OrderAddComponent {
 
 				try {
 					this.error = err.json().error || this.error;
-				} catch(e) {
-					this.error = err.text() || this.error;
-				}
+				} catch(e) {}
 				
 				this._busy = false;	
 			});

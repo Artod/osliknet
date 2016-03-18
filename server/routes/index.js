@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var mdlwares = require('../libs/mdlwares');
 
-router.get('/', function(req, res, next) {
-	res.render('index');
-});
+router.get('/', mdlwares.renderIndexUnlessXhr);
 
 /*var Trip = require('../models/trip');
 router.get('/', function(req, res, next) {

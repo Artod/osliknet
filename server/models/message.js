@@ -4,10 +4,11 @@ var mongoose = require('mongoose'),
 var User = require('./user');
 
 var winston = require('winston');
+var path = require('path');
 var logger = new (winston.Logger)({
     transports: [
 		new (winston.transports.File)({
-			filename: 'logs/message.log'
+			filename: path.join(__dirname, '../logs/message.log')
 		})
     ],
 	exitOnError: false

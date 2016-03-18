@@ -7,22 +7,22 @@
 		<i>A link to access has been sent to your email address. Please check your email inbox.</i>
 	</p>
 
-	<form *ngIf="!success" class="{{error ? 'has-error' : ''}}" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(email)" novalidate>
+	<form *ngIf="!success" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(email)" novalidate>
 		<div class="form-group">
 			<label class="sr-only">E-mail</label>
 			<input class="form-control input-lg email" type="email" name="email" [(ngModel)]="model.email" [ngFormControl]="form.controls.email" placeholder="E-mail" #email />
 		</div>
 		<div class="help-block text-right">
 			Don't have an account? - <a [routerLink]="['Join']">Sign up »</a>
-		</div>		
-		<div *ngIf="error" class="help-block">
-			{{ error }}
-		</div>
+		</div>	
 		
 		<div class="form-group text-right">
 			<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait..' : 'Log in' }}</button>
 		</div>
 		
+		<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+			{{ error }}
+		</div>
 
 	</form>
 </div>

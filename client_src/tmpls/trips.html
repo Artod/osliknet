@@ -1,6 +1,7 @@
 <div *ngIf="isMain">
-	<video *ngIf="isMain" autoplay loop id="bgvid"><!-- poster="polina.jpg" -->
-		<source src="/342960428.mp4" type="video/mp4">
+	<video *ngIf="isMain" id="bgvid" autoplay loop muted poster="/img/342960428.jpg">
+		<source type="video/mp4" src="/video/342960428.mp4" />
+		<source type="video/webm" src="/video/342960428.webm" />
 	</video>
 	
 	<div class="video-overlay"></div>

@@ -1,0 +1,100 @@
+doctype html
+html
+	head
+		title Osliki.Net
+
+		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+		
+		meta(http-equiv="X-UA-Compatible", content="IE=edge")
+		meta(charset="utf-8") 
+		
+		base(href="/")
+		
+		link(rel='stylesheet', href='/modules/bootstrap/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/css/src/splash.css')
+		link(rel='stylesheet', href='/css/src/mydatepicker.css')
+		link(rel='stylesheet', href='/css/src/style.css')
+		// link(rel='stylesheet', href='/css/style.css')
+		
+		script(src='/modules/systemjs/system.src.js')
+		// script(src='/js/system.js')
+		
+		script.
+			System.config({
+				baseURL: '/',
+				/*transpiler: 'typescript',
+				paths: {
+					'/': 'modules/*'
+				},*/
+				defaultJSExtensions: true,
+				packages: {
+					/*client_dist: {
+						format: 'register',
+						defaultExtension: 'js'
+					}*/
+				}
+				/*,
+				map: {
+				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
+				  "moment": "modules/moment/moment.js"
+				}
+				*/
+			});
+			
+		script(src='/modules/angular2/angular2-polyfills.js')
+		script(src='/modules/rxjs/Rx.js')
+		script(src='/modules/angular2/angular2.dev.js')
+		script(src='/modules/angular2/router.dev.js')
+		script(src='/modules/angular2/http.dev.js')
+		
+		// script(src='/js/libs.js')
+		// script(src='/js/app.js')
+
+		
+		
+		
+		
+
+		//script(src='/modules/ng2-datepicker/ng2-datepicker.js')		
+		//script(src='/modules/moment/moment.js')		
+		
+	body
+
+			
+		app
+
+				
+				
+		script.
+			// System.import('bootstrap');
+			
+			window.user = {
+				id: '#{user.id}',
+				name: '#{user.name}',
+				gravatar_hash: '#{user.gravatar_hash}'
+			};
+			
+			window.googleMaps = {
+				apiKey: 'AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ',
+				apiVersion: 3,
+				params: '&libraries=places&signed_in=true&language=en'
+			};
+			
+			window.googleRecaptcha = function() {
+				window.googleRecaptcha.loaded = true;
+			};
+			
+			window.googleRecaptcha.key = '#{recaptcha.key}';
+			window.googleRecaptcha.loaded = false;
+
+			window.orderStatus = !{orderStatus};
+			window.orderStatusConst = !{orderStatusConst};
+			
+
+
+			System.import('/client_compiled/boot').then( null, console.error.bind(console) );
+
+				
+	
+		if !user.id
+			script(src='https://www.google.com/recaptcha/api.js?onload=googleRecaptcha&render=explicit', async, defer)

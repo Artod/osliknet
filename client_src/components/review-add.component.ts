@@ -82,9 +82,7 @@ export class ReviewAddComponent {
 
 				try {
 					this.error = err.json().error || this.error;
-				} catch(e) {
-					this.error = err.text() || this.error;
-				}
+				} catch(e) {}
 				
 				this._busy = false;
 			});

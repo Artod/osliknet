@@ -6,9 +6,7 @@ import {Observable} from 'rxjs/Observable';
 @Injectable()
 
 export class OrderService {
-	constructor(public http:Http) {
-		console.log('OrderService constructor');
-	}
+	constructor(public http:Http) {}
 	
 	public get(limit, page) {
 		let headers = new Headers();

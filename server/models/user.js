@@ -5,10 +5,11 @@ var config = require('../config');
 var sendgrid  = require('sendgrid')(config.sendgrid.key);
 
 var winston = require('winston');
+var path = require('path');
 var logger = new (winston.Logger)({
     transports: [
 		new (winston.transports.File)({
-			filename: 'logs/user.log'
+			filename: path.join(__dirname, '../logs/user.log')
 		})
     ],
 	exitOnError: false

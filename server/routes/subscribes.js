@@ -7,10 +7,11 @@ var Trip = require('../models/trip');
 var Subscribe = require('../models/subscribe');
 
 var winston = require('winston');
+var path = require('path');
 var logger = new (winston.Logger)({
     transports: [
 		new (winston.transports.File)({
-			filename: 'logs/subscribes.log'
+			filename: path.join(__dirname, '../logs/subscribes.log')
 		})
     ],
 	exitOnError: false

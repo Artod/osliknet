@@ -1,3 +1,10 @@
+process.on('uncaughtException', function (error) {
+   console.error('------------uncaughtException------------');
+   console.dir(error.stack);
+   console.error('------------uncaughtException------------');
+});
+
+// NODE_ENV=development
 /*
 
 TODO:
@@ -58,10 +65,15 @@ TODO:
 \/- assembling gulp
 
 
-- hosting 
-- deploy (secret key captcha + sendgrid)
+\/- hosting 
+\/- deploy (secret key captcha + sendgrid)
 
-
+- loading on search trip
+- indexes db
+- zero dialogs
+- email oslikinet
+- support link
+- nginx cache
 
 
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
@@ -97,26 +109,26 @@ TODO:
     "zone.js": "0.5.10"*/
 
 
-
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var morgan = require('morgan');
 var winston = require('winston');
+var path = require('path');
  
 winston.handleExceptions(new winston.transports.File({
-	filename: 'logs/exceptions.log',
+	filename: path.join(__dirname, 'logs/exceptions.log'),
 	handleExceptions: true,
 	humanReadableUnhandledException: true,
 	exitOnError: false
 }));
-  
-var cookieParser = require('cookie-parser');
 
+var express = require('express');
+var favicon = require('serve-favicon');
+var morgan = require('morgan');
+var mongoose = require('mongoose');  
+var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var MongoStoreSession = require('connect-mongo')(session);
-
 var bodyParser = require('body-parser');
+
+var config = require('./config');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -126,97 +138,68 @@ var messages = require('./routes/messages');
 var reviews = require('./routes/reviews');
 var subscribes = require('./routes/subscribes');
 
-var config = require('./config');
-
-
 
 var app = express();
 
-var mongoose = require('mongoose');
-// TODO: MongoDB setup (given default can be used)
-// var pathToMongoDb = 'mongodb://localhost/osliknet';
+app.set( 'env', (process.env.NODE_ENV === 'development' ? 'development' : 'production') );
+app.set( 'isDev', app.get('env') === 'development' );
 
-mongoose.connect(config.mongo.path);
+console.log('NODE_ENV = ', process.env.NODE_ENV );
+console.log('env = ', app.get('env') );
+console.log('isDev = ', app.get('isDev') );
+
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: path.join(__dirname, 'logs/db.log')
+		})
+    ],
+	exitOnError: false
+});
+
+var mongoPath = (app.get('isDev') ? config.mongo.pathDev : config.mongo.path);
+
+var mongoParams = {
+	server: {
+		auto_reconnect: true,
+		socketOptions: {
+			keepAlive: 120
+		}
+	},
+	auth: {
+		authdb: 'admin'
+	}	
+};
+
+mongoose.connect(mongoPath, mongoParams, function(err) {
+	if (err) {
+		console.error(err);
+		logger.error(err, {line: 160});
+	}
+});
+
 //We have a pending connection to the test database running on localhost. We now need to get notified if we connect successfully or if a connection error occurs:
 
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function(callback) {
-  // yay!
+
+db.on('error', function(callback) {
+	console.error('connection error');
+	logger.error('connection error', {line: 169});
 });
 
-// app.set('env', 'production')
-app.set('env', 'development')
-
-
-
-
-
+db.once('open', function(callback) {
+	console.log('Mongo connection = opened');
+});
 
 var passwordless = require('passwordless');
+// var MongoStorePasswordless = require('passwordless-mongostore-bcrypt-node');
+var MongoStorePasswordless = require(app.get('isDev') ? 'passwordless-mongostore-bcrypt-node' : 'passwordless-mongostore');
 
+mongoParams.mongostore = {
+	collection: config.passwordless.collection
+};
 
-var MongoStorePasswordless = require('passwordless-mongostore-bcrypt-node');
-
-
-// var sendgrid_api_key = 'v ftp'config.sendgrid.key;
-// var sendgrid  = require('sendgrid')(config.sendgrid.key);
-// var sendgrid  = require('sendgrid')('hjhh');
-
-
-// var yourEmail = config.email;
-/*
-// TODO: email setup (has to be changed)
-
-var email   = require("emailjs");
-var yourEmail = 'osliknet@gmail.com';
-var yourPwd = 'v ftp';
-var yourSmtp = 'smtp.gmail.com';
-var smtpServer = email.server.connect({
-   user: yourEmail, 
-   password: yourPwd, 
-   host: yourSmtp, 
-   ssl: true
-});
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: Path to be send via email
-// var host = 'http://localhost:3000/'config.host;
-
-// Setup of Passwordless
-/*
-var mongoStorePasswordlessInst = new MongoStorePasswordless(pathToMongoDb, {
-    mongostore: {
-        collection: 'token'
-	}
-});
-
-mongoStorePasswordlessInst._db = db;
-*/
-
-//TODO: Поправить сделать чтоб один коннект был монгусовский щас нельзя моотому что другой обьект использует
-
-
-// app.set('passwordlessTTL', config.passwordless.ttl);
- 
-passwordless.init(new MongoStorePasswordless(config.mongo.path, {
-    mongostore: {
-        collection: config.passwordless.collection
-	}
-}), {
+passwordless.init(new MongoStorePasswordless(mongoPath, mongoParams), {
 	userProperty: config.passwordless.userProperty
 });
 
@@ -225,7 +208,6 @@ passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback, r
 	req.passwordless.tokenToSend = tokenToSend;
 	req.passwordless.uidToSend = uidToSend;
 	req.passwordless.recipient = recipient;
-console.dir(req.passwordless)
 	callback();
 }, {
 	ttl: config.passwordless.ttl //app.get('passwordlessTTL')	
@@ -248,9 +230,11 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-if (app.get('env') === 'development') {
+
+if ( app.get('isDev') ) {
 	app.use( morgan('dev') );
 }
+
 app.use(bodyParser.json());
 /* !!!!!extended */app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -270,7 +254,7 @@ var sessionParam = {
 	resave: false
 }
 
-if (app.get('env') === 'production') {
+if ( !app.get('isDev') ) {
 	// app.set('trust proxy', 1) // trust first proxy
 	// sessionParam.cookie.secure = true // serve secure cookies
 }
@@ -279,19 +263,23 @@ app.use( session(sessionParam) );
 /* Session ***/
 
 
-app.use( express.static( path.join(__dirname, '../public') ) );
+if ( app.get('isDev') ) {
+	app.use( express.static( path.join(__dirname, '../public') ) );
+	
+	// app.use(express.static(path.join(__dirname, 'node_modules')));
+	// app.use(express.static(path.join(__dirname, 'scripts')));
+	// app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));
+	// app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
 
-// app.use(express.static(path.join(__dirname, 'node_modules')));
-// app.use(express.static(path.join(__dirname, 'scripts')));
-// app.use('/node_modules/ng2-datepicker', express.static(__dirname + '/node_modules/ng2-datepicker'));
-// app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
 
-// app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
-// app.use('/modules/angular2',  express.static(path.join(__dirname, '../node_modules/angular2/bundles')));
-// app.use('/modules/systemjs',  express.static(path.join(__dirname, '../node_modules/systemjs/dist')));
-// app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));
-// app.use('/client_dist',       express.static(path.join(__dirname, '../client_dist')));
-// app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
+	app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
+	app.use('/modules/angular2',  express.static(path.join(__dirname, '../node_modules/angular2/bundles')));
+	app.use('/modules/systemjs',  express.static(path.join(__dirname, '../node_modules/systemjs/dist')));
+	app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));
+	app.use('/client_compiled',       express.static(path.join(__dirname, '../client_compiled')));
+	app.use('/client_src',       express.static(path.join(__dirname, '../client_src')));
+	// app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
+}
 
 // Passwordless middleware
 app.use(passwordless.sessionSupport());
@@ -324,7 +312,6 @@ app.use(function (req, res, next) {
 	next();
 });
 
-
 app.use('/', routes);
 app.use('/users', users);
 app.use('/trips', trips);
@@ -333,7 +320,6 @@ app.use('/messages', messages);
 app.use('/reviews', reviews);
 app.use('/subscribes', subscribes);
 
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -341,11 +327,9 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// error handlers
-
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if ( app.get('isDev') ) {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {

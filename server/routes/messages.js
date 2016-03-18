@@ -10,10 +10,11 @@ var Order = require('../models/order');
 var User = require('../models/user');
 
 var winston = require('winston');
+var path = require('path');
 var logger = new (winston.Logger)({
     transports: [
 		new (winston.transports.File)({
-			filename: 'logs/messages.log'
+			filename: path.join(__dirname, '../logs/messages.log')
 		})
     ],
 	exitOnError: false

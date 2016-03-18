@@ -27,12 +27,14 @@ gulp.task('tslint', function() {
     .pipe( tslint.report('verbose') );
 }); */ 
 
-var tsProject = ts.createProject('tsconfig.json', {
-	typescript: require('typescript'),
-	outFile: 'app.js'
-});
+
 
 gulp.task('app', function() {
+	var tsProject = ts.createProject('tsconfig.json', {
+		typescript: require('typescript'),
+		outFile: 'app.js'
+	});
+	
 	return gulp.src(appTsSrc)
 		.pipe( sourcemaps.init() )
 		.pipe( inlineNg2Template(/*{ useRelativePaths: true }*/) )
@@ -44,6 +46,16 @@ gulp.task('app', function() {
 		//.js
 		.pipe( gulp.dest('public/js') );
 		//.pipe( livereload() );
+});
+
+gulp.task('dev_app', function() {
+	var tsProject = ts.createProject('tsconfig.json', {
+		typescript: require('typescript')
+	});
+	
+	return gulp.src(appTsSrc)
+		.pipe( ts(tsProject) )
+		.pipe( gulp.dest('client_compiled') );
 });
 
 gulp.task('libs', function() {
@@ -86,12 +98,12 @@ gulp.task('css', function() {
 
 gulp.task('build', ['app', 'libs', 'copy:system', 'css', 'copy:fonts']);
 
-gulp.task('watch', ['app'], function() {
+gulp.task('watch', ['dev_app'], function() {
 	// livereload.listen();
-    gulp.watch('client_src/**/**/*', ['app']);
+    gulp.watch('client_src/**/**/*', ['dev_app']);
 });
 
-
+// sudo service nginx restart && sudo pm2 restart www
 
 
 

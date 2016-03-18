@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 
 var winston = require('winston');
+var path = require('path');
 
 var mdlwares = require('../libs/mdlwares');
 var passwordless = require('passwordless');
@@ -30,7 +31,7 @@ var winston = require('winston');
 var logger = new (winston.Logger)({
     transports: [
 		new (winston.transports.File)({
-			filename: 'logs/users.log'
+			filename: path.join(__dirname, '../logs/users.log')
 		})
     ],
 	exitOnError: false
@@ -192,8 +193,6 @@ function deliveryToken(req, res, next) {
 	}
 	
 	var link = config.host + 'users/logged_in?token=' + req.passwordless.tokenToSend + '&uid=' + encodeURIComponent(req.passwordless.uidToSend);
-	
-return res.status(500).type('json').json({error: link});
 
 	var email = new sendgrid.Email();
 	

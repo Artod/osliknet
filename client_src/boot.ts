@@ -1,7 +1,7 @@
 import {AppComponent} from './components/app';
 import {bootstrap} from 'angular2/platform/browser';
 import {APP_BASE_HREF, ROUTER_PROVIDERS} from 'angular2/router';
-import {provide} from 'angular2/core';
+import {provide, enableProdMode} from 'angular2/core';
 import {Http} from 'angular2/http';
 
 // import {AuthService} from './services/auth/auth.service';
@@ -11,6 +11,12 @@ import 'rxjs/Rx'
 // import 'rxjs/add/operator/catch';
 
 import {LazyMapsAPILoader, LazyMapsAPILoaderConfig} from './services/maps-api-loader/lazy-maps-api-loader';
+
+
+
+enableProdMode();
+
+
 
 declare var window: any;
 

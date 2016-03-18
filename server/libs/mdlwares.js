@@ -32,7 +32,8 @@ module.exports.restricted = function(req, res, next) {
 	}
 };
 
-var templatePath = require.resolve('../views/index.jade');
+var templatePath = require.resolve(process.env.NODE_ENV === 'development' ? '../views/dev_index.jade' : '../views/index.jade');
+
 var indexCompiled = jade.compileFile(templatePath, {cache: true});
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {

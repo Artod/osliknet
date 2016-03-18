@@ -1,6 +1,6 @@
-import {Component, ElementRef, Injector, Inject, provide, ApplicationRef/*, Renderer*/} from 'angular2/core';
+import {Component, ElementRef, Injector, Inject, provide, ApplicationRef, OnDestroy, AfterViewInit/*, Renderer*/} from 'angular2/core';
 import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
-import {ROUTER_DIRECTIVES, RouteParams, RouteData, Router, Location} from 'angular2/router';
+import {ROUTER_DIRECTIVES, RouteParams, RouteData, Router, Location, CanReuse, OnReuse} from 'angular2/router';
 
 import {TripService}  from '../services/trip/trip.service';
 import {OrderService} from '../services/order/order.service';
@@ -14,14 +14,20 @@ import {OrderAddComponent} from './order-add.component';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
+declare var window: any;
+
 @Component({
 	templateUrl: '/client_src/tmpls/trips.html',
 	directives: [GmAutocompliteComponent, ROUTER_DIRECTIVES, TripCardComponent, CaptchaComponent],
 	pipes: [ToDatePipe]
 })
 
-
-export class TripsComponent {
+export class TripsComponent implements
+	OnDestroy,
+	CanReuse,
+    OnReuse,
+	AfterViewInit
+{
 	public trips : any[] = [];
 	public subscribe : any = {};	
 	
@@ -36,7 +42,7 @@ export class TripsComponent {
 		/*from: "Montreal, QC, Canada",
 		from_id: "ChIJDbdkHFQayUwR7-8fITgxTmU"	*/
 	public sitekey : string;	
-
+ 
 	constructor(
 		private _router: Router,
 		private _location: Location,
@@ -48,11 +54,10 @@ export class TripsComponent {
 		private _fb : FormBuilder,
 		private _routeParams : RouteParams,
 		private _routeData : RouteData,
-		
+		private _el : ElementRef,
 		private _appRef : ApplicationRef,
 		@Inject('config.user') public configUser
 	) {
-
 		this.isMain = this._routeData.get('isMain');
 
 		this.searchForm = this._fb.group({
@@ -82,27 +87,48 @@ export class TripsComponent {
 		
 		this.init();
 		
-		this._location.subscribe(() => {
+		this._locationSubscribe = this._location.subscribe(() => {
 			this.init();
 		});
 		
+	}
+	
+	public ngAfterViewInit() : void {
+		/*if (this.isMain) {
+			
+			var video = window.document.getElementById('bgvid');
+			window.addEventListener('touchstart', function videoStart() {
+				video.play();
+				this.removeEventListener('touchstart', videoStart);
+			});
+			
+			// this._el.nativeElement.querySelector('#bgvid').play();
+		}*/
+	}
+	
+	public ngOnDestroy() : void {
+		this._locationSubscribe.unsubscribe();
 	}
 	
 	public routerCanReuse(nextInstruction, prevInstruction) {
 		return (nextInstruction.urlPath === prevInstruction.urlPath);
 	}
 	
+	public routerOnReuse(next: ComponentInstruction, prev: ComponentInstruction) {
+		this._routeParams.params = next.params;
+	}
+	
 	public init() {
 		let from = this._routeParams.get('from'),
 			to = this._routeParams.get('to');
-			
+
 		this.searchModel = {
-			from: from ? decodeURIComponent( from ) : this.searchModel.from,
-			from_id: this._routeParams.get('from_id') || this.searchModel.from_id,
-			to: to ? decodeURIComponent( to ) : this.searchModel.to,
-			to_id: this._routeParams.get('to_id') || this.searchModel.to_id
+			from: from ? decodeURIComponent( from ) : '',
+			from_id: this._routeParams.get('from_id') || '',
+			to: to ? decodeURIComponent( to ) : '',
+			to_id: this._routeParams.get('to_id') || ''
 		}
-		
+
 		this.search();
 	}
 	
@@ -163,17 +189,20 @@ export class TripsComponent {
 		}
 
 		if ($event) {
-			let params = {
+			/*let params = {
 				from: this.searchModel.from,
-				from_id: this.searchModel.from_id,
+				from_id: this.searchModel.from_id || '',
 				to: this.searchModel.to,
-				to_id: this.searchModel.to_id
-			};
+				to_id: this.searchModel.to_id || ''
+			};*/
 			
 			if (this.isMain) {
-				this._router.navigate(['Trips', params]);
+				setTimeout( () => this._router.navigate(['Trips', this.searchModel]), 10 );
+				// this._router.navigate(['Trips', this.searchModel]);
+				
+				return;
 			} else {
-				this._location.go('/trips', this.serialize(params));
+				this._location.go('/trips', this.serialize(this.searchModel));
 			}
 		}
 		

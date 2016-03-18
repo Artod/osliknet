@@ -81,7 +81,6 @@ export class ChatComponent implements
 	
 	public ngOnChanges(changes: {[propName: string]: SimpleChange}) : void {
 		if ( changes.isChatActual && !changes.isChatActual.currentValue && !changes.isChatActual.isFirstChange() ) {
-console.log('ngOnChangesngOnChangesngOnChanges', changes.isChatActual)
 			this.getLastMessages();
 		}		
 	}
@@ -95,7 +94,6 @@ console.log('ngOnChangesngOnChangesngOnChanges', changes.isChatActual)
 	private _listTop : number;	
 	
 	public ngAfterViewChecked() : void {
-console.log('Chat ngAfterViewChecked');
 		let listTop = Math.round( this.elChatList.getBoundingClientRect().top + (window.document.documentElement.scrollTop || window.document.body.scrollTop) ); // round for mozilla round
 		
 		if (this._listTop !== listTop) {
@@ -112,12 +110,10 @@ console.log('Chat ngAfterViewChecked');
 
 	
 	public scrollDown() : void {
-		this.elChatList.scrollTop = this.elChatList.scrollHeight;
-console.log('setsetsetsetsetsetsetsetsetsetsetset this.elChatList.scrollHeight = ', this.elChatList.scrollHeight)	
+		this.elChatList.scrollTop = this.elChatList.scrollHeight;	
 	}
 	
 	public expand(listTop?) : void {
-console.log('expandexpandexpandexpandexpandexpandexpan')
 		let windowHeight = window.innerHeight || window.document.document.documentElement.clientHeight || window.document.documentElement.clientHeight;
 		
 		listTop = listTop || ( this.elChatList.getBoundingClientRect().top + (window.document.documentElement.scrollTop || window.document.body.scrollTop) );
