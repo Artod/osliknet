@@ -50,7 +50,7 @@ export class OrdersComponent implements OnDestroy {
 	}
 	
 	public page : number = 0;
-	public limit : number = 5;
+	public limit : number = 15;
 	public fullPage : boolean = false;
 	private _busy : boolean = false;
 

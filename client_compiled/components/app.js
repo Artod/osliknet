@@ -124,9 +124,10 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
                         { path: '/messages', name: 'Dialogs', component: dialogs_component_1.DialogsComponent }
                     ]),
                     __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [router_1.Location, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _a) || Object, Object])
                 ], AppComponent);
                 return AppComponent;
+                var _a;
             }());
             exports_1("AppComponent", AppComponent);
         }

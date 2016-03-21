@@ -10,61 +10,24 @@ html
 		
 		base(href="/")
 		
-		link(rel='stylesheet', href='/modules/bootstrap/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/node_modules/bootstrap/dist/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/css/src/splash.css')
 		link(rel='stylesheet', href='/css/src/mydatepicker.css')
 		link(rel='stylesheet', href='/css/src/style.css')
 		// link(rel='stylesheet', href='/css/style.css')
 		
-		script(src='/modules/systemjs/system.src.js')
-		// script(src='/js/system.js')
-		
-		script.
-			System.config({
-				baseURL: '/',
-				/*transpiler: 'typescript',
-				paths: {
-					'/': 'modules/*'
-				},*/
-				defaultJSExtensions: true,
-				packages: {
-					/*client_dist: {
-						format: 'register',
-						defaultExtension: 'js'
-					}*/
-				}
-				/*,
-				map: {
-				  "ng2-datepicker": "node_modules/ng2-datepicker/ng2-datepicker.js",
-				  "moment": "modules/moment/moment.js"
-				}
-				*/
-			});
-			
-		script(src='/modules/angular2/angular2-polyfills.js')
-		script(src='/modules/rxjs/Rx.js')
-		script(src='/modules/angular2/angular2.dev.js')
-		script(src='/modules/angular2/router.dev.js')
-		script(src='/modules/angular2/http.dev.js')
-		
-		// script(src='/js/libs.js')
-		// script(src='/js/app.js')
-
 		
 		
+		// script(src='/node_modules/es6-shim/es6-shim.js')
+		script(src='/node_modules/systemjs/dist/system-polyfills.js')
+		// script(src='/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js')		
+		script(src='/node_modules/angular2/bundles/angular2-polyfills.js')
+		script(src='/node_modules/systemjs/dist/system.src.js')
+		script(src='/node_modules/rxjs/bundles/Rx.js')
+		script(src='/node_modules/angular2/bundles/angular2.dev.js')
+		script(src='/node_modules/angular2/bundles/router.dev.js')
+		script(src='/node_modules/angular2/bundles/http.dev.js')
 		
-		
-
-		//script(src='/modules/ng2-datepicker/ng2-datepicker.js')		
-		//script(src='/modules/moment/moment.js')		
-		
-	body
-
-			
-		app
-
-				
-				
 		script.
 			// System.import('bootstrap');
 			
@@ -90,9 +53,32 @@ html
 			window.orderStatus = !{orderStatus};
 			window.orderStatusConst = !{orderStatusConst};
 			
-
-
+			System.config({
+				packages: {        
+					client_compiled: {
+						format: 'register',
+						defaultExtension: 'js'
+					}
+				}
+			});
+			
 			System.import('/client_compiled/boot').then( null, console.error.bind(console) );
+			
+			
+			
+	body
+
+			
+		app
+			div.promo-text.text-center
+				p
+					br
+					| People who travel frequently can deliver anything. For example, you live in the USA and you urgently need any medication or documents from Russia. In our application, you can find someone who is just about to arrive from Moscow to New York. He can help you for money or for free. Initialization app...
+					br
+					br
+				
+				
+
 
 				
 	

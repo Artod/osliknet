@@ -2,7 +2,15 @@ process.on('uncaughtException', function (error) {
    console.error('------------uncaughtException------------');
    console.dir(error.stack);
    console.error('------------uncaughtException------------');
-});
+});''
+
+
+/*
+
+sudo service nginx restart && sudo pm2 restart www
+sudo service nginx restart && sudo pm2 restart oslikinet
+
+*/
 
 // NODE_ENV=development
 /*
@@ -68,14 +76,21 @@ TODO:
 \/- hosting 
 \/- deploy (secret key captcha + sendgrid)
 
-- loading on search trip
-- indexes db
-- zero dialogs
-- email oslikinet
+\/- email oslikinet (5$)
+\/- page count limit
+\/- caprtcha under button
+\/- subsc если ты разлогинен на зареганый емайл
+
+
+\/- loading on search trip
+\/- loading on login
+?- zero dialogs
+\/- nginx cache
+
+- pm2 product
 - support link
-- nginx cache
-
-
+- определение мобильных браузеров
+- indexes db
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
 - paypal
 
@@ -220,7 +235,7 @@ passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback, r
 
 
 
-app.locals.title = 'OSLiKi.Net';
+app.locals.title = config.name;
 //app.locals.strftime = require('strftime');
 app.locals.email = config.email;
 
@@ -265,6 +280,8 @@ app.use( session(sessionParam) );
 
 if ( app.get('isDev') ) {
 	app.use( express.static( path.join(__dirname, '../public') ) );
+	// app.use( express.static( path.join(__dirname, '../node_modules') ) );
+	app.use('/node_modules',      express.static(path.join(__dirname, '../node_modules')));
 	
 	// app.use(express.static(path.join(__dirname, 'node_modules')));
 	// app.use(express.static(path.join(__dirname, 'scripts')));
@@ -272,10 +289,10 @@ if ( app.get('isDev') ) {
 	// app.use('/modules/moment', express.static(__dirname + '/node_modules/moment'));
 
 
-	app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
+	/*app.use('/modules/bootstrap', express.static(path.join(__dirname, '../node_modules/bootstrap/dist')));
 	app.use('/modules/angular2',  express.static(path.join(__dirname, '../node_modules/angular2/bundles')));
 	app.use('/modules/systemjs',  express.static(path.join(__dirname, '../node_modules/systemjs/dist')));
-	app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));
+	app.use('/modules/rxjs',      express.static(path.join(__dirname, '../node_modules/rxjs/bundles')));*/
 	app.use('/client_compiled',       express.static(path.join(__dirname, '../client_compiled')));
 	app.use('/client_src',       express.static(path.join(__dirname, '../client_src')));
 	// app.use('/scripts', express.static(path.join(__dirname, '/scripts')));
@@ -356,6 +373,8 @@ module.exports = app;
 
 
 /*
+
+Angular2, Node.js, MongoDB, JavaScript, TypeScript, ES6, Jade, Bootsrap, HTML5, Nginx, DigitalOcean, Gulp.js, Mongoose.js, Express.js, rxjs, SendGrid, PayPal API
 
 Angular2, Node.js, MongoDB, TypeScript, JavaScript, ES6, Express.js, HTML5, Bootstrap, Jade, jQuery, delivery, p2p, startup, ecmascript 6, MEAN, mongoose
 

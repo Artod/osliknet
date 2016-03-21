@@ -61,7 +61,7 @@ export class TripsMyComponent implements OnDestroy {
 	}
 	
 	public page : number = 0;
-	public limit : number = 5;
+	public limit : number = 10;
 	public fullPage : boolean = false;
 	private _busy : boolean = false;
 

@@ -48,9 +48,10 @@ System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', '.
                         directives: [router_1.ROUTER_DIRECTIVES, chat_component_1.ChatComponent, user_card_component_1.UserCardComponent]
                     }),
                     __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [router_1.RouteParams, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _a) || Object, Object])
                 ], MessagesComponent);
                 return MessagesComponent;
+                var _a;
             }());
             exports_1("MessagesComponent", MessagesComponent);
         }

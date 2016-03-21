@@ -89,9 +89,10 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
                     }),
                     __param(2, core_1.Inject('orderId')),
                     __param(3, core_1.Inject('onReviewAdd')), 
-                    __metadata('design:paramtypes', [common_1.FormBuilder, review_service_1.ReviewService, String, Function])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _b) || Object, String, Object])
                 ], ReviewAddComponent);
                 return ReviewAddComponent;
+                var _a, _b;
             }());
             exports_1("ReviewAddComponent", ReviewAddComponent);
         }

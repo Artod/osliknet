@@ -102,9 +102,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         templateUrl: '/client_src/tmpls/trip-add.html',
                         directives: [gm_autocomplite_component_1.GmAutocompliteComponent, common_1.FORM_DIRECTIVES, common_1.CORE_DIRECTIVES, mydatepicker_1.MyDatePicker]
                     }), 
-                    __metadata('design:paramtypes', [common_1.FormBuilder, router_1.Router, trip_service_1.TripService])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof router_1.Router !== 'undefined' && router_1.Router) === 'function' && _b) || Object, (typeof (_c = typeof trip_service_1.TripService !== 'undefined' && trip_service_1.TripService) === 'function' && _c) || Object])
                 ], TripAddComponent);
                 return TripAddComponent;
+                var _a, _b, _c;
             }());
             exports_1("TripAddComponent", TripAddComponent);
         }

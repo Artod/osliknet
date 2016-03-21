@@ -85,7 +85,7 @@ export class UserComponent {
 	}
 	
 	public page : number = 0;
-	public limit : number = 2;
+	public limit : number = 15;
 	public fullPage : boolean = false;
 	private _busyPaging : boolean = false;
 

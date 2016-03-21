@@ -201,13 +201,14 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					var email = new sendgrid.Email();
 					
 					email.addTo(subscribe.email);
-					email.subject = 'New trip on Osliki.Net';
-					email.from = 'osliknet@gmail.com';
+					email.setFromName(config.name);
+					email.subject = 'New trip on ' + config.name;
+					email.from = config.email;
 					
 					email.text += 'Hello!\n\r\n\r';
 					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' ' + config.host + 'trips/' + trip.id + '.\n\r';
 					email.text += 'Unsubscribe: ' + config.host + 'subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
-					email.text += 'Team http://Osliki.Net .';
+					email.text += 'Team ' + config.host;
 
 					sendgrid.send(email, function(err, json) {
 						if (err) {

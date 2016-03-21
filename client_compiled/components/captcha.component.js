@@ -37,11 +37,14 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                     this.checkLoaded();
                 };
                 CaptchaComponent.prototype.ngOnDestroy = function () {
-                    clearInterval(this.interval);
+                    if (this.interval) {
+                        window.clearInterval(this.interval);
+                    }
                 };
                 CaptchaComponent.prototype.checkLoaded = function () {
                     if (this.configCaptcha.loaded) {
-                        clearInterval(this.interval);
+                        window.clearInterval(this.interval);
+                        this.interval = null;
                         this.init();
                     }
                 };
@@ -66,7 +69,7 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                 };
                 __decorate([
                     core_1.Input(), 
-                    __metadata('design:type', common_1.Control)
+                    __metadata('design:type', (typeof (_a = typeof common_1.Control !== 'undefined' && common_1.Control) === 'function' && _a) || Object)
                 ], CaptchaComponent.prototype, "ctrl", void 0);
                 __decorate([
                     core_1.Input(), 
@@ -74,7 +77,7 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                 ], CaptchaComponent.prototype, "model", void 0);
                 __decorate([
                     core_1.Output('modelChange'), 
-                    __metadata('design:type', core_1.EventEmitter)
+                    __metadata('design:type', (typeof (_b = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _b) || Object)
                 ], CaptchaComponent.prototype, "modelChange", void 0);
                 CaptchaComponent = __decorate([
                     core_1.Component({
@@ -82,9 +85,10 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                         template: "\n\t\t<input name=\"recaptcha\" type=\"hidden\" [(ngModel)]=\"model\" [ngFormControl]=\"ctrl\" value=\"\" />\n\t\t<div class=\"g-recaptcha\">Loading captcha...</div>\n\t"
                     }),
                     __param(0, core_1.Inject('config.captcha')), 
-                    __metadata('design:paramtypes', [Object, core_1.ElementRef])
+                    __metadata('design:paramtypes', [Object, (typeof (_c = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _c) || Object])
                 ], CaptchaComponent);
                 return CaptchaComponent;
+                var _a, _b, _c;
             }());
             exports_1("CaptchaComponent", CaptchaComponent);
         }

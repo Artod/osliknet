@@ -64,9 +64,10 @@ System.register(['angular2/core', 'angular2/router', '../services/message/messag
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(3, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [message_service_1.MessageService, notification_service_1.NotificationService, core_1.ApplicationRef, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof message_service_1.MessageService !== 'undefined' && message_service_1.MessageService) === 'function' && _a) || Object, (typeof (_b = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _b) || Object, (typeof (_c = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _c) || Object, Object])
                 ], DialogsComponent);
                 return DialogsComponent;
+                var _a, _b, _c;
             }());
             exports_1("DialogsComponent", DialogsComponent);
         }

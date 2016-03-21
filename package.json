@@ -5,10 +5,12 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "typings": "typings",
+    "postinstall": "typings install"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.7",
+    "angular2": "2.0.0-beta.11",
     "async": "1.5.2",
     "body-parser": "~1.13.2",
     "bootstrap": "3.3.6",
@@ -17,7 +19,7 @@
     "debug": "~2.2.0",
     "emailjs": "1.0.1",
     "es6-promise": "3.0.2",
-    "es6-shim": "0.33.3",
+    "es6-shim": "0.35.0",
     "express": "~4.13.1",
     "express-session": "1.12.1",
     "jade": "~1.11.0",
@@ -32,9 +34,9 @@
     "rxjs": "5.0.0-beta.2",
     "sendgrid": "2.0.0",
     "serve-favicon": "~2.3.0",
-    "systemjs": "0.19.22",
+    "systemjs": "0.19.24",
     "winston": "2.2.0",
-    "zone.js": "0.5.15"
+    "zone.js": "0.6.4"
   },
   "devDependencies": {
     "gulp-clean-css": "2.0.3",
@@ -43,7 +45,9 @@
     "gulp-livereload": "3.8.1",
     "gulp-nodemon": "2.0.6",
     "gulp-sourcemaps": "1.6.0",
+    "gulp-typescript": "2.12.1",
     "gulp-uglify": "1.5.3",
-    "typescript": "1.8.0"
+    "typescript": "1.8.0",
+	"typings":"0.7.9"
   }
 }

@@ -1,4 +1,5 @@
 node_modules/
+typings/
 client_src/**/*.js
 client_src/**/*.map
 server/logs/**/*.log

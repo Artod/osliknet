@@ -5,9 +5,8 @@ import {NgIf, NgFor, NgClass, NgStyle, NgModel} from 'angular2/common';
 import {MyDate, MyMonth} from './interfaces';
 
 @Component({
-    selector: 'my-date-picker'
-})
-@View({
+    selector: 'my-date-picker',
+
     templateUrl: '/client_src/services/datepicker/template/mydatepicker.html',
     directives: [NgIf, NgFor, NgClass, NgStyle]
 })

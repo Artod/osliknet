@@ -175,19 +175,19 @@ System.register(['angular2/core', 'angular2/router', 'angular2/common', '../serv
                 ], ChatComponent.prototype, "isChatActual", void 0);
                 __decorate([
                     core_1.Output(), 
-                    __metadata('design:type', core_1.EventEmitter)
+                    __metadata('design:type', (typeof (_a = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _a) || Object)
                 ], ChatComponent.prototype, "isChatActualChange", void 0);
                 __decorate([
                     core_1.Output('user'), 
-                    __metadata('design:type', core_1.EventEmitter)
+                    __metadata('design:type', (typeof (_b = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _b) || Object)
                 ], ChatComponent.prototype, "userOutput", void 0);
                 __decorate([
                     core_1.Output('order'), 
-                    __metadata('design:type', core_1.EventEmitter)
+                    __metadata('design:type', (typeof (_c = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _c) || Object)
                 ], ChatComponent.prototype, "orderOutput", void 0);
                 __decorate([
                     core_1.Output('orderStatus'), 
-                    __metadata('design:type', core_1.EventEmitter)
+                    __metadata('design:type', (typeof (_d = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _d) || Object)
                 ], ChatComponent.prototype, "orderStatusOutput", void 0);
                 ChatComponent = __decorate([
                     core_1.Component({
@@ -197,9 +197,10 @@ System.register(['angular2/core', 'angular2/router', 'angular2/common', '../serv
                         directives: [router_1.ROUTER_DIRECTIVES]
                     }),
                     __param(5, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [message_service_1.MessageService, notification_service_1.NotificationService, common_1.FormBuilder, core_1.ElementRef, core_1.ApplicationRef, Object])
+                    __metadata('design:paramtypes', [(typeof (_e = typeof message_service_1.MessageService !== 'undefined' && message_service_1.MessageService) === 'function' && _e) || Object, (typeof (_f = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _f) || Object, (typeof (_g = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _g) || Object, (typeof (_h = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _h) || Object, (typeof (_j = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _j) || Object, Object])
                 ], ChatComponent);
                 return ChatComponent;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j;
             }());
             exports_1("ChatComponent", ChatComponent);
         }

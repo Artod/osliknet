@@ -197,10 +197,11 @@ function deliveryToken(req, res, next) {
 	var email = new sendgrid.Email();
 	
 	email.addTo(req.passwordless.recipient);
-	email.subject = 'Token for ' + config.host;
+	email.setFromName(config.name);
+	email.subject = 'Token for ' + config.name;
 	email.from = config.email;
-	email.text = 'Hello! \n You can now access your account here: ' + link + '\n Team of OsLiKi.Net';
-	email.html = '<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team of OsLiKi.Net</p>';
+	email.text = 'Hello! \n You can now access your account here: ' + link + '\n Team ' + config.name;
+	email.html = '<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team ' + config.name + '</p>';
 
 	sendgrid.send(email, function(err, json) {
 		if (err) {

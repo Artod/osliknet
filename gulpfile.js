@@ -58,13 +58,40 @@ gulp.task('dev_app', function() {
 		.pipe( gulp.dest('client_compiled') );
 });
 
+
+/* 		script(src='/node_modules/es6-shim/es6-shim.js')
+		script(src='/node_modules/systemjs/dist/system-polyfills.src.js')
+		script(src='/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js')
+		
+		script(src='/node_modules/angular2/bundles/angular2-polyfills.js')
+		script(src='/node_modules/systemjs/dist/system.src.js')
+		script(src='/node_modules/rxjs/bundles/Rx.js')
+		script(src='/node_modules/angular2/bundles/angular2.dev.js')
+		script(src='/node_modules/angular2/bundles/router.dev.js')
+		script(src='/node_modules/angular2/bundles/http.dev.js')
+		 */
+		 
+		 
+		// script(src='/node_modules/es6-shim/es6-shim.js')
+		// script(src='/node_modules/systemjs/dist/system-polyfills.js')
+		// script(src='/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js')
+		
+		// script(src='/node_modules/angular2/bundles/angular2-polyfills.js')
+		// script(src='/node_modules/systemjs/dist/system.src.js')
+		// script(src='/node_modules/rxjs/bundles/Rx.js')
+		// script(src='/node_modules/angular2/bundles/angular2.dev.js')
+		// script(src='/node_modules/angular2/bundles/router.dev.js')
+		// script(src='/node_modules/angular2/bundles/http.dev.js')
+		
 gulp.task('libs', function() {
 	return gulp.src([
+		// 'node_modules/es6-shim/es6-shim.js',
 		'node_modules/systemjs/dist/system-polyfills.js',
-		'node_modules/systemjs/dist/system.js',
-		'node_modules/es6-shim/es6-shim.js',
-		'node_modules/rxjs/bundles/Rx.js',
+		// 'node_modules/angular2/es6/dev/src/testing/shims_for_IE.js',
+		
 		'node_modules/angular2/bundles/angular2-polyfills.js',
+		'node_modules/systemjs/dist/system.js',
+		'node_modules/rxjs/bundles/Rx.min.js',
 		'node_modules/angular2/bundles/angular2.dev.js',
 		'node_modules/angular2/bundles/router.dev.js',
 		'node_modules/angular2/bundles/http.dev.js'
@@ -73,11 +100,11 @@ gulp.task('libs', function() {
 	.pipe( concat('libs.js') )
 	.pipe( gulp.dest('public/js') );
 });
-
+/*
 gulp.task('copy:system', function() {
 	return gulp.src('node_modules/systemjs/dist/system.js')
 		.pipe( gulp.dest('public/js') );
-});
+});*/
 
 gulp.task('copy:fonts', function() {
 	return gulp.src('node_modules/bootstrap/dist/fonts/*')
@@ -96,7 +123,7 @@ gulp.task('css', function() {
 	.pipe( gulp.dest('public/css') );
 });
 
-gulp.task('build', ['app', 'libs', 'copy:system', 'css', 'copy:fonts']);
+gulp.task('build', ['app', 'libs', 'css', 'copy:fonts']);
 
 gulp.task('watch', ['dev_app'], function() {
 	// livereload.listen();

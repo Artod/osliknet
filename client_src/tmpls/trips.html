@@ -23,7 +23,7 @@
 	
 	<h4 *ngIf="isMain" class="white-font">Find trips</h4>
 	
-	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit($event, form, thanx)">
+	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="_busySearch ? false : onSubmit($event, form, thanx)">
 		<div class="form-group">
 			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
 		</div>
@@ -37,7 +37,7 @@
 		</div>
 		
 		<div class="form-group">
-			<button type="submit" class="btn btn-warning btn-lg">Find</button>
+			<button type="submit" class="btn btn-warning btn-lg">{{ _busySearch ? 'Wait' : 'Find' }}</button>
 		</div>
 	</form>
 </div>
@@ -91,12 +91,14 @@
 				
 				<div class="form-group {{_subSubmitted && !subForm.controls.email.valid ? 'has-error' : ''}}">
 					<input *ngIf="!configUser.id" class="form-control subscribe-email" type="email" name="email" [(ngModel)]="subModel.email" [ngFormControl]="subForm.controls.email" placeholder="E-mail"  />		
-
-					<button type="submit" class="btn btn-warning btn-lg1">{{ _subBusy ? 'Wait...' : 'Subscribe' }}</button>
-				</div>	
-
+				</div>
+					
 				<div *ngIf="!configUser.id" class="form-group {{_subSubmitted && subModel.recaptcha === '' ? 'has-error' : ''}}">
 					<captcha [ctrl]="subForm.controls.recaptcha" [(model)]="subModel.recaptcha"></captcha>
+				</div>
+				
+				<div class="form-group {{configUser.id ? '' : 'text-right'}}">
+					<button type="submit" class="btn btn-warning btn-lg1">{{ _subBusy ? 'Wait...' : 'Subscribe' }}</button>	
 				</div>
 
 			</form> 

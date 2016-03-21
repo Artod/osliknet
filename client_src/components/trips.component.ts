@@ -137,7 +137,7 @@ export class TripsComponent implements
 	}
 
 	public lastId : string = '';
-	public limit : number = 2;
+	public limit : number = 15;
 	private _busy : boolean = false;
 
 	public loadNext() : void {
@@ -174,6 +174,8 @@ export class TripsComponent implements
 		
 		this.search($event, $form, $thanx);
 	}
+	
+	private _busySearch : boolean = false;
 	
 	public search($event, $form, $thanx) : void {
 		if (!this.searchForm.valid) {			
@@ -223,14 +225,18 @@ export class TripsComponent implements
 			return;
 		}
 		
+		this._busySearch = true;
+		
 		this._tripService.search(this.searchModel, this.limit).subscribe(data => {
 			this.trips = data.trips || [];
 			this.lastId = (data.trips[this.limit - 1] || {})._id || '';
 			this.subscribe = data.subscribe || {};
 			
 			this._inited = true;
+			this._busySearch = false;
 		}, err => {
 			this._inited = true;
+			this._busySearch = false;
 		});
 	}
 

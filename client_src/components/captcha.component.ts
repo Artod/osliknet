@@ -35,13 +35,16 @@ export class CaptchaComponent {
 	}
 	
 	public ngOnDestroy() {
-		clearInterval(this.interval);
+		if (this.interval) {
+			window.clearInterval(this.interval);
+		}
 	}
 	
 	public checkLoaded() : void {
 		if (this.configCaptcha.loaded) {
-			clearInterval(this.interval);
-			
+			window.clearInterval(this.interval);
+			this.interval = null;
+
 			this.init();
 		}
 	}

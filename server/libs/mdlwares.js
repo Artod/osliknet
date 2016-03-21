@@ -32,9 +32,16 @@ module.exports.restricted = function(req, res, next) {
 	}
 };
 
-var templatePath = require.resolve(process.env.NODE_ENV === 'development' ? '../views/dev_index.jade' : '../views/index.jade');
-
-var indexCompiled = jade.compileFile(templatePath, {cache: true});
+var indexCompiled = (function() {
+	if (process.env.NODE_ENV === 'development') {
+		return function(data) {
+			var indexCompiled = jade.compileFile( require.resolve('../views/dev_index.jade', {cache: true}) );
+			return indexCompiled(data);
+		}
+	} else {
+		return jade.compileFile( require.resolve('../views/index.jade', {cache: true}) );		
+	}
+})();
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
 	if (req.xhr) {

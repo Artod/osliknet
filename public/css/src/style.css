@@ -264,7 +264,7 @@ input.input-lg {
 }
  
 	.head .navbar-default{
-		background-color: rgba(255,255,255,0.85);
+		background-color: rgba(255,255,255,0.9);
 		border: 0px;
 		border-bottom: 1px solid #e7e7e7;
 		
@@ -335,7 +335,7 @@ input.input-lg {
 	left:-50%;
 	
 	top:43px;
-	background-color: rgba(255,255,255,0.85);
+	background-color: rgba(255,255,255,0.9);
 	border-top: 0px solid #e7e7e7;
 	border-right: 1px solid #e7e7e7;
 	height:100%;
@@ -396,7 +396,7 @@ input.input-lg {
 }
 
 .popover-my {
-	background-color: rgba(255,255,255,0.85);
+	background-color: rgba(255,255,255,0.9);
 	border-color: #fff;
 	border-radius: 5px;
 	box-shadow: 0 0 5px rgba(0,0,0,0.4);
@@ -490,7 +490,7 @@ a.avatar {
 	font-size: 2.5em;
 }
 
-.g-recaptcha {display:inline-block;}
+/*.g-recaptcha {display:inline-block;}*/
 .has-error .g-recaptcha {
 	border: 1px solid #a94442;
 }
@@ -500,12 +500,12 @@ a.avatar {
 	margin-left: auto;
     margin-right: auto;
 }
-
+/*
 .subscribe-form input.form-control {
 	width:210px;
 	display:inline-block;
 	vertical-align:middle;
-}
+}*/
 
 .user-card {
 	display:inline-block;

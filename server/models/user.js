@@ -406,12 +406,14 @@ setInterval(function() {
 					text += '<li>You have new ' + (msgsInDialog.length > 1 ? '<a href="' + config.host + 'messages">private messages</a>' : '<a href="' + config.host + 'messages/user/' + msgsInDialog[0] + '">private message</a>') + '.</li>';
 				}
 				
-				text += '</ul> <p>Team <a href="http://Osliki.Net">Osliki.Net</a> .</p>';
+				text += '</ul> <p>Team <a href="' + config.host + '">' + config.name + '</a> .</p>';
 				
 				var email = new sendgrid.Email();
 				
 				email.addTo(user.email);
-				email.subject = 'Notifications from Osliki.Net';
+				email.setFromName(config.name);
+				
+				email.subject = 'Notifications from ' + config.name;
 				email.from = config.email;
 				// email.text = text;
 				email.html = text;

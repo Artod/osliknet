@@ -114,9 +114,10 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     __param(6, core_1.Inject('config.orderStatus')),
                     __param(7, core_1.Inject('config.orderStatusConst')),
                     __param(8, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [order_service_1.OrderService, modal_service_1.ModalService, review_service_1.ReviewService, router_1.RouteParams, core_1.Renderer, core_1.ApplicationRef, Object, Object, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _d) || Object, (typeof (_e = typeof core_1.Renderer !== 'undefined' && core_1.Renderer) === 'function' && _e) || Object, (typeof (_f = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _f) || Object, Object, Object, Object])
                 ], OrderComponent);
                 return OrderComponent;
+                var _a, _b, _c, _d, _e, _f;
             }());
             exports_1("OrderComponent", OrderComponent);
         }

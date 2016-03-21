@@ -73,9 +73,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     this.searchModel = {};
                     this.subModel = {};
                     this.lastId = '';
-                    this.limit = 2;
+                    this.limit = 15;
                     this._busy = false;
                     this._inited = false;
+                    this._busySearch = false;
                     this._subBusy = false;
                     this._subsFinished = false;
                     this._subSubmitted = false;
@@ -184,13 +185,16 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         this.lastId = '';
                         return;
                     }
+                    this._busySearch = true;
                     this._tripService.search(this.searchModel, this.limit).subscribe(function (data) {
                         _this.trips = data.trips || [];
                         _this.lastId = (data.trips[_this.limit - 1] || {})._id || '';
                         _this.subscribe = data.subscribe || {};
                         _this._inited = true;
+                        _this._busySearch = false;
                     }, function (err) {
                         _this._inited = true;
+                        _this._busySearch = false;
                     });
                 };
                 TripsComponent.prototype.onSubscribe = function ($event, $form) {
@@ -239,9 +243,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(11, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [router_1.Router, router_1.Location, modal_service_1.ModalService, order_service_1.OrderService, trip_service_1.TripService, subscribe_service_1.SubscribeService, common_1.FormBuilder, router_1.RouteParams, router_1.RouteData, core_1.ElementRef, core_1.ApplicationRef, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.Router !== 'undefined' && router_1.Router) === 'function' && _a) || Object, (typeof (_b = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _b) || Object, (typeof (_c = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _c) || Object, (typeof (_d = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _d) || Object, (typeof (_e = typeof trip_service_1.TripService !== 'undefined' && trip_service_1.TripService) === 'function' && _e) || Object, (typeof (_f = typeof subscribe_service_1.SubscribeService !== 'undefined' && subscribe_service_1.SubscribeService) === 'function' && _f) || Object, (typeof (_g = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _g) || Object, (typeof (_h = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _h) || Object, (typeof (_j = typeof router_1.RouteData !== 'undefined' && router_1.RouteData) === 'function' && _j) || Object, (typeof (_k = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _k) || Object, (typeof (_l = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _l) || Object, Object])
                 ], TripsComponent);
                 return TripsComponent;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
             }());
             exports_1("TripsComponent", TripsComponent);
         }
