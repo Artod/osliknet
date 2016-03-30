@@ -1,4 +1,4 @@
-System.register(['angular2/core', 'angular2/router', '../services/order/order.service', '../services/modal/modal.service', '../services/review/review.service', '../pipes/to-date.pipe', './trip-card.component', './order-card.component', './review-add.component', './chat.component'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', '../services/order/order.service', '../services/modal/modal.service', '../services/review/review.service', '../services/invoice/invoice.service', '../pipes/to-date.pipe', './trip-card.component', './order-card.component', './review-add.component', './invoice-add.component', './chat.component'], function(exports_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -12,7 +12,7 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
     var __param = (this && this.__param) || function (paramIndex, decorator) {
         return function (target, key) { decorator(target, key, paramIndex); }
     };
-    var core_1, router_1, order_service_1, modal_service_1, review_service_1, to_date_pipe_1, trip_card_component_1, order_card_component_1, review_add_component_1, chat_component_1;
+    var core_1, router_1, order_service_1, modal_service_1, review_service_1, invoice_service_1, to_date_pipe_1, trip_card_component_1, order_card_component_1, review_add_component_1, invoice_add_component_1, chat_component_1;
     var OrderComponent;
     return {
         setters:[
@@ -31,6 +31,9 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
             function (review_service_1_1) {
                 review_service_1 = review_service_1_1;
             },
+            function (invoice_service_1_1) {
+                invoice_service_1 = invoice_service_1_1;
+            },
             function (to_date_pipe_1_1) {
                 to_date_pipe_1 = to_date_pipe_1_1;
             },
@@ -43,17 +46,20 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
             function (review_add_component_1_1) {
                 review_add_component_1 = review_add_component_1_1;
             },
+            function (invoice_add_component_1_1) {
+                invoice_add_component_1 = invoice_add_component_1_1;
+            },
             function (chat_component_1_1) {
                 chat_component_1 = chat_component_1_1;
             }],
         execute: function() {
             OrderComponent = (function () {
-                function OrderComponent(_orderService, _modalService, _reviewService, _routeParams, _renderer, _appRef, configOrderStatus, sts, configUser) {
+                function OrderComponent(_orderService, _modalService, _reviewService, _invoiceService, _routeParams, _appRef, configOrderStatus, sts, configUser) {
                     this._orderService = _orderService;
                     this._modalService = _modalService;
                     this._reviewService = _reviewService;
+                    this._invoiceService = _invoiceService;
                     this._routeParams = _routeParams;
-                    this._renderer = _renderer;
                     this._appRef = _appRef;
                     this.configOrderStatus = configOrderStatus;
                     this.sts = sts;
@@ -78,20 +84,29 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                         _this._changeStatusBusy = false;
                     });
                 };
+                OrderComponent.prototype.sendInvoice = function () {
+                    var _this = this;
+                    this._modalService.show(invoice_add_component_1.InvoiceAddComponent, core_1.Injector.resolve([
+                        core_1.provide(invoice_service_1.InvoiceService, { useValue: this._invoiceService }),
+                        core_1.provide('orderId', { useValue: this.orderId }),
+                        core_1.provide('onInvoiceAdd', {
+                            useValue: function () {
+                                _this.isChatActual = false;
+                            }
+                        })
+                    ]));
+                };
                 OrderComponent.prototype.sendReview = function () {
                     var _this = this;
-                    this._modalService.open().then(function (modalComponentRef) {
-                        _this._modalService.bind(review_add_component_1.ReviewAddComponent, modalComponentRef, core_1.Injector.resolve([
-                            core_1.provide(core_1.Renderer, { useValue: _this._renderer }),
-                            core_1.provide(review_service_1.ReviewService, { useValue: _this._reviewService }),
-                            core_1.provide('orderId', { useValue: _this.orderId }),
-                            core_1.provide('onReviewAdd', {
-                                useValue: function () {
-                                    _this.isChatActual = false;
-                                }
-                            })
-                        ]));
-                    });
+                    this._modalService.show(review_add_component_1.ReviewAddComponent, core_1.Injector.resolve([
+                        core_1.provide(review_service_1.ReviewService, { useValue: this._reviewService }),
+                        core_1.provide('orderId', { useValue: this.orderId }),
+                        core_1.provide('onReviewAdd', {
+                            useValue: function () {
+                                _this.isChatActual = false;
+                            }
+                        })
+                    ]));
                 };
                 OrderComponent.prototype.onOrder = function (order) {
                     this.order = order;
@@ -114,7 +129,7 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     __param(6, core_1.Inject('config.orderStatus')),
                     __param(7, core_1.Inject('config.orderStatusConst')),
                     __param(8, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _d) || Object, (typeof (_e = typeof core_1.Renderer !== 'undefined' && core_1.Renderer) === 'function' && _e) || Object, (typeof (_f = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _f) || Object, Object, Object, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _d) || Object, (typeof (_e = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _e) || Object, (typeof (_f = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _f) || Object, Object, Object, Object])
                 ], OrderComponent);
                 return OrderComponent;
                 var _a, _b, _c, _d, _e, _f;

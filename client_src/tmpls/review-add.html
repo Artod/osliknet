@@ -29,8 +29,8 @@
 	</div>
 	
 	<p class="text-right">
+		<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
 		<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
-		<button class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
 	</p>
 	
 	<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">

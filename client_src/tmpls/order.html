@@ -35,6 +35,7 @@
 					</span>
 					<span *ngSwitchWhen="sts.PROCESSING">
 						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
+						<button class="btn btn-warning" (click)="sendInvoice()">Send invoice</button>
 					</span>
 					<span *ngSwitchWhen="sts.REFUSED">
 						<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>

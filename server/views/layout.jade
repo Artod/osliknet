@@ -54,6 +54,8 @@ html
 
 			window.orderStatus = !{orderStatus};
 			window.orderStatusConst = !{orderStatusConst};
+			
+			window.fees = !{fees};
 
 			System.config({
 				packages: {        
@@ -66,7 +68,6 @@ html
 			
 			System.import('boot').then( null, console.error.bind(console) );
 
-			
 		if !user.id
 			script(src='https://www.google.com/recaptcha/api.js?onload=googleRecaptcha&render=explicit', async, defer)
 

@@ -36,7 +36,7 @@
     "serve-favicon": "~2.3.0",
     "systemjs": "0.19.24",
     "winston": "2.2.0",
-    "zone.js": "0.6.4"
+    "zone.js": "0.6.5"
   },
   "devDependencies": {
     "gulp-clean-css": "2.0.3",

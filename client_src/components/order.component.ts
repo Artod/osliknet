@@ -1,15 +1,17 @@
-import {Component, Inject, provide, Renderer, Injector, ApplicationRef} from 'angular2/core';	
+import {Component, Inject, provide, /*Renderer, */Injector, ApplicationRef} from 'angular2/core';	
 import {ROUTER_DIRECTIVES, RouteParams} from 'angular2/router';
 
 import {OrderService} from '../services/order/order.service';
 import {ModalService} from '../services/modal/modal.service';
 import {ReviewService}  from '../services/review/review.service';
+import {InvoiceService}  from '../services/invoice/invoice.service';
 
 import {ToDatePipe} from '../pipes/to-date.pipe';
 
 import {TripCardComponent} from './trip-card.component';
 import {OrderCardComponent} from './order-card.component';
 import {ReviewAddComponent} from './review-add.component';
+import {InvoiceAddComponent} from './invoice-add.component';
 import {ChatComponent} from './chat.component';
 
 @Component({
@@ -30,8 +32,9 @@ export class OrderComponent {
 		private _orderService : OrderService,
 		private _modalService : ModalService,
 		private _reviewService : ReviewService,
+		private _invoiceService : InvoiceService,
 		private _routeParams : RouteParams,
-		private _renderer : Renderer,
+		//private _renderer : Renderer,
 		private _appRef : ApplicationRef,
 		@Inject('config.orderStatus') public configOrderStatus,
 		@Inject('config.orderStatusConst') public sts,
@@ -58,8 +61,21 @@ export class OrderComponent {
 		});
 	}
 	
+	
+	public sendInvoice() : void {	
+		this._modalService.show(InvoiceAddComponent, Injector.resolve([		
+			provide(InvoiceService, {useValue: this._invoiceService}),
+			provide('orderId', {useValue: this.orderId}),
+			provide('onInvoiceAdd', {
+				useValue: () => {
+					this.isChatActual = false;
+				}
+			})
+		]) );
+	}
+	
 	public sendReview() : void {
-		this._modalService.open().then(modalComponentRef => {			
+		/*this._modalService.open().then(modalComponentRef => {			
 			this._modalService.bind( ReviewAddComponent, modalComponentRef, Injector.resolve([
 				provide(Renderer, {useValue: this._renderer}),				
 				provide(ReviewService, {useValue: this._reviewService}),				
@@ -70,7 +86,18 @@ export class OrderComponent {
 					}
 				})
 			]) );
-		})
+		})*/
+		
+		this._modalService.show(ReviewAddComponent, Injector.resolve([
+			//provide(Renderer, {useValue: this._renderer}),		
+			provide(ReviewService, {useValue: this._reviewService}),
+			provide('orderId', {useValue: this.orderId}),
+			provide('onReviewAdd', {
+				useValue: () => {
+					this.isChatActual = false;
+				}
+			})
+		]) );
 	}
 	
 	public onOrder(order) : void {

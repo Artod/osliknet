@@ -7,8 +7,13 @@ process.on('uncaughtException', function (error) {
 
 /*
 
+jechanceux-buyer@gmail.com
+jechanceux-facilitator@gmail.com
+
 sudo service nginx restart && sudo pm2 restart www
 sudo service nginx restart && sudo pm2 restart oslikinet
+
+x=1000; y=(x/100)*3.9 + 0.35; z=(x/100)*5+0.5;  x+y+z= 
 
 */
 
@@ -152,6 +157,7 @@ var orders = require('./routes/orders');
 var messages = require('./routes/messages');
 var reviews = require('./routes/reviews');
 var subscribes = require('./routes/subscribes');
+var invoices = require('./routes/invoices');
 
 
 var app = express();
@@ -323,7 +329,8 @@ app.use(function (req, res, next) {
 		},
 		orderStatus: JSON.stringify(Order.stsInv),
 		orderStatusConst: JSON.stringify(Order.sts),
-		recaptcha: config.recaptcha
+		recaptcha: config.recaptcha,
+		fees: JSON.stringify(config.fees)
 	};
 
 	next();
@@ -336,6 +343,7 @@ app.use('/orders', orders);
 app.use('/messages', messages);
 app.use('/reviews', reviews);
 app.use('/subscribes', subscribes);
+app.use('/invoices', invoices); 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

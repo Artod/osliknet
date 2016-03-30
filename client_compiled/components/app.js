@@ -1,4 +1,4 @@
-System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/common', './trip.component', './trips.component', './trip-add.component', './trips-my.component', './orders.component', './order.component', './user.component', './notifications.component', './messages.component', './dialogs.component', './login.component', './join.component', './user-card.component', '../services/trip/trip.service', '../services/order/order.service', '../services/modal/modal.service', '../services/message/message.service', '../services/review/review.service', '../services/user/user.service', '../services/notification/notification.service', '../services/subscribe/subscribe.service'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/common', './trip.component', './trips.component', './trip-add.component', './trips-my.component', './orders.component', './order.component', './user.component', './notifications.component', './messages.component', './dialogs.component', './login.component', './join.component', './user-card.component', '../services/trip/trip.service', '../services/order/order.service', '../services/modal/modal.service', '../services/message/message.service', '../services/review/review.service', '../services/invoice/invoice.service', '../services/user/user.service', '../services/notification/notification.service', '../services/subscribe/subscribe.service'], function(exports_1) {
     "use strict";
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -12,7 +12,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
     var __param = (this && this.__param) || function (paramIndex, decorator) {
         return function (target, key) { decorator(target, key, paramIndex); }
     };
-    var core_1, router_1, http_1, common_1, trip_component_1, trips_component_1, trip_add_component_1, trips_my_component_1, orders_component_1, order_component_1, user_component_1, notifications_component_1, messages_component_1, dialogs_component_1, login_component_1, join_component_1, user_card_component_1, trip_service_1, order_service_1, modal_service_1, message_service_1, review_service_1, user_service_1, notification_service_1, subscribe_service_1;
+    var core_1, router_1, http_1, common_1, trip_component_1, trips_component_1, trip_add_component_1, trips_my_component_1, orders_component_1, order_component_1, user_component_1, notifications_component_1, messages_component_1, dialogs_component_1, login_component_1, join_component_1, user_card_component_1, trip_service_1, order_service_1, modal_service_1, message_service_1, review_service_1, invoice_service_1, user_service_1, notification_service_1, subscribe_service_1;
     var AppComponent;
     return {
         setters:[
@@ -82,6 +82,9 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
             function (review_service_1_1) {
                 review_service_1 = review_service_1_1;
             },
+            function (invoice_service_1_1) {
+                invoice_service_1 = invoice_service_1_1;
+            },
             function (user_service_1_1) {
                 user_service_1 = user_service_1_1;
             },
@@ -106,7 +109,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
                         selector: 'app',
                         templateUrl: '/client_src/tmpls/app.html',
                         directives: [router_1.ROUTER_DIRECTIVES, common_1.FORM_DIRECTIVES, common_1.CORE_DIRECTIVES, notifications_component_1.NotificationsComponent, user_card_component_1.UserCardComponent],
-                        providers: [http_1.HTTP_PROVIDERS, common_1.FORM_PROVIDERS, trip_service_1.TripService, order_service_1.OrderService, modal_service_1.ModalService, message_service_1.MessageService, notification_service_1.NotificationService, user_service_1.UserService, review_service_1.ReviewService, subscribe_service_1.SubscribeService]
+                        providers: [http_1.HTTP_PROVIDERS, common_1.FORM_PROVIDERS, trip_service_1.TripService, order_service_1.OrderService, modal_service_1.ModalService, message_service_1.MessageService, notification_service_1.NotificationService, user_service_1.UserService, review_service_1.ReviewService, invoice_service_1.InvoiceService, subscribe_service_1.SubscribeService]
                     }),
                     router_1.RouteConfig([
                         { path: '/', name: 'Main', component: trips_component_1.TripsComponent, data: { isMain: true } },

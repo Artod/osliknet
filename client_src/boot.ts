@@ -58,5 +58,8 @@ bootstrap(AppComponent, [
 			FINISHED: 25
 		};*/
 	}}),
+	provide('config.fees', {useFactory: () => {
+		return window.fees;
+	}}),
 	LazyMapsAPILoader
 ]);

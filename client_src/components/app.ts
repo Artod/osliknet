@@ -22,6 +22,7 @@ import {OrderService}   from '../services/order/order.service';
 import {ModalService}   from '../services/modal/modal.service';
 import {MessageService} from '../services/message/message.service';
 import {ReviewService}  from '../services/review/review.service';
+import {InvoiceService}  from '../services/invoice/invoice.service';
 import {UserService}    from '../services/user/user.service';
 import {NotificationService} from '../services/notification/notification.service';
 import {SubscribeService} from '../services/subscribe/subscribe.service';
@@ -31,7 +32,7 @@ import {SubscribeService} from '../services/subscribe/subscribe.service';
     selector: 'app',
 	templateUrl: '/client_src/tmpls/app.html',
 	directives: [ROUTER_DIRECTIVES, FORM_DIRECTIVES, CORE_DIRECTIVES, NotificationsComponent, UserCardComponent],
-	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, /*Location, */TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService, SubscribeService]
+	providers: [HTTP_PROVIDERS, FORM_PROVIDERS, /*Location, */TripService, OrderService, ModalService, MessageService, NotificationService, UserService, ReviewService, InvoiceService, SubscribeService]
 })
 
 @RouteConfig([

@@ -1,5 +1,39 @@
 var captcha = require('../libs/captcha');
 var jade = require('jade');
+var Order = require('../models/order');
+
+module.exports.checkOrderAccess = function(req, res, next) {
+	Order.findById( req.body.order || req.params.id ).populate('trip').exec(function(err, order) {
+		if (err) {
+			//logger.error(err, {line: 16});
+			
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+				
+			return;
+		}
+
+		if (!order) {
+			res.status(400).type('json')
+				.json({error: 'Order not found.'}); 
+				
+			return;
+		}
+		
+		var orderUser = order.user.toString(),
+			tripUser = order.trip.user.toString(); //order.tripUser
+
+		if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
+
+			return;
+		}
+		
+		res.order = order;
+		
+		next();
+	});
+};
 
 module.exports.checkCaptcha = function(req, res, next) {
 	if (req.session.uid) {

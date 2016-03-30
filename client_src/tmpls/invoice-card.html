@@ -1,0 +1,21 @@
+<table *ngIf="fees" class="table" style="max-width:500px; text-align:left;">
+	<tr>
+		<td>For the tripper</td>
+		<td>{{ fees.safe }} {{ currency }}</td>
+	</tr>
+	
+	<tr>
+		<td>Osliki.Net fee ({{ fees.nonRefundableOsliki }} {{ currency }} non-refundable)</td>
+		<td>{{ fees.oslikiFee }} {{ currency }}</td>
+	</tr>
+	
+	<tr>
+		<td>PayPal fee ({{ fees.nonRefundablePaypal }} {{ currency }} non-refundable)</td>
+		<td>{{ fees.paypalFee }} {{ currency }}</td>
+	</tr>
+
+	<tr>
+		<th style="text-align:right;">Total:</th>
+		<th style="text-align:left;">{{ fees.total }} {{ currency }}</th>
+	</tr>
+</table>

@@ -47,10 +47,18 @@ router.get('/', mdlwares.restricted, function(req, res, next) {
 	});
 });
 
-router.post('/add', mdlwares.restricted, function(req, res, next) {
-	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
+router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req, res, next) {
+	var order = res.order;
+	
+	var orderUser = order.user.toString(),
+		tripUser = order.trip.user.toString(); //order.tripUser
+	
+	Review.findOne({
+		order: order._id,
+		user: req.session.uid
+	}).exec(function(err, review) {
 		if (err) {
-			logger.error(err, {line: 52});
+			logger.error(err, {line: 81});
 			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
@@ -58,118 +66,72 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			return;
 		}
 		
-		if (!order) {
-			res.status(400).type('json')
-				.json({error: 'Order not found.'});
-				
-			return;
-		}
+		var wasNew = false;
+
+		if (!review) {
+			wasNew = true;
+			review = new Review();
+		}			
 		
-		var orderUser = order.user.toString(),
-			tripUser = order.trip.user.toString();
-			
-		if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
-			res.status(401).type('json').json({error: 'Unauthorized'});
-			
-			return;
-		}
+		review.order = order._id;
+		review.user = req.session.uid;
+		review.isUserTripper = (req.session.uid === tripUser);
+		review.corr = (req.session.uid !== orderUser ? orderUser : tripUser);
+		review.rating = (req.body.rating && [1, 2, 3, 4, 5].indexOf( Number(req.body.rating) ) > -1 ? req.body.rating : 5);
+		review.comment = req.body.comment;
 		
-		Review.findOne({
-			order: order._id,
-			user: req.session.uid
-		}).exec(function(err, review) {
+		review.save(function(err, review) {
 			if (err) {
-				logger.error(err, {line: 81});
+				logger.error(err, {line: 105});
 				
-				res.status(500).type('json')
+				res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
 					.json({error: 'Unexpected server error.'});
 					
 				return;
 			}
 			
-			var wasNew = false;
-
-			if (!review) {
-				wasNew = true;
-				review = new Review();
-			}			
-			
-			review.order = order._id;
-			review.user = req.session.uid;
-			review.isUserTripper = (req.session.uid === tripUser);
-			review.corr = (req.session.uid !== orderUser ? orderUser : tripUser);
-			review.rating = (req.body.rating && [1, 2, 3, 4, 5].indexOf( Number(req.body.rating) ) > -1 ? req.body.rating : 5);
-			review.comment = req.body.comment;
-			
-			review.save(function(err, review) {
+			Message.addToOrder(order, {
+				order: order._id,
+				user: review.user,
+				corr: review.corr,
+				message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' review.'
+			}, function(err, message) {
 				if (err) {
-					logger.error(err, {line: 105});
+					logger.error(err, {line: 120});
 					
-					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
-						.json({error: 'Unexpected server error.'});
+					return;
+				}
+			});			
+			
+			Review.aggregate([{
+				$match: {
+					isUserTripper: review.isUserTripper,
+					corr: review.corr
+				}
+			}, {
+				$group: {
+					_id: "$rating",
+					count: { $sum : 1 }/*,
+					totalRating: { $sum: "$rating" }*/
+				}
+			}]).exec(function(err, docs) {
+				if (err) {
+					logger.error(err, {line: 155});
 						
 					return;
 				}
 				
-				Message.addToOrder(order, {
-					order: order._id,
-					user: review.user,
-					corr: review.corr,
-					message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' review.'
-				}, function(err, message) {
-					if (err) {
-						logger.error(err, {line: 120});
-						
-						return;
-					}
+				var rate = [0, 0, 0, 0, 0];
+				
+				docs.forEach(function(doc) {
+					rate[doc._id - 1] = doc.count;
 				});
-				
-				/*var message = new Message({
-					order: order._id,
-					user: review.user,
-					corr: review.corr,
-					message: 'I ' + (wasNew ? 'have just written a' : 'have just changed the') + ' review.'
-				});		
-				
-				message.save(function(err, message) {
-					if (err) {// log error							
-						return;
-					}
 
-					User.setMessagesUnreaded(review.corr, order.id, message.id);
-				});*/
-				
-				
-				Review.aggregate([{
-					$match: {
-						isUserTripper: review.isUserTripper,
-						corr: review.corr
-					}
-				}, {
-					$group: {
-						_id: "$rating",
-						count: { $sum : 1 }/*,
-						totalRating: { $sum: "$rating" }*/
-					}
-				}]).exec(function(err, docs) {
-					if (err) {
-						logger.error(err, {line: 155});
-							
-						return;
-					}
-					
-					var rate = [0, 0, 0, 0, 0];
-					
-					docs.forEach(function(doc) {
-						rate[doc._id - 1] = doc.count;
-					});
-
-					User.stats(review.corr, review.isUserTripper ? 'r_rate' : 't_rate', rate);	
-				});
-				
-				res.type('json')
-					.json({review: review});
+				User.stats(review.corr, review.isUserTripper ? 'r_rate' : 't_rate', rate);	
 			});
+			
+			res.type('json')
+				.json({review: review});
 		});
 	});
 

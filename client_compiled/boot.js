@@ -43,6 +43,9 @@ System.register(['./components/app', 'angular2/platform/browser', 'angular2/rout
                 core_1.provide('config.orderStatusConst', { useFactory: function () {
                         return window.orderStatusConst;
                     } }),
+                core_1.provide('config.fees', { useFactory: function () {
+                        return window.fees;
+                    } }),
                 lazy_maps_api_loader_1.LazyMapsAPILoader
             ]);
         }

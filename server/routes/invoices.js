@@ -2,52 +2,104 @@ var express = require('express');
 var router = express.Router();
 var mdlwares = require('../libs/mdlwares');
 
+var Trip = require('../models/trip');
+var Message = require('../models/message');
+var Order = require('../models/order');
+var User = require('../models/user');
+var Invoice = require('../models/invoice');
+
+var payments = require('../libs/payments');
+var paypal = payments.paypal;
+var getFees = payments.getFees;
+
 var debug = require('debug')('osliknet:server');
 var config = require('../config');
-var paypal = require('paypal-rest-sdk');
 
-paypal.configure(config.paypal.api);
+var winston = require('winston');
+var path = require('path');
+var logger = new (winston.Logger)({
+    transports: [
+		new (winston.transports.File)({
+			filename: path.join(__dirname, '../logs/invoices.log')
+		})
+    ],
+	exitOnError: false
+});
 
-router.get('/', mdlwares.renderIndexUnlessXhr);
+router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req, res, next) {
+	var order = res.order;
+	
+	var orderUser = order.user.toString(),
+		tripUser = order.trip.user.toString(); //order.tripUser
+	
+	var fees = getFees(req.body.amount, req.body.currency);
+		
+	if (!fees) {
+		res.status(400).type('json')
+			.json({error: 'Unexpected server error.'});
+		
+		return;
+	}
+	
+	req.body.user = tripUser;
+	req.body.corr = orderUser;		
+	
+	var invoice = new Invoice(req.body);
+	
+	invoice.save(function(err, invoice) {
+		if (err) {
+			logger.error(err, {line: 105});
+			
+			res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+				.json({error: 'Unexpected server error.'});
+				
+			return;
+		}
+		
+		Message.addToOrder(order, {
+			order: order._id,
+			user: invoice.user,
+			corr: invoice.corr,
+			message: 'I have just sent an invoice to you.'
+		}, function(err, message) {
+			if (err) {
+				logger.error(err, {line: 120});
+				
+				return;
+			}
+		});
+		
+		res.type('json')
+			.json({invoice: invoice});
+	});
+});
+
+router.get('/order/:id', mdlwares.restricted, mdlwares.checkOrderAccess, function(req, res, next) {
+	var order = res.order;
+	
+	var orderUser = order.user.toString(),
+		tripUser = order.trip.user.toString(); //order.tripUser
+		
+	Invoice.find({
+		order: order._id
+	}).select('+dest_id').exec(function(err, invoices) {
+		if (err) {
+			logger.error(err, {line: 87});
+			
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+				
+			return;
+		}
+	
+		res.type('json')
+			.json({invoices: invoices});
+	});
+});
 
 router.get('/paypal/cancel', function(req, res, next) {
 	res.type('html').send('Canceled payment. <script>setTimeout(function() {window.location='/'}, 2000)</script>');
 });
-
-/*router.get('/paypal/payout', function(req, res, next) {
-	var sender_batch_id = Math.random().toString(36).substring(9);
-
-	var create_payout_json = {
-		"sender_batch_header": {
-			"sender_batch_id": sender_batch_id,
-			"email_subject": "You have a payment"
-		},
-		"items": [
-			{
-				"recipient_type": "EMAIL",
-				"amount": {
-					"value": 3,
-					"currency": "USD"
-				},
-				"receiver": "jechanceux-customer@gmail.com",
-				"note": "Thank you.",
-				"sender_item_id": "item_3"
-			}
-		]
-	};
-
-	var sync_mode = 'false';
-
-	paypal.payout.create(create_payout_json, sync_mode, function (error, payout) {
-		if (error) {
-			console.log(error.response);
-			throw error;
-		} else {
-			console.log("Create Single Payout Response");
-			console.log(payout);
-		}
-	});
-});*/
 
 router.get('/paypal/execute', function(req, res, next) {
 	//paymentId=PAY-011062373N1272208K3YYOKI&token=EC-60W27794J27018634&PayerID=YUDW2TUGYKZ7L
@@ -68,17 +120,16 @@ router.get('/paypal/execute', function(req, res, next) {
 
 	paypal.payment.execute(req.query.paymentId, execute_payment_json, function (error, payment) {
 		if (error) {
-			debug('execute errorerrorerrorerrorerror:');
-			debug(JSON.stringify(error, null, 2));
+			//debug('execute errorerrorerrorerrorerror:');
 		} else {
-			debug('execute Get Payment Response:');
-			debug(JSON.stringify(payment, null, 2));
+			//debug('execute Get Payment Response:');
+			//debug(JSON.stringify(payment, null, 2));
 			res.type('text').send('thx.');
 		}
 	});
 });
 
-router.get('/paypal', function(req, res, next) {
+router.get('/paypal/create', function(req, res, next) {
 	var confPayment = config.fees;
 	
 	var safe = 1 * ( Number( req.query.safe ) || 0 ).toFixed(2),
@@ -186,59 +237,6 @@ debug(JSON.stringify(p, null, 2));
 		}
 	});
 	
-return;
-	
-	/*paypal.invoice.send('', function (error, rv) {
-		if (error) {
-			console.log(error.response);
-			throw error;
-		} else {
-			console.log("Send Invoice Response");
-			console.log(rv);
-		}
-	});*/
-	
-	/*var create_invoice_json = {
-		merchant_info: {
-			email: "jechanceux-facilitator@gmail.com"
-		},
-		billing_info: [{
-			email: "jechanceux-customer@gmail.com"
-		}],
-		"items": [{
-			"name": "shipping",
-			"quantity": 1.0,
-			"unit_price": {
-				"currency": "EUR",
-				"value": 100
-			}
-		}],
-		"tax_inclusive": false
-	};
-	
-	
-	paypal.invoice.create(create_invoice_json, function (error, invoice) {
-		if (error) {
-			//throw error;
-			debug(error)
-		} else {
-			debug("Create Invoice Response");
-			debug(JSON.stringify(invoice, null, 2));
-			
-			
-			var invoiceId = invoice.id;
-
-			paypal.invoice.send(invoiceId, function (error, rv) {
-				if (error) {
-					console.log(error.response);
-					throw error;
-				} else {
-					debug("Send Invoice Response");
-					debug(JSON.stringify(rv, null, 2));
-				}
-			});
-		}
-	});*/
 
 
 });
@@ -249,27 +247,3 @@ return;
 module.exports = router;
 
 
-
-
-
-
-
-
-
-/*
-
-
-Review and process refund
-
-Confirm the refund details and then click Issue Refund. To make changes, click Edit.
-Name	test buyer
-Email	jechanceux-buyer@gmail.com
-Transaction ID	0PE308074G611334B
-Original payment	$6.00 USD
-Amount Refunded by Seller	$5.83 USD
-Fees Refunded by PayPal	$0.17 USD
-Total Refund Amount	$6.00 USD Help
-
-
-
-*/
