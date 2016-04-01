@@ -79,6 +79,7 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     }
                     if (this.form.valid && !this._busy) {
                         this._busy = true;
+                        this.error = '';
                         this._orderService.add(this.model).subscribe(function (data) {
                             _this.error = '';
                             _this.order = data.order || {};

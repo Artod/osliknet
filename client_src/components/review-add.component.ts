@@ -70,7 +70,8 @@ export class ReviewAddComponent {
 		
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
-
+			this.error = '';
+			
 			this._reviewService.add(this.formModel).subscribe(data => {				
 				this.closeModal();
 

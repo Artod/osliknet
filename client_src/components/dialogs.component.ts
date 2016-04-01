@@ -28,13 +28,12 @@ export class DialogsComponent implements OnDestroy {
 		this._messageService.getDialogs().subscribe(res => {			
 			this.users = res.users;
 		}, error => {
-			console.dir(error);
+			
 		});
 		
 		this.newPrivMessages = this._notificationService.data.newPrivMessages || {};
 		
 		this._notifSub = this._notificationService.start().subscribe(data => {
-console.log('DialogsComponent _notifSub ');
 			this.newPrivMessages = data.newPrivMessages || {};
 			this._appRef.tick();
 		});
@@ -44,11 +43,3 @@ console.log('DialogsComponent _notifSub ');
 		this._notifSub.unsubscribe();
 	}
 }
-
-
-
-
-
-
-
-

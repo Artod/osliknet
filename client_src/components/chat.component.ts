@@ -168,7 +168,7 @@ export class ChatComponent implements
 			
 			this._appRef.tick();
 		}, error => {
-			console.dir(error);
+
 		});
 	}	
 	

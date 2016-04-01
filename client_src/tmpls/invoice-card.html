@@ -1,22 +1,24 @@
 <table *ngIf="fees" class="table invoice-table">
 	<thead>
 		<tr *ngIf="invoice._id">
-			<th colspan="2">
-				Invoice: <i>#{{invoice._id}}</i>
+			<td colspan="2">
+				<b>Invoice: #{{invoice._id}}</b>
 				
-				<!-- <br />
-				
-				PayPal id: <i>{{ invoice.dest_id }}</i> -->
+				<span *ngIf="invoice.dest_id">
+					<br />
+					
+					PayPal id: <b>{{ invoice.dest_id }}</b>				
+				</span>
 				
 				<br />
 				
-				Status: <i>{{ invoice.status }}</i>
-			</th>
+				Status: <b>{{ invoiceStatus[invoice.status] }}</b>
+			</td>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td>For the tripper <b *ngIf="invoice._id">{{ invoice.user.name }}</b></td>
+			<td>For the traveler <b *ngIf="invoice._id">{{ invoice.user.name }}</b></td>
 			<td>{{ fees.safe }} {{ invoice.currency }}</td>
 		</tr>
 		

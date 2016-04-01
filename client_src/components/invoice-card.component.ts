@@ -19,8 +19,8 @@ export class InvoiceCardComponent implements
 	
 	constructor(
 		private _invoiceService : InvoiceService,
-		@Inject('config.user') public configUser
-		
+		@Inject('config.user') public configUser,
+		@Inject('config.invoiceStatus') public invoiceStatus
 	) {
 		
 	}

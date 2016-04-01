@@ -43,6 +43,12 @@ System.register(['./components/app', 'angular2/platform/browser', 'angular2/rout
                 core_1.provide('config.orderStatusConst', { useFactory: function () {
                         return window.orderStatusConst;
                     } }),
+                core_1.provide('config.invoiceStatus', { useFactory: function () {
+                        return window.invoiceStatus;
+                    } }),
+                core_1.provide('config.invoiceStatusConst', { useFactory: function () {
+                        return window.invoiceStatusConst;
+                    } }),
                 core_1.provide('config.fees', { useFactory: function () {
                         return window.fees;
                     } }),

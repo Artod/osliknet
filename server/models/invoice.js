@@ -37,6 +37,15 @@ var schema = mongoose.Schema({
 		select: false,
 		required: true
 	},
+	status: {
+		type: Number,
+		required: true,
+		default: 5
+	},
+	payment: {
+		type: Schema.Types.Mixed,
+		select: false
+	},
 	comment: {
 		type: String,
 		trim: true,
@@ -45,6 +54,22 @@ var schema = mongoose.Schema({
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
+
+schema.statics.sts = {
+	UNPAID: 5,
+	PAID: 10,	
+	TRANSFERRED: 15,
+	REFUNDED: 20,
+	PENDING: 25
+};
+
+schema.statics.stsInv = {
+	5: 'Unpaid',
+	10: 'Paid and hold',
+	15: 'Transferred to the tripper',
+	20: 'Refunded',
+	25: 'Pending'
+};
 
 schema.pre('save', function(next) {
 	var now = new Date();

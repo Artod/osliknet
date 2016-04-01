@@ -49,9 +49,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     var _this = this;
                     if (this.form.valid) {
                         this._busy = true;
+                        this.error = '';
                         this._userService.login(this.model).subscribe(function (res) {
                             _this.success = true;
-                            _this.error = '';
                             _this._busy = false;
                         }, function (err) {
                             _this.error = 'Unexpected error. Try again later.';

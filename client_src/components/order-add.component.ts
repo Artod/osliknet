@@ -90,6 +90,7 @@ export class OrderAddComponent implements
 		
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
+			this.error = '';
 			
 			this._orderService.add(this.model).subscribe(data => {					
 				//this.closeModal();

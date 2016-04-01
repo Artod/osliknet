@@ -58,7 +58,6 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                 }
                 TripAddComponent.prototype.onSubmit = function ($from, $to, $when, $description) {
                     var _this = this;
-                    console.dir($from);
                     if (!this.model.from_id) {
                         $from.querySelector('input[type="text"]').focus();
                         return;
@@ -77,6 +76,7 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     }
                     if (this.form.valid) {
                         this._busy = true;
+                        this.error = '';
                         this._tripService.addTrips(this.model).subscribe(function (res) {
                             if (res.trip && res.trip._id)
                                 _this._router.navigate(['Trip', { id: res.trip._id }]);

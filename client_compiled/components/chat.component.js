@@ -142,7 +142,6 @@ System.register(['angular2/core', 'angular2/router', 'angular2/common', '../serv
                         _this.isChatActualChange.emit(_this.isChatActual);
                         _this._appRef.tick();
                     }, function (error) {
-                        console.dir(error);
                     });
                 };
                 ChatComponent.prototype.onSubmit = function (elComment) {

@@ -533,11 +533,11 @@ a.avatar {
     color: #a94442;
 }
 
-.invoice-table td:first-child {
+.invoice-table tbody td:first-child {
 	text-align:left;
 }
 
-.invoice-table td:last-child {
+.invoice-table tbody td:last-child {
 	text-align:right;
 }
 

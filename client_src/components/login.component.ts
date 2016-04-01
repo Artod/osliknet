@@ -44,10 +44,10 @@ export class LoginComponent {
 	public onSubmit($email) : void {
 		if (this.form.valid) {
 			this._busy = true;
+			this.error = '';
 			
 			this._userService.login(this.model).subscribe(res => {
 				this.success = true;
-				this.error = '';
 
 				this._busy = false;
 			}, err => {

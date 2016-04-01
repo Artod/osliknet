@@ -44,6 +44,22 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1) {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
+                InvoiceService.prototype.unhold = function (invoiceId) {
+                    var headers = new http_1.Headers();
+                    headers.append('Content-Type', 'application/json');
+                    headers.append('X-Requested-With', 'XMLHttpRequest');
+                    return this.http.post('/invoices/unhold', JSON.stringify({ invoiceId: invoiceId }), {
+                        headers: headers
+                    }).map(function (res) { return res.json(); });
+                };
+                InvoiceService.prototype.refund = function (invoiceId) {
+                    var headers = new http_1.Headers();
+                    headers.append('Content-Type', 'application/json');
+                    headers.append('X-Requested-With', 'XMLHttpRequest');
+                    return this.http.post('/invoices/refund', JSON.stringify({ invoiceId: invoiceId }), {
+                        headers: headers
+                    }).map(function (res) { return res.json(); });
+                };
                 InvoiceService.prototype.getByOrderId = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');

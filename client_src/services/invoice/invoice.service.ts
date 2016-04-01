@@ -29,6 +29,25 @@ export class InvoiceService {
 		}).map( res => <any[]> res.json() );
 	}
 	
+	public unhold(invoiceId) {
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.post('/invoices/unhold', JSON.stringify({invoiceId: invoiceId}), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
+	public refund(invoiceId) {
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.post('/invoices/refund', JSON.stringify({invoiceId: invoiceId}), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
 	public getByOrderId(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');

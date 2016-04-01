@@ -82,10 +82,10 @@ export class JoinComponent {
 		
 		if (this.form.valid) {
 			this._busy = true;
+			this.error = '';
 			
 			this._userService.signup(this.model).subscribe(res => {
 				this.success = true;
-				this.error = '';
 
 				this._busy = false;
 			}, err => {

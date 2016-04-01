@@ -70,7 +70,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 				callback(err, order);
 			});
 		},                    
-	}, function(err, asyncRes){
+	}, function(err, asyncRes) {
 		if (err) {
 			logger.error(err, {line: 74});
 			

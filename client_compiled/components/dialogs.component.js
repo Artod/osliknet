@@ -45,11 +45,9 @@ System.register(['angular2/core', 'angular2/router', '../services/message/messag
                     this._messageService.getDialogs().subscribe(function (res) {
                         _this.users = res.users;
                     }, function (error) {
-                        console.dir(error);
                     });
                     this.newPrivMessages = this._notificationService.data.newPrivMessages || {};
                     this._notifSub = this._notificationService.start().subscribe(function (data) {
-                        console.log('DialogsComponent _notifSub ');
                         _this.newPrivMessages = data.newPrivMessages || {};
                         _this._appRef.tick();
                     });

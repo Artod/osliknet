@@ -10,7 +10,14 @@ paypal.configure(config.paypal.api);
 
 router.get('/', mdlwares.renderIndexUnlessXhr);
 
-router.get('/paypal/cancel', function(req, res, next) {
+
+
+module.exports = router;
+
+
+return;
+
+router.get('/ggggggggggggggggggpaypal/cancel', function(req, res, next) {
 	res.type('html').send('Canceled payment. <script>setTimeout(function() {window.location='/'}, 2000)</script>');
 });
 
@@ -49,7 +56,7 @@ router.get('/paypal/cancel', function(req, res, next) {
 	});
 });*/
 
-router.get('/paypal/execute', function(req, res, next) {
+router.get('/dfffffffffffffpaypal/execute', function(req, res, next) {
 	//paymentId=PAY-011062373N1272208K3YYOKI&token=EC-60W27794J27018634&PayerID=YUDW2TUGYKZ7L
 	// req.query.paymentId
 	// req.query.token
@@ -78,7 +85,7 @@ router.get('/paypal/execute', function(req, res, next) {
 	});
 });
 
-router.get('/paypal', function(req, res, next) {
+router.get('/ffffffffffffffpaypal', function(req, res, next) {
 	var confPayment = config.fees;
 	
 	var safe = 1 * ( Number( req.query.safe ) || 0 ).toFixed(2),
@@ -246,7 +253,7 @@ return;
 
 
 
-module.exports = router;
+
 
 
 

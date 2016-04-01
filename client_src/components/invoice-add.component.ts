@@ -25,14 +25,15 @@ export class InvoiceAddComponent {
 	
 	private _modalComponent : ModalComponent;
 	
-	private _busy : boolean;
-
+	private _loaded : boolean;
+	
 	constructor(
 		private _fb : FormBuilder,		
 		private _invoiceService : InvoiceService,
 		@Inject('order') public order : {},
 		@Inject('onInvoiceAdd') public onInvoiceAdd : Function,
-		@Inject('config.user') public configUser
+		@Inject('config.user') public configUser,
+		@Inject('config.invoiceStatusConst') public sts
 	) {
 		this.form = this._fb.group({
 			order: ['', Validators.required],
@@ -62,24 +63,24 @@ export class InvoiceAddComponent {
 			agree: ['', Validators.required]
 		});
 
-		this.model.order = this.order._id;		
+		this.model.order = this.order._id;
 		
-		this._busy = true;
+		this._loaded = false;
 		
-		this._invoiceService.getByOrderId(this.order._id).subscribe(data => {		
+		this._invoiceService.getByOrderId(this.order._id).subscribe(data => {
 			this.invoices = data && data.invoices || [];
 			
 			let last = this.invoices[this.invoices.length - 1];
 			
-			if (last) {				
+			if (last) {
 				this.model.dest_id = last.dest_id;
 				this.model.amount = last.amount;
 				this.model.currency = last.currency;
 			}
 			
-			this._busy = false;
+			this._loaded = true;
 		}, err => {
-			this._busy = false;
+			this._loaded = true;
 		});
 	}
 	
@@ -93,19 +94,73 @@ export class InvoiceAddComponent {
 		}
 	}
 	
-	private _busyInvoice : boolean;
-	public errorInvoice : string = '';
+	private _busyInvoice : boolean = false;
 	
-	public payInvoice(invoiceId) : void {
-		this._invoiceService.pay(invoiceId).subscribe(data => {
-			
-			window.location = data.redirectUrl;
+	public errorInvoice : string = '';	
+	
+	public unhold(invoiceId) : void {
+		if ( !this.model.agree || !confirm('Are you sure?') ) {
+			return;
+		}
 		
+		this.errorInvoice = '';
+		this._busyInvoice = true;
+		
+		this._invoiceService.unhold(invoiceId).subscribe(data => {		
 			this.closeModal();
 
-			//this.onInvoiceAdd();
+			this.onInvoiceAdd();
+			
+		}, err => {
+			this.errorInvoice = 'Unexpected error. Try again later.';
+
+			try {
+				this.errorInvoice = err.json().error || this.errorInvoice;
+			} catch(e) {}
 			
 			this._busyInvoice = false;
+		});
+	}
+	
+	public refund(invoiceId) : void {
+		if ( !this.model.agree || !confirm('Are you sure?') ) {
+			return;
+		}
+		
+		this.errorInvoice = '';
+		this._busyInvoice = true;
+		
+		this._invoiceService.refund(invoiceId).subscribe(data => {		
+			this.closeModal();
+
+			this.onInvoiceAdd();
+			
+		}, err => {
+			this.errorInvoice = 'Unexpected error. Try again later.';
+
+			try {
+				this.errorInvoice = err.json().error || this.errorInvoice;
+			} catch(e) {}
+			
+			this._busyInvoice = false;
+		});
+	}
+	
+	public payInvoice(invoiceId) : void {
+		this.errorInvoice = '';
+		this._busyInvoice = true;
+		
+		this._invoiceService.pay(invoiceId).subscribe(data => {
+			if (data.redirectUrl) {
+				window.location = data.redirectUrl;
+			} else {
+				this._busyInvoice = false;
+				this.errorInvoice = 'Unexpected error. Try again later.';
+			}
+		
+			//this.closeModal();
+
+			//this.onInvoiceAdd();
 			
 		}, err => {
 			this.errorInvoice = 'Unexpected error. Try again later.';
@@ -120,6 +175,8 @@ export class InvoiceAddComponent {
 	
 	public error : string = '';
 	
+	private _busy : boolean = false;
+		
 	public onSubmit(elComment) : void {
 		if (!this.form.valid) {
 			elComment.focus();
@@ -127,7 +184,8 @@ export class InvoiceAddComponent {
 		
 		if (this.form.valid && !this._busy) {
 			this._busy = true;
-
+			this.error = '';
+			
 			this._invoiceService.add(this.model).subscribe(data => {				
 				this.closeModal();
 

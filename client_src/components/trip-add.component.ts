@@ -60,9 +60,6 @@ description:""*/
 	public error : string = '';
 	
 	public onSubmit($from, $to, $when, $description) : void {
-		
-		
-		console.dir($from)
 		if (!this.model.from_id) {
 			$from.querySelector('input[type="text"]').focus();
 			
@@ -89,6 +86,7 @@ description:""*/
 		
 		if (this.form.valid) {			
 			this._busy = true;
+			this.error = '';
 			
 			this._tripService.addTrips(this.model).subscribe(res => {
 				if (res.trip && res.trip._id) 

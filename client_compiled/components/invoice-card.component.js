@@ -24,9 +24,10 @@ System.register(['angular2/core', '../services/invoice/invoice.service'], functi
             }],
         execute: function() {
             InvoiceCardComponent = (function () {
-                function InvoiceCardComponent(_invoiceService, configUser) {
+                function InvoiceCardComponent(_invoiceService, configUser, invoiceStatus) {
                     this._invoiceService = _invoiceService;
                     this.configUser = configUser;
+                    this.invoiceStatus = invoiceStatus;
                     this.invoice = {};
                 }
                 InvoiceCardComponent.prototype.ngOnInit = function () {
@@ -45,8 +46,9 @@ System.register(['angular2/core', '../services/invoice/invoice.service'], functi
                         selector: 'invoice-card',
                         templateUrl: '/client_src/tmpls/invoice-card.html'
                     }),
-                    __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _a) || Object, Object])
+                    __param(1, core_1.Inject('config.user')),
+                    __param(2, core_1.Inject('config.invoiceStatus')), 
+                    __metadata('design:paramtypes', [(typeof (_a = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _a) || Object, Object, Object])
                 ], InvoiceCardComponent);
                 return InvoiceCardComponent;
                 var _a;

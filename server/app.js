@@ -178,7 +178,8 @@ var logger = new (winston.Logger)({
 	exitOnError: false
 });
 
-var mongoPath = (app.get('isDev') ? config.mongo.pathDev : config.mongo.path);
+// var mongoPath = (app.get('isDev') ? config.mongo.pathDev : config.mongo.path);
+var mongoPath = config.mongo.path;
 
 var mongoParams = {
 	server: {
@@ -319,6 +320,7 @@ app.use(passwordless.sessionSupport());
 // app.set('orderStatusConst', require('./models/order').sts);
 
 var Order = require('./models/order');
+var Invoice = require('./models/invoice');
 
 app.use(function (req, res, next) {
 	res.locals = {
@@ -329,6 +331,8 @@ app.use(function (req, res, next) {
 		},
 		orderStatus: JSON.stringify(Order.stsInv),
 		orderStatusConst: JSON.stringify(Order.sts),
+		invoiceStatus: JSON.stringify(Invoice.stsInv),
+		invoiceStatusConst: JSON.stringify(Invoice.sts),
 		recaptcha: config.recaptcha,
 		fees: JSON.stringify(config.fees)
 	};

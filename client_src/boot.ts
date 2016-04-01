@@ -58,6 +58,12 @@ bootstrap(AppComponent, [
 			FINISHED: 25
 		};*/
 	}}),
+	provide('config.invoiceStatus', {useFactory: () => {
+		return window.invoiceStatus;
+	}}),
+	provide('config.invoiceStatusConst', {useFactory: () => {
+		return window.invoiceStatusConst;
+	}}),
 	provide('config.fees', {useFactory: () => {
 		return window.fees;
 	}}),
