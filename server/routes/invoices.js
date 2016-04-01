@@ -26,6 +26,108 @@ var logger = new (winston.Logger)({
 	exitOnError: false
 });
 
+router.post('/pay', mdlwares.restricted, function(req, res, next) {
+		
+	Invoice.findOne({
+		_id: req.body.invoiceId,
+		corr: req.session.uid
+	}).populate('user').exec(function(err, invoice) {
+		if (err) {
+			logger.error(err, {line: 41});
+			
+			res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+				.json({error: 'Unexpected server error.'});
+				
+			return;
+		}
+		
+		if (!invoice) {
+			res.status(400).type('json')
+				.json({error: 'Invoice not found.'});
+				
+			return;
+		}
+		
+		
+		var fees = getFees(invoice.amount, invoice.currency);
+			
+		if (!fees) {
+			res.status(400).type('json')
+				.json({error: 'Unexpected server error.'});
+			
+			return;
+		}
+		
+		var invoice = {
+			intent: "sale",
+			// intent: "pay_upon_invoice",
+			// intent: "authorize",
+			payer: {
+				"payment_method": "paypal"
+			},
+			redirect_urls: {
+				return_url: "/paypal/execute",
+				cancel_url: "/paypal/cancel"
+			},
+			transactions: [{
+				item_list: {
+					items: [{
+						name: "The amount for the traveler \"" + invoice.user.name + "\"",
+						price: fees.safe,
+						currency: invoice.currency,
+						quantity: 1
+					},{
+						name: "Osliki.Net fee (" + fees.nonRefundableOsliki + " " + invoice.currency + " non-refundable)",
+						price: fees.oslikiFee,
+						currency: invoice.currency,
+						quantity: 1
+					},{
+						name: "PayPal fee (" + fees.nonRefundablePaypal + " " + invoice.currency + " non-refundable)",
+						price: fees.paypalFee,
+						currency: invoice.currency,
+						quantity: 1
+					}]
+				},
+				amount: {
+					currency: invoice.currency,
+					total: fees.total
+				}/*,
+				description: "This is the payment description."*/
+			}]
+		};
+
+		paypal.payment.create(invoice, function (error, payment) {
+			if (error) {
+				logger.error(error, {line: 104});
+				
+				res.status(400).type('json')
+					.json({error: 'Unexpected server error.'});
+					
+				return;
+			} else {			
+				if (payment.payer.payment_method === 'paypal') {
+					req.session.paymentId = payment.id;
+
+					var redirectUrl;
+
+					for(var i=0; i < payment.links.length; i++) {
+						var link = payment.links[i];
+						if (link.method === 'REDIRECT') {
+							redirectUrl = link.href;
+						}
+					}
+
+					//res.redirect(redirectUrl);
+					res.type('json')
+						.json({redirectUrl: redirectUrl});
+						
+					return;
+				}
+			}
+		});
+	});
+});
+
 router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req, res, next) {
 	var order = res.order;
 	
@@ -82,7 +184,7 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.checkOrderAccess, functio
 		
 	Invoice.find({
 		order: order._id
-	}).select('+dest_id').exec(function(err, invoices) {
+	}).select(tripUser === req.session.uid ? '+dest_id' : '').populate('user').exec(function(err, invoices) {
 		if (err) {
 			logger.error(err, {line: 87});
 			

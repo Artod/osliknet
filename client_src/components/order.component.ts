@@ -62,10 +62,12 @@ export class OrderComponent {
 	}
 	
 	
-	public sendInvoice() : void {	
+	public invoices() : void {	
 		this._modalService.show(InvoiceAddComponent, Injector.resolve([		
 			provide(InvoiceService, {useValue: this._invoiceService}),
-			provide('orderId', {useValue: this.orderId}),
+			
+			provide('order', {useValue: this.order}),
+			provide('config.user', {useValue: this.configUser}),
 			provide('onInvoiceAdd', {
 				useValue: () => {
 					this.isChatActual = false;
@@ -74,20 +76,7 @@ export class OrderComponent {
 		]) );
 	}
 	
-	public sendReview() : void {
-		/*this._modalService.open().then(modalComponentRef => {			
-			this._modalService.bind( ReviewAddComponent, modalComponentRef, Injector.resolve([
-				provide(Renderer, {useValue: this._renderer}),				
-				provide(ReviewService, {useValue: this._reviewService}),				
-				provide('orderId', {useValue: this.orderId}),
-				provide('onReviewAdd', {
-					useValue: () => {
-						this.isChatActual = false;
-					}
-				})
-			]) );
-		})*/
-		
+	public sendReview() : void {	
 		this._modalService.show(ReviewAddComponent, Injector.resolve([
 			//provide(Renderer, {useValue: this._renderer}),		
 			provide(ReviewService, {useValue: this._reviewService}),

@@ -17,7 +17,8 @@ export class InvoiceAddComponent {
 	
 	public model : any = {
 		currency: 'USD',
-		amount: 25.00
+		amount: 25.00,
+		agree: true
 	};
 
 	public form : ControlGroup;
@@ -29,8 +30,9 @@ export class InvoiceAddComponent {
 	constructor(
 		private _fb : FormBuilder,		
 		private _invoiceService : InvoiceService,
-		@Inject('orderId') public orderId : string,
-		@Inject('onInvoiceAdd') public onInvoiceAdd : Function
+		@Inject('order') public order : {},
+		@Inject('onInvoiceAdd') public onInvoiceAdd : Function,
+		@Inject('config.user') public configUser
 	) {
 		this.form = this._fb.group({
 			order: ['', Validators.required],
@@ -60,11 +62,11 @@ export class InvoiceAddComponent {
 			agree: ['', Validators.required]
 		});
 
-		this.model.order = this.orderId;		
+		this.model.order = this.order._id;		
 		
 		this._busy = true;
 		
-		this._invoiceService.getByOrderId(this.orderId).subscribe(data => {		
+		this._invoiceService.getByOrderId(this.order._id).subscribe(data => {		
 			this.invoices = data && data.invoices || [];
 			
 			let last = this.invoices[this.invoices.length - 1];
@@ -89,6 +91,31 @@ export class InvoiceAddComponent {
 		if (el.checked) {
 			this.model.rating = el.value;
 		}
+	}
+	
+	private _busyInvoice : boolean;
+	public errorInvoice : string = '';
+	
+	public payInvoice(invoiceId) : void {
+		this._invoiceService.pay(invoiceId).subscribe(data => {
+			
+			window.location = data.redirectUrl;
+		
+			this.closeModal();
+
+			//this.onInvoiceAdd();
+			
+			this._busyInvoice = false;
+			
+		}, err => {
+			this.errorInvoice = 'Unexpected error. Try again later.';
+
+			try {
+				this.errorInvoice = err.json().error || this.errorInvoice;
+			} catch(e) {}
+			
+			this._busyInvoice = false;
+		});
 	}
 	
 	public error : string = '';

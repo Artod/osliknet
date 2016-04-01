@@ -533,6 +533,14 @@ a.avatar {
     color: #a94442;
 }
 
+.invoice-table td:first-child {
+	text-align:left;
+}
+
+.invoice-table td:last-child {
+	text-align:right;
+}
+
 /*
 @media (min-width: 400px) {
 	.trips-find-form .form-control {

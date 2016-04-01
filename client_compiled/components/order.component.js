@@ -84,11 +84,12 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                         _this._changeStatusBusy = false;
                     });
                 };
-                OrderComponent.prototype.sendInvoice = function () {
+                OrderComponent.prototype.invoices = function () {
                     var _this = this;
                     this._modalService.show(invoice_add_component_1.InvoiceAddComponent, core_1.Injector.resolve([
                         core_1.provide(invoice_service_1.InvoiceService, { useValue: this._invoiceService }),
-                        core_1.provide('orderId', { useValue: this.orderId }),
+                        core_1.provide('order', { useValue: this.order }),
+                        core_1.provide('config.user', { useValue: this.configUser }),
                         core_1.provide('onInvoiceAdd', {
                             useValue: function () {
                                 _this.isChatActual = false;

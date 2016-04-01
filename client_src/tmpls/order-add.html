@@ -1,5 +1,9 @@
 <div (window:keydown)="$event.keyCode == 27 ? closeModal() : true">
 	<div *ngIf="!_checked">
+		<div class="page-header">
+			<h2> </h2>
+		</div>
+		
 		Loading...
 	</div>
 	
@@ -13,6 +17,10 @@
 	</div>
 
 	<div *ngIf="_checked && order && order._id">
+		<div class="page-header">
+			<h2> </h2>
+		</div>
+		
 		<p>
 			<span class="text-muted">{{ order.created_at | toDate | date: 'longDate' }}</span>
 		</p>	

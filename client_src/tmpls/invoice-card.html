@@ -1,21 +1,38 @@
-<table *ngIf="fees" class="table" style="max-width:500px; text-align:left;">
-	<tr>
-		<td>For the tripper</td>
-		<td>{{ fees.safe }} {{ currency }}</td>
-	</tr>
-	
-	<tr>
-		<td>Osliki.Net fee ({{ fees.nonRefundableOsliki }} {{ currency }} non-refundable)</td>
-		<td>{{ fees.oslikiFee }} {{ currency }}</td>
-	</tr>
-	
-	<tr>
-		<td>PayPal fee ({{ fees.nonRefundablePaypal }} {{ currency }} non-refundable)</td>
-		<td>{{ fees.paypalFee }} {{ currency }}</td>
-	</tr>
+<table *ngIf="fees" class="table invoice-table">
+	<thead>
+		<tr *ngIf="invoice._id">
+			<th colspan="2">
+				Invoice: <i>#{{invoice._id}}</i>
+				
+				<!-- <br />
+				
+				PayPal id: <i>{{ invoice.dest_id }}</i> -->
+				
+				<br />
+				
+				Status: <i>{{ invoice.status }}</i>
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>For the tripper <b *ngIf="invoice._id">{{ invoice.user.name }}</b></td>
+			<td>{{ fees.safe }} {{ invoice.currency }}</td>
+		</tr>
+		
+		<tr>
+			<td>Osliki.Net fee ({{ fees.nonRefundableOsliki }} {{ invoice.currency }} non-refundable)</td>
+			<td>{{ fees.oslikiFee }} {{ invoice.currency }}</td>
+		</tr>
+		
+		<tr>
+			<td>PayPal fee ({{ fees.nonRefundablePaypal }} {{ invoice.currency }} non-refundable)</td>
+			<td>{{ fees.paypalFee }} {{ invoice.currency }}</td>
+		</tr>
 
-	<tr>
-		<th style="text-align:right;">Total:</th>
-		<th style="text-align:left;">{{ fees.total }} {{ currency }}</th>
-	</tr>
+		<tr>
+			<td><b>Total:</b></td>
+			<td><b>{{ fees.total }} {{ invoice.currency }}</b></td>
+		</tr>
+	</tbody>
 </table>

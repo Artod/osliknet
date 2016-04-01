@@ -1,62 +1,92 @@
-<div class="page-header">
-	<h2>Invoices</h2>
-</div>
+<div (window:keydown)="$event.keyCode == 27 ? closeModal() : true">
+	<div class="page-header">
+		<h2>Invoices</h2>
+	</div>
 
-<ul>
-	<li *ngFor="#invoice of invoices">
-		<invoice-card [amount]="invoice.amount" [currency]="invoice.currency"></invoice-card>
-	</li>
-</ul>
-
-<hr />
-
-<form action="/invoices/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)" novalidate>
-	<input type="hidden" name="order" value="" [(ngModel)]="model.order" [ngFormControl]="form.controls.order" />
+	<div class="container container-trips-add">
 	
-	<div class="form-group">	
-		<label>Your PayPal id:</label>
-		
-		<input class="form-control" type="email" name="email" [(ngModel)]="model.dest_id" [ngFormControl]="form.controls.dest_id" placeholder="E-mail" />
-	</div>	
-	
-	<div class="form-group">	
-		<label>Amount:</label>
-		
-		<div class="form-group form-inline">
-			
-			<input class="form-control" name="amount" type="number" min="0.01" placeholder="25.00" [(ngModel)]="model.amount" [ngFormControl]="form.controls.amount" />
-			
-			<select class="form-control" name="currency" [(ngModel)]="model.currency" [ngFormControl]="form.controls.currency">
-				<option value="USD">USD</option>
-				<option value="EUR">EUR</option>
-				<option value="CAD">CAD</option>
-				<option value="RUB">RUB</option>
-			</select>
+		<div *ngFor="#invoice of invoices">
+			<invoice-card [invoice]="invoice"></invoice-card>
+
+			<div *ngIf="invoice.corr === configUser.id" class="text-right">
+				<div class="help-block text-right">
+					<i>All of the money will be placed on the account of our service until the order is executed. If you trust traveler, you can send the money to him directly.</i>
+					
+					<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
+				</div>
+				
+				<button type="button" class="btn btn-warning" (click)="_busyInvoice ? false : payInvoice(invoice._id)">{{ _busyInvoice ? 'Wait...' : 'Pay' }}</button>
+				
+				<div *ngIf="errorInvoice" class="help-block text-right {{errorInvoice ? 'has-error' : ''}}">
+					{{ errorInvoice }}
+				</div>
+			</div>			
 		</div>
-	</div>
 
-	
-	<div class="form-group">
-		<label>Comment:</label>
-		
-		<input class="form-control" name="comment" [(ngModel)]="model.comment" [ngFormControl]="form.controls.comment" maxlength="2000" placeholder="Comment" />
-	</div>
-	
-	<div class="form-group help-block text-right">
-		<invoice-card [amount]="model.amount" [currency]="model.currency">{{model.amount}}</invoice-card>
-	
-		<p>All of the money will be stored in the account of our service until the order is executed.</p>
-		
-		<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
-	</div>
+		<br />
 
+		<div *ngIf="order.user._id !== configUser.id">
+			<hr />
+			
+			<h3>New invoice</h3>
+			
+			<br />
+			
+			<form action="/invoices/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)" novalidate>
+				<input type="hidden" name="order" value="" [(ngModel)]="model.order" [ngFormControl]="form.controls.order" />
+				
+				<div class="form-group">	
+					<label>Your PayPal id:</label>
+					
+					<input class="form-control input-lg" type="email" name="email" [(ngModel)]="model.dest_id" [ngFormControl]="form.controls.dest_id" placeholder="E-mail" />
+				</div>	
+				
+				<div class="form-group">	
+					<label>Amount:</label>
+					
+					<div class="form-group form-inline">
+						
+						<input class="form-control input-lg" name="amount" type="number" min="0.01" step="5" placeholder="25.00" [(ngModel)]="model.amount" [ngFormControl]="form.controls.amount" />
+						
+						<select class="form-control input-lg" name="currency" [(ngModel)]="model.currency" [ngFormControl]="form.controls.currency">
+							<option value="USD">USD</option>
+							<option value="EUR">EUR</option>
+							<option value="CAD">CAD</option>
+							<option value="RUB">RUB</option>
+						</select>
+					</div>
+				</div>
+
+				
+				<div class="form-group">
+					<label>Comment:</label>
+					
+					<input class="form-control input-lg" name="comment" [(ngModel)]="model.comment" [ngFormControl]="form.controls.comment" maxlength="2000" placeholder="Comment" />
+				</div>
+				
+				<br />
+				
+				<div class="form-group help-block text-right">
+					<invoice-card [invoice]="{amount: model.amount, currency: model.currency}">{{model.amount}}</invoice-card>
+				
+					<i>All of the money will be placed on the account of our service.</i>
+					
+					<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
+				</div>
+
+					
+				<p class="text-right">
+					<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
+					<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button>
+				</p>
+				
+				<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+					{{ error }}
+				</div>
+			</form>
+			<br />
+			<br />
+		</div>
 		
-	<p class="text-right">
-		<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
-		<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button>
-	</p>
-	
-	<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
-		{{ error }}
 	</div>
-</form>
+</div>

@@ -30,17 +30,20 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
             }],
         execute: function() {
             InvoiceAddComponent = (function () {
-                function InvoiceAddComponent(_fb, _invoiceService, orderId, onInvoiceAdd) {
+                function InvoiceAddComponent(_fb, _invoiceService, order, onInvoiceAdd, configUser) {
                     var _this = this;
                     this._fb = _fb;
                     this._invoiceService = _invoiceService;
-                    this.orderId = orderId;
+                    this.order = order;
                     this.onInvoiceAdd = onInvoiceAdd;
+                    this.configUser = configUser;
                     this.invoices = [];
                     this.model = {
                         currency: 'USD',
-                        amount: 25.00
+                        amount: 25.00,
+                        agree: true
                     };
+                    this.errorInvoice = '';
                     this.error = '';
                     this.form = this._fb.group({
                         order: ['', common_1.Validators.required],
@@ -65,9 +68,9 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         comment: '',
                         agree: ['', common_1.Validators.required]
                     });
-                    this.model.order = this.orderId;
+                    this.model.order = this.order._id;
                     this._busy = true;
-                    this._invoiceService.getByOrderId(this.orderId).subscribe(function (data) {
+                    this._invoiceService.getByOrderId(this.order._id).subscribe(function (data) {
                         _this.invoices = data && data.invoices || [];
                         var last = _this.invoices[_this.invoices.length - 1];
                         if (last) {
@@ -87,6 +90,21 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                     if (el.checked) {
                         this.model.rating = el.value;
                     }
+                };
+                InvoiceAddComponent.prototype.payInvoice = function (invoiceId) {
+                    var _this = this;
+                    this._invoiceService.pay(invoiceId).subscribe(function (data) {
+                        window.location = data.redirectUrl;
+                        _this.closeModal();
+                        _this._busyInvoice = false;
+                    }, function (err) {
+                        _this.errorInvoice = 'Unexpected error. Try again later.';
+                        try {
+                            _this.errorInvoice = err.json().error || _this.errorInvoice;
+                        }
+                        catch (e) { }
+                        _this._busyInvoice = false;
+                    });
                 };
                 InvoiceAddComponent.prototype.onSubmit = function (elComment) {
                     var _this = this;
@@ -115,9 +133,10 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         providers: [common_1.FormBuilder],
                         directives: [invoice_card_component_1.InvoiceCardComponent]
                     }),
-                    __param(2, core_1.Inject('orderId')),
-                    __param(3, core_1.Inject('onInvoiceAdd')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, String, Object])
+                    __param(2, core_1.Inject('order')),
+                    __param(3, core_1.Inject('onInvoiceAdd')),
+                    __param(4, core_1.Inject('config.user')), 
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, Object, Object, Object])
                 ], InvoiceAddComponent);
                 return InvoiceAddComponent;
                 var _a, _b;

@@ -1,39 +1,41 @@
-<div class="page-header">
-	<h2>Review on the delivery</h2>
+<div (window:keydown)="$event.keyCode == 27 ? closeModal() : true">
+	<div class="page-header">
+		<h2>Review on the delivery</h2>
+	</div>
+
+	<form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)">
+		<input type="hidden" name="order" value="" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
+		<!-- http://stackoverflow.com/questions/33986633/angular-2-dependency-injection-error-on-ngfor-in-dynamically-created-component -->
+		<div class="form-group text-center">
+			<span *ngFor="#rating of _ratings" class="star-clickable glyphicon glyphicon-star{{ formModel.rating >= rating ? '' : '-empty' }}" (click)="formModel.rating = rating"></span>
+			
+			<input type="hidden" name="rating" value="" [(ngModel)]="formModel.rating" [ngFormControl]="form.controls.rating" />
+		
+			 <!-- <label class="radio-inline">
+				<input type="radio" name="rating" value="-1" (change)="onChangeRating(rate1)" [checked]="formModel.rating === -1" #rate1 /> <span class="glyphicon glyphicon-thumbs-down"></span> 
+			</label>
+			
+			<label class="radio-inline">
+				<input type="radio" name="rating" value="1" (change)="onChangeRating(rate2)" [checked]="formModel.rating === 1" #rate2 /> <span class="glyphicon glyphicon-thumbs-up"></span> 
+			</label>	
+			
+			<select class="form-control" required [(ngModel)]="formModel.order" [ngFormControl]="form.controls.rating">
+				<option *ngFor="#r of ratings" [value]="r">{{r}}</option>
+			</select>-->		
+
+		</div>
+		
+		<div class="form-group">		
+			<textarea class="form-control" name="comment" placeholder="Comment" [(ngModel)]="formModel.comment" [ngFormControl]="form.controls.comment" maxlength="2000" #comment></textarea>
+		</div>
+		
+		<p class="text-right">
+			<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
+			<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
+		</p>
+		
+		<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
+			{{ error }}
+		</div>
+	</form>
 </div>
-
-<form action="/reviews/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)">
-	<input type="hidden" name="order" value="" [(ngModel)]="formModel.order" [ngFormControl]="form.controls.order" />
-	<!-- http://stackoverflow.com/questions/33986633/angular-2-dependency-injection-error-on-ngfor-in-dynamically-created-component -->
-	<div class="form-group text-center">
-		<span *ngFor="#rating of _ratings" class="star-clickable glyphicon glyphicon-star{{ formModel.rating >= rating ? '' : '-empty' }}" (click)="formModel.rating = rating"></span>
-		
-		<input type="hidden" name="rating" value="" [(ngModel)]="formModel.rating" [ngFormControl]="form.controls.rating" />
-	
-		 <!-- <label class="radio-inline">
-			<input type="radio" name="rating" value="-1" (change)="onChangeRating(rate1)" [checked]="formModel.rating === -1" #rate1 /> <span class="glyphicon glyphicon-thumbs-down"></span> 
-		</label>
-		
-		<label class="radio-inline">
-			<input type="radio" name="rating" value="1" (change)="onChangeRating(rate2)" [checked]="formModel.rating === 1" #rate2 /> <span class="glyphicon glyphicon-thumbs-up"></span> 
-		</label>	
-		
-		<select class="form-control" required [(ngModel)]="formModel.order" [ngFormControl]="form.controls.rating">
-			<option *ngFor="#r of ratings" [value]="r">{{r}}</option>
-		</select>-->		
-
-	</div>
-	
-	<div class="form-group">		
-		<textarea class="form-control" name="comment" placeholder="Comment" [(ngModel)]="formModel.comment" [ngFormControl]="form.controls.comment" maxlength="2000" #comment></textarea>
-	</div>
-	
-	<p class="text-right">
-		<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>
-		<button type="submit" class="btn btn-warning btn-lg">{{ _busy ? 'Wait...' : 'Send' }}</button><!--  [disabled]="{{ _busy }}" [ngFormControl]="form.controls.rating"-->
-	</p>
-	
-	<div *ngIf="error" class="help-block text-right {{error ? 'has-error' : ''}}">
-		{{ error }}
-	</div>
-</form>

@@ -19,6 +19,16 @@ export class InvoiceService {
 		}).map( res => <any[]> res.json() );
 	}
 	
+	public pay(invoiceId) {
+		let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.post('/invoices/pay', JSON.stringify({invoiceId: invoiceId}), {			
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
 	public getByOrderId(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
