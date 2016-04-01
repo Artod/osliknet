@@ -1,6 +1,8 @@
 Creating project [Osliki.Net](http://Osliki.Net) on Node.js and Angular2
 ============================
 
+https://www.livecoding.tv/artglem/
+
 People who travel frequently can deliver anything. For example you live in the US you urgently need any medication or documents from Russia. In our application you can find someone who is just about to arrive from Moscow to New York. He can help you for money or for free.
 
 Benefits:
