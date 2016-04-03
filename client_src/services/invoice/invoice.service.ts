@@ -48,11 +48,21 @@ export class InvoiceService {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
+	
 	public getByOrderId(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
 		return this.http.get('/invoices/order/' + id, {
+			headers: headers
+		}).map( res => <any[]> res.json() );
+	}
+	
+	public check(id) {	
+		let headers = new Headers();
+		headers.append('X-Requested-With', 'XMLHttpRequest');
+	
+		return this.http.get('/invoices/check/' + id, {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}

@@ -7,7 +7,7 @@
 		Loading...
 	</div>
 	
-	<div *ngIf="_loaded && !invoices || !invoices.length">
+	<div *ngIf="_loaded && order.user._id === configUser.id && (!invoices || !invoices.length)">
 		<i>There are no invoices yet.</i>
 	</div>
 		
@@ -20,33 +20,47 @@
 			<div [ngSwitch]="invoice.status">
 				<div *ngSwitchWhen="sts.UNPAID" class="text-right">
 					<div *ngIf="invoice.corr === configUser.id">
-						<div class="help-block text-right">
-							<i>All of the money will be held on the account of our service until the order is executed. <!-- If you trust the traveler, you can send the money to him directly.  After 60 days the PayPal fee will not be refunded.--> You have up to 60 days to refund the payment if the money has not yet been transferred to the traveler.</i>
-							
-							<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
+						<div class="help-block">
+							<i>When you Unhold, all of the money will be transferred to the traveler PayPal account within one day and we will not be able to refund your money. <br /> When you request a refund, it will take some time to determine whether interests of the traveler are taken into account.</i>
 						</div>
 						
-						<button type="button" class="btn btn-warning" (click)="_busyInvoice ? false : payInvoice(invoice._id)">{{ _busyInvoice ? 'Wait...' : 'Pay' }}</button>
-						
-						<div *ngIf="errorInvoice" class="help-block text-right {{errorInvoice ? 'has-error' : ''}}">
-							{{ errorInvoice }}
+						<div class="checkbox {{ !agree.checked ? 'has-error' : '' }}">					
+							<label>
+								<input type="checkbox" [disabled]="_busyInvoice[invoice._id]" checked #agree /> I understand and agree with the above.						
+							</label>
 						</div>
+						
+						<button type="button" class="btn btn-warning" (click)="_busyInvoice[invoice._id] ? false : payInvoice(invoice._id, agree)">{{ _busyInvoice[invoice._id] ? 'Wait...' : 'Pay' }}</button>
+						
+						<div *ngIf="errorInvoice[invoice._id]" class="help-block text-right {{errorInvoice[invoice._id] ? 'has-error' : ''}}">
+							{{ errorInvoice[invoice._id] }}
+						</div>
+						
+						<br />
 					</div>
 				</div>
 				
 				<div *ngSwitchWhen="sts.PAID" class="text-right">
-					<div class="help-block text-right">
-						<i>When you Unhold, all of the money will be transferred to the traveler PayPal account and we will not be able to refund your money. <br /> When you request a refund, it will take some time to determine whether interests of the traveler are taken into account.</i>
+					<div *ngIf="invoice.corr === configUser.id">
+						<div class="help-block">
+							<i>When you Unhold, all of the money will be transferred to the traveler PayPal account and we will not be able to refund your money. <br /> When you request a refund, it will take some time to determine whether interests of the traveler are taken into account.</i>
+						</div>
 						
-						<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
-					</div>
-				
-					<button type="button" class="btn btn-warning" (click)="_busyInvoice ? false : unhold(invoice._id)">{{ _busyInvoice ? 'Wait......' : 'Unhold money' }}</button>
+						<div class="checkbox {{ !agree.checked ? 'has-error' : '' }}">					
+							<label>
+								<input type="checkbox" [disabled]="_busyInvoice[invoice._id]" checked #agree /> I understand and agree with the above.						
+							</label>
+						</div>					
 					
-					<button type="button" class="btn btn-warning" (click)="_busyInvoice ? false : refund(invoice._id)">{{ _busyInvoice ? 'Wait..' : 'Refund' }}</button>
-					
-					<div *ngIf="errorInvoice" class="help-block text-right {{errorInvoice ? 'has-error' : ''}}">
-						{{ errorInvoice }}
+						<button type="button" class="btn btn-warning" (click)="_busyInvoice[invoice._id] ? false : invoiceAct('unhold', invoice._id, agree)">{{ _busyInvoice[invoice._id] ? 'Wait........' : 'Unhold money' }}</button>
+						
+						<button type="button" class="btn btn-warning" (click)="_busyInvoice[invoice._id] ? false : invoiceAct('refund', invoice._id, agree)">{{ _busyInvoice[invoice._id] ? 'Wait..' : 'Refund' }}</button>
+						
+						<div *ngIf="errorInvoice[invoice._id]" class="help-block text-right {{errorInvoice[invoice._id] ? 'has-error' : ''}}">
+							{{ errorInvoice[invoice._id] }}
+						</div>
+						
+						<br />
 					</div>
 				</div>
 			</div>		
@@ -61,29 +75,36 @@
 			
 			<br />
 			
-			<form action="/invoices/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(comment)" novalidate>
+			<form action="/invoices/add" method="post" [ngFormModel]="form" (submit)="_busy ? false : onSubmit(dest_id, amount, agree)" novalidate>
 				<input type="hidden" name="order" value="" [(ngModel)]="model.order" [ngFormControl]="form.controls.order" />
 				
-				<div class="form-group">	
+				<div class="form-group {{form.controls.dest_id.touched && !form.controls.dest_id.valid ? 'has-error' : ''}}">	
 					<label>Your PayPal id:</label>
 					
-					<input class="form-control input-lg" type="email" name="email" [(ngModel)]="model.dest_id" [ngFormControl]="form.controls.dest_id" placeholder="E-mail" />
+					<input class="form-control input-lg" type="email" name="email" [(ngModel)]="model.dest_id" [ngFormControl]="form.controls.dest_id" placeholder="E-mail" #dest_id />
+					
+					<p *ngIf="form.controls.dest_id.touched && form.controls.dest_id.errors && form.controls.dest_id.errors.invalidEmail" class="help-block">
+						E-mail is not valid.
+					</p>
 				</div>	
 				
-				<div class="form-group">	
+				<div class="form-group {{form.controls.amount.touched && !form.controls.amount.valid ? 'has-error' : ''}}">	
 					<label>Amount:</label>
 					
-					<div class="form-group form-inline">
+					<div class="form-group form-inline">						
+						<input class="form-control input-lg" name="amount" type="number" min="0.01" step="5" placeholder="25.00" [(ngModel)]="model.amount" [ngFormControl]="form.controls.amount" #amount />
 						
-						<input class="form-control input-lg" name="amount" type="number" min="0.01" step="5" placeholder="25.00" [(ngModel)]="model.amount" [ngFormControl]="form.controls.amount" />
-						
-						<select class="form-control input-lg" name="currency" [(ngModel)]="model.currency" [ngFormControl]="form.controls.currency">
+						<select class="form-control input-lg" name="currency" [(ngModel)]="model.currency" [ngFormControl]="form.controls.currency" (change)="model.currency=select.value" #select>
 							<option value="USD">USD</option>
 							<option value="EUR">EUR</option>
 							<option value="CAD">CAD</option>
 							<option value="RUB">RUB</option>
 						</select>
 					</div>
+					
+					<p *ngIf="form.controls.amount.touched && form.controls.amount.errors && form.controls.amount.errors.invalidAmount" class="help-block">
+						Amount should be valid number and more than "0.01"
+					</p>
 				</div>
 				
 				<div class="form-group">
@@ -96,12 +117,14 @@
 				
 				<div class="form-group help-block text-right">
 					<invoice-card [invoice]="{amount: model.amount, currency: model.currency}">{{model.amount}}</invoice-card>
-				
 					<i>All of the money will be placed on the account of our service.</i>
-					
-					<label class="help-block text-right">I understand and agree with the above <input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" />.</label>
 				</div>
-
+				
+				<div class="checkbox text-right {{ !form.controls.agree.valid ? 'has-error' : '' }}">					
+					<label>
+						<input type="checkbox" [(ngModel)]="model.agree" [ngFormControl]="form.controls.agree" #agree /> I understand and agree with the above.						
+					</label>
+				</div>
 					
 				<p class="text-right">
 					<button type="button" class="btn btn-default btn-lg" (click)="closeModal()" [disabled]="_busy">Cancel</button>

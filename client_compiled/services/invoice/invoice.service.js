@@ -67,6 +67,13 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1) {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
+                InvoiceService.prototype.check = function (id) {
+                    var headers = new http_1.Headers();
+                    headers.append('X-Requested-With', 'XMLHttpRequest');
+                    return this.http.get('/invoices/check/' + id, {
+                        headers: headers
+                    }).map(function (res) { return res.json(); });
+                };
                 InvoiceService.prototype.getFees = function (amount, currency) {
                     var confPayment = this.configFees;
                     var safe = 1 * (Number(amount) || 0).toFixed(2);

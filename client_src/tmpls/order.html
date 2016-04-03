@@ -20,15 +20,14 @@
 					</span>
 					<span *ngSwitchWhen="sts.PROCESSING">
 						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
-						<button *ngIf="order && order._id" class="btn btn-warning" (click)="invoices()">Invoices</button>
 					</span>
 					<span *ngSwitchWhen="sts.CANCELLED">
 						<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
 					</span>
 					
 					<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
-						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
-						
+						<button *ngIf="order && order._id" class="btn btn-warning" (click)="invoices()">Invoices</button>
+						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>						
 					</span>
 				</p>
 			</div>
@@ -41,12 +40,12 @@
 					</span>
 					<span *ngSwitchWhen="sts.PROCESSING">
 						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
-						<button *ngIf="order && order._id" class="btn btn-warning" (click)="invoices()">Invoices</button>
 					</span>
 					<span *ngSwitchWhen="sts.REFUSED">
 						<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
 					</span>
 					<span *ngIf="order.status === sts.PROCESSING || order.status === sts.FINISHED">
+						<button *ngIf="order && order._id" class="btn btn-warning" (click)="invoices()">Invoices</button>
 						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="sendReview()">Leave feedback</button>
 					</span>
 				</p>

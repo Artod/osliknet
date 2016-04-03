@@ -2,23 +2,45 @@
 	<thead>
 		<tr *ngIf="invoice._id">
 			<td colspan="2">
-				<b>Invoice: #{{invoice._id}}</b>
+
+				<small>
+					
+					Invoice: #{{invoice._id}}
+				</small>
 				
-				<span *ngIf="invoice.dest_id">
+				<small>
 					<br />
 					
-					PayPal id: <b>{{ invoice.dest_id }}</b>				
-				</span>
+					Date: {{ invoice.created_at | toDate | date: 'longDate' }}
+				</small>	
+				
+				<small *ngIf="invoice.dest_id">
+					<br />
+					
+					PayPal id: {{ invoice.dest_id }}		
+				</small>			
+				
+				<small *ngIf="invoice.comment">
+					<br />
+					
+					Comment: {{ invoice.comment }}
+				</small>
 				
 				<br />
-				
-				Status: <b>{{ invoiceStatus[invoice.status] }}</b>
+					
+				Status:
+					<b>
+						{{ invoiceStatus[invoice.status] }}
+						
+						<a *ngIf="invoice.status === sts.UNCLEARED" (click)="_busy ? false : checkStatus($event)" href="#">{{ _busy ? 'Wait...' : 'Check'}}</a>
+					</b>
+					<span *ngIf="error" class="help-block {{ error ? 'has-error' : '' }}" style="display:inline;">({{ error }})</span>
 			</td>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td>For the traveler <b *ngIf="invoice._id">{{ invoice.user.name }}</b></td>
+			<td>For the traveler <span *ngIf="invoice._id">"{{ invoice.user.name }}"</span></td>
 			<td>{{ fees.safe }} {{ invoice.currency }}</td>
 		</tr>
 		

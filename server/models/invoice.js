@@ -42,6 +42,9 @@ var schema = mongoose.Schema({
 		required: true,
 		default: 5
 	},
+	fees: {
+		type: Schema.Types.Mixed
+	},
 	payment: {
 		type: Schema.Types.Mixed,
 		select: false
@@ -60,7 +63,8 @@ schema.statics.sts = {
 	PAID: 10,	
 	TRANSFERRED: 15,
 	REFUNDED: 20,
-	PENDING: 25
+	PENDING: 25,
+	UNCLEARED: 30
 };
 
 schema.statics.stsInv = {
@@ -68,7 +72,8 @@ schema.statics.stsInv = {
 	10: 'Paid and hold',
 	15: 'Transferred to the tripper',
 	20: 'Refunded',
-	25: 'Pending'
+	25: 'Pending',
+	30: 'Uncleared'
 };
 
 schema.pre('save', function(next) {

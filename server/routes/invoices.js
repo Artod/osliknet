@@ -115,8 +115,7 @@ router.post('/refund', mdlwares.restricted, function(req, res, next) {
 });
 
 router.post('/pay', mdlwares.restricted, function(req, res, next) {
-	var sts = Invoice.sts;
-	
+
 	Invoice.findOne({
 		_id: req.body.invoiceId,
 		corr: req.session.uid,
@@ -151,31 +150,31 @@ router.post('/pay', mdlwares.restricted, function(req, res, next) {
 		// var invoice = ;
 
 		paypal.payment.create({
-			intent: "sale",
+			intent: 'sale',
 			// intent: "pay_upon_invoice",
 			// intent: "authorize",
 			payer: {
-				"payment_method": "paypal"
+				payment_method: 'paypal'
 			},
 			redirect_urls: {
-				return_url: config.host + "invoices/paypal/execute?orderId=" + invoice.order + '&invoiceId=' + invoice._id,
+				return_url: config.host + 'invoices/paypal/execute?invoiceId=' + invoice._id,
 				// cancel_url: config.host + "paypal/cancel"invoice
-				cancel_url: config.host + "messages/order/" + invoice.order
+				cancel_url: config.host + 'messages/order/' + invoice.order
 			},
 			transactions: [{
 				item_list: {
 					items: [{
-						name: "The amount for the traveler \"" + invoice.user.name + "\"",
+						name: 'The amount for the traveler "' + invoice.user.name + '" (invoice: #' + invoice._id + ')',
 						price: fees.safe,
 						currency: invoice.currency,
 						quantity: 1
 					},{
-						name: "Osliki.Net fee (" + fees.nonRefundableOsliki + " " + invoice.currency + " non-refundable)",
+						name: 'Osliki.Net fee (' + fees.nonRefundableOsliki + ' ' + invoice.currency + ' non-refundable)',
 						price: fees.oslikiFee,
 						currency: invoice.currency,
 						quantity: 1
 					},{
-						name: "PayPal fee (" + fees.nonRefundablePaypal + " " + invoice.currency + " non-refundable)",
+						name: 'PayPal fee (' + fees.nonRefundablePaypal + ' ' + invoice.currency + ' non-refundable)',
 						price: fees.paypalFee,
 						currency: invoice.currency,
 						quantity: 1
@@ -185,11 +184,11 @@ router.post('/pay', mdlwares.restricted, function(req, res, next) {
 					currency: invoice.currency,
 					total: fees.total
 				},
-				description: "Invoice: #" + invoice._id
+				description: 'Invoice: #' + invoice._id
 			}]
-		}, function (error, payment) {
-			if (error) {
-				logger.error(error, {line: 104});
+		}, function(err, payment) {
+			if (err) {
+				logger.error(err, {line: 104});
 				
 				res.status(400).type('json')
 					.json({error: 'Unexpected server error.'});
@@ -243,8 +242,12 @@ router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req
 		return;
 	}
 	
+	req.body.order = order._id;
 	req.body.user = tripUser;
 	req.body.corr = orderUser;		
+	req.body.fees = fees;		
+	req.body.status = sts.UNPAID;		
+	req.body.payment = {};
 	
 	var invoice = new Invoice(req.body);
 	
@@ -284,7 +287,7 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.checkOrderAccess, functio
 		
 	Invoice.find({
 		order: order._id
-	}).select(tripUser === req.session.uid ? '+dest_id' : '').populate('user').exec(function(err, invoices) {
+	}).sort('-_id').select(tripUser === req.session.uid ? '+dest_id' : '').populate('user').exec(function(err, invoices) {
 		if (err) {
 			logger.error(err, {line: 87});
 			
@@ -296,6 +299,76 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.checkOrderAccess, functio
 	
 		res.type('json')
 			.json({invoices: invoices});
+	});
+});
+
+router.get('/check/:id', mdlwares.restricted, function(req, res, next) {
+
+	Invoice.findById(req.params.id).select('+payment').exec(function(err, invoice) {
+		if (err) {
+			logger.error(err, {line: 322});
+			
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+				
+			return;
+		}
+		
+		if (!invoice) {
+			res.status(400).type('json')
+				.json({error: 'Invoice not found.'});
+				
+			return;
+		}
+
+		if ( req.session.uid !== invoice.user.toString() && req.session.uid !== invoice.corr.toString() ) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
+			
+			return;
+		}
+
+		paypal.payment.get(invoice.payment.id, function (err, payment) {
+			if (err) {
+				logger.error(err, {line: 334});
+				
+				res.status(400).type('json')
+					.json({error: 'Unexpected server error.'});
+					
+				return;
+			} else {
+				var newStatus = sts.UNCLEARED;
+				
+				try {
+					if ( payment.transactions[0].related_resources[0].sale.state === 'completed' ) {
+						newStatus = sts.PAID;
+					}
+				} catch(err) {};
+				
+				if (newStatus !== invoice.status) {
+					invoice.status = newStatus;
+					invoice.payment = payment;
+					invoice.markModified('payment');
+					
+					invoice.save(function(err, invoice) {
+						if (err) {
+							logger.error(err, {line: 356});
+							
+							res.status(400).type('json')
+								.json({error: 'Unexpected server error.'});
+								
+							return;
+						}
+						
+						res.type('json')
+							.json({status: invoice.status});
+					});
+				} else {
+					res.type('json')
+						.json({status: invoice.status});
+				}
+			}
+		});	
+		
 	});
 });
 
@@ -311,7 +384,7 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 	
 	// var orderId = req.query.orderId;
 	
-	Invoice.findById({
+	Invoice.findOne({
 		_id: req.query.invoiceId,
 		corr: req.session.uid
 	}).populate('order').exec(function(err, invoice) {
@@ -330,8 +403,6 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 				
 			return;
 		}
-		
-		var sts = Invoice.sts;
 
 		paypal.payment.execute(req.query.paymentId, {
 			"payer_id": req.query.PayerID/*,
@@ -342,11 +413,11 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 				},
 				"description": "WTF"
 			}]*/
-		}, function (error, payment) {
-			var redirectUrl = config.host + "messages/order/" + req.query.orderId;
+		}, function(err, payment) {
+			var redirectUrl = config.host + "messages/order/" + invoice.order._id;
 			
-			if (error) {
-				logger.error(error, {line: 258});
+			if (err) {
+				logger.error(err, {line: 258});
 				res.type('html').send('Something went wrong. <a href="' + redirectUrl + '">Return to the order.</a>');
 			} else {
 				//debug('execute Get Payment Response:');
@@ -354,12 +425,21 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 				// res.type('text').send('thx.');
 				
 				async.parallel({
-					invoice: function(callback) {	
-						invoice.status = sts.PAID;
+					invoice: function(callback) {
+						invoice.status = sts.UNCLEARED;
+						
+						try {
+							if ( payment.transactions[0].related_resources[0].sale.state === 'completed' ) {
+								invoice.status = sts.PAID;
+							}
+						} catch(err) {}
+						
+						invoice.payment = payment;
+						
 						invoice.save(function(err, invoice) {
 							callback(err, invoice);
 						});
-					},
+					}, 
 					message: function(callback) {
 						Message.addToOrder(invoice.order, {
 							order: invoice.order._id,

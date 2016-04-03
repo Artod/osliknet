@@ -194,7 +194,7 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, fun
 				populate: {
 					path: 'user',
 					model: 'User',
-					select: 'name gravatar_hash'
+					select: 'name gravatar_hash email'
 				}
 			}).populate({
 				path: 'user',
@@ -227,7 +227,11 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, fun
 			res.status(401).type('json').json({error: 'Unauthorized'});
 				
 			return;
-		}	
+		}
+
+		if (req.session.uid !== asyncRes.order.trip.user.id) {
+			asyncRes.order.trip.user.email = '';
+		}
 
 		User.setMessagesReaded(req.session.uid, asyncRes.order.id);
 		

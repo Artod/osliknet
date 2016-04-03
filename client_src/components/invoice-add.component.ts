@@ -37,51 +37,104 @@ export class InvoiceAddComponent {
 	) {
 		this.form = this._fb.group({
 			order: ['', Validators.required],
-			amount: ['', Validators.compose([
-				(ctrl) => {
-					let amount = Number(ctrl.value);
-					if ( ctrl.value && ( !amount || amount < 0.01 ) ) {
-						return {invalidAmount: true};
-					}
-					
-					return null;
-				},
-				Validators.required]
-			)],
+			amount: ['', (ctrl) => {
+				let amount = Number(ctrl.value);
+				if ( !amount && ( !amount || amount < 0.01 ) ) {
+					return {invalidAmount: true};
+				}
+				
+				return null;
+			}],
 			currency: ['', Validators.required],
-			dest_id: ['', Validators.compose([
-				(ctrl) => {
-					if ( !/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
-						return {invalidEmail: true};
-					}
-					
-					return null;
-				},
-				Validators.required]
-			)],
+			dest_id: ['', (ctrl) => {
+				if ( !/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value) ) {
+					return {invalidEmail: true};
+				}
+				
+				return null;
+			}],
 			comment: '',
-			agree: ['', Validators.required]
+			agree: ['', (ctrl) => {				
+				if ( !ctrl.value ) {
+					return {invalidAgree: true};
+				}
+				
+				return null;
+			}]
 		});
 
 		this.model.order = this.order._id;
+		this.model.dest_id = this.order.trip.user.email;
 		
 		this._loaded = false;
 		
 		this._invoiceService.getByOrderId(this.order._id).subscribe(data => {
+
 			this.invoices = data && data.invoices || [];
+		
+			let first = this.invoices[0];
+
 			
-			let last = this.invoices[this.invoices.length - 1];
-			
-			if (last) {
-				this.model.dest_id = last.dest_id;
-				this.model.amount = last.amount;
-				this.model.currency = last.currency;
+			if (first) {
+
+				this.model.dest_id = first.dest_id;
+				this.model.amount = first.amount;
+				this.model.currency = first.currency;
 			}
-			
+		
 			this._loaded = true;
+
 		}, err => {
 			this._loaded = true;
 		});
+	}
+	
+	public error : string = '';
+	
+	private _busy : boolean = false;
+		
+	public onSubmit($dest_id, $amount, $agree) : void {	
+		if (!this.form.controls.dest_id.valid) {
+			$dest_id.focus();
+			
+			return;
+		}
+		
+		if (!this.form.controls.amount.valid) {
+			$amount.focus();
+			
+			return;
+		}	
+		
+		if (!this.form.controls.agree.valid) {
+			$agree.focus();
+			
+			return;
+		}		
+		
+		if (!this.form.valid) {
+			return;
+		}		
+
+		this._busy = true;
+		this.error = '';
+
+		this._invoiceService.add(this.model).subscribe(data => {				
+			this.closeModal();
+
+			this.onInvoiceAdd();
+			
+			this._busy = false;
+		}, err => {
+			this.error = 'Unexpected error. Try again later.';
+
+			try {
+				this.error = err.json().error || this.error;
+			} catch(e) {}
+			
+			this._busy = false;
+		});
+		
 	}
 	
 	public closeModal() : void {
@@ -94,68 +147,26 @@ export class InvoiceAddComponent {
 		}
 	}
 	
-	private _busyInvoice : boolean = false;
+	private _busyInvoice : boolean[] = [];
 	
-	public errorInvoice : string = '';	
+	public errorInvoice : string[] = [];	
 	
-	public unhold(invoiceId) : void {
-		if ( !this.model.agree || !confirm('Are you sure?') ) {
+	public payInvoice(invoiceId, $agree) : void {
+		if (!$agree.checked) {
+			$agree.focus();
+			
 			return;
 		}
 		
-		this.errorInvoice = '';
-		this._busyInvoice = true;
-		
-		this._invoiceService.unhold(invoiceId).subscribe(data => {		
-			this.closeModal();
+		this.errorInvoice[invoiceId] = '';
+		this._busyInvoice[invoiceId] = true;
 
-			this.onInvoiceAdd();
-			
-		}, err => {
-			this.errorInvoice = 'Unexpected error. Try again later.';
-
-			try {
-				this.errorInvoice = err.json().error || this.errorInvoice;
-			} catch(e) {}
-			
-			this._busyInvoice = false;
-		});
-	}
-	
-	public refund(invoiceId) : void {
-		if ( !this.model.agree || !confirm('Are you sure?') ) {
-			return;
-		}
-		
-		this.errorInvoice = '';
-		this._busyInvoice = true;
-		
-		this._invoiceService.refund(invoiceId).subscribe(data => {		
-			this.closeModal();
-
-			this.onInvoiceAdd();
-			
-		}, err => {
-			this.errorInvoice = 'Unexpected error. Try again later.';
-
-			try {
-				this.errorInvoice = err.json().error || this.errorInvoice;
-			} catch(e) {}
-			
-			this._busyInvoice = false;
-		});
-	}
-	
-	public payInvoice(invoiceId) : void {
-		this.errorInvoice = '';
-		this._busyInvoice = true;
-		
 		this._invoiceService.pay(invoiceId).subscribe(data => {
 			if (data.redirectUrl) {
 				window.location = data.redirectUrl;
 			} else {
-				this._busyInvoice = false;
-				this.errorInvoice = 'Unexpected error. Try again later.';
+				this._busyInvoice[invoiceId] = false;
+				this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
 			}
 		
 			//this.closeModal();
@@ -163,44 +174,44 @@ export class InvoiceAddComponent {
 			//this.onInvoiceAdd();
 			
 		}, err => {
-			this.errorInvoice = 'Unexpected error. Try again later.';
+			this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
 
 			try {
-				this.errorInvoice = err.json().error || this.errorInvoice;
+				this.errorInvoice[invoiceId] = err.json().error || this.errorInvoice[invoiceId];
 			} catch(e) {}
 			
-			this._busyInvoice = false;
+			this._busyInvoice[invoiceId] = false;
 		});
 	}
 	
-	public error : string = '';
-	
-	private _busy : boolean = false;
-		
-	public onSubmit(elComment) : void {
-		if (!this.form.valid) {
-			elComment.focus();
-		}
-		
-		if (this.form.valid && !this._busy) {
-			this._busy = true;
-			this.error = '';
+	public invoiceAct(act, invoiceId, $agree) : void {
+		if (!$agree.checked) {
+			$agree.focus();
 			
-			this._invoiceService.add(this.model).subscribe(data => {				
-				this.closeModal();
-
-				this.onInvoiceAdd();
-				
-				this._busy = false;
-			}, err => {
-				this.error = 'Unexpected error. Try again later.';
-
-				try {
-					this.error = err.json().error || this.error;
-				} catch(e) {}
-				
-				this._busy = false;
-			});
+			return;
 		}
+		
+		if ( !confirm('Are you sure?') ) {
+			return;
+		}
+		
+		this.errorInvoice[invoiceId] = '';
+		this._busyInvoice[invoiceId] = true;
+
+		this._invoiceService[act](invoiceId).subscribe(data => {		
+			this.closeModal();
+
+			this.onInvoiceAdd();
+			
+		}, err => {
+			this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
+
+			try {
+				this.errorInvoice[invoiceId] = err.json().error || this.errorInvoice;
+			} catch(e) {}
+			
+			this._busyInvoice[invoiceId] = false;
+		});
 	}
+
 }

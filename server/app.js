@@ -92,12 +92,18 @@ TODO:
 ?- zero dialogs
 \/- nginx cache
 
-- pm2 product
+\/- pm2 product
+\/- paypal
+	\/- validation
+	\/- credit cards
+	
+	
+- help baloons
+
 - support link
 - определение мобильных браузеров
 - indexes db
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
-- paypal
 
 - soc share
 

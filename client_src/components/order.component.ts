@@ -65,7 +65,7 @@ export class OrderComponent {
 	public invoices() : void {	
 		this._modalService.show(InvoiceAddComponent, Injector.resolve([		
 			provide(InvoiceService, {useValue: this._invoiceService}),
-			
+
 			provide('order', {useValue: this.order}),
 			provide('config.user', {useValue: this.configUser}),
 			provide('onInvoiceAdd', {

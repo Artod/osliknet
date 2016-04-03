@@ -44,48 +44,82 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         amount: 25.00,
                         agree: true
                     };
-                    this._busyInvoice = false;
-                    this.errorInvoice = '';
                     this.error = '';
                     this._busy = false;
+                    this._busyInvoice = [];
+                    this.errorInvoice = [];
                     this.form = this._fb.group({
                         order: ['', common_1.Validators.required],
-                        amount: ['', common_1.Validators.compose([
-                                function (ctrl) {
-                                    var amount = Number(ctrl.value);
-                                    if (ctrl.value && (!amount || amount < 0.01)) {
-                                        return { invalidAmount: true };
-                                    }
-                                    return null;
-                                },
-                                common_1.Validators.required])],
+                        amount: ['', function (ctrl) {
+                                var amount = Number(ctrl.value);
+                                if (!amount && (!amount || amount < 0.01)) {
+                                    return { invalidAmount: true };
+                                }
+                                return null;
+                            }],
                         currency: ['', common_1.Validators.required],
-                        dest_id: ['', common_1.Validators.compose([
-                                function (ctrl) {
-                                    if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value)) {
-                                        return { invalidEmail: true };
-                                    }
-                                    return null;
-                                },
-                                common_1.Validators.required])],
+                        dest_id: ['', function (ctrl) {
+                                if (!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i.test(ctrl.value)) {
+                                    return { invalidEmail: true };
+                                }
+                                return null;
+                            }],
                         comment: '',
-                        agree: ['', common_1.Validators.required]
+                        agree: ['', function (ctrl) {
+                                if (!ctrl.value) {
+                                    return { invalidAgree: true };
+                                }
+                                return null;
+                            }]
                     });
                     this.model.order = this.order._id;
+                    this.model.dest_id = this.order.trip.user.email;
                     this._loaded = false;
                     this._invoiceService.getByOrderId(this.order._id).subscribe(function (data) {
                         _this.invoices = data && data.invoices || [];
-                        var last = _this.invoices[_this.invoices.length - 1];
-                        if (last) {
-                            _this.model.dest_id = last.dest_id;
-                            _this.model.amount = last.amount;
-                            _this.model.currency = last.currency;
+                        var first = _this.invoices[0];
+                        if (first) {
+                            _this.model.dest_id = first.dest_id;
+                            _this.model.amount = first.amount;
+                            _this.model.currency = first.currency;
                         }
                         _this._loaded = true;
                     }, function (err) {
                         _this._loaded = true;
                     });
                 }
+                InvoiceAddComponent.prototype.onSubmit = function ($dest_id, $amount, $agree) {
+                    var _this = this;
+                    if (!this.form.controls.dest_id.valid) {
+                        $dest_id.focus();
+                        return;
+                    }
+                    if (!this.form.controls.amount.valid) {
+                        $amount.focus();
+                        return;
+                    }
+                    if (!this.form.controls.agree.valid) {
+                        $agree.focus();
+                        return;
+                    }
+                    if (!this.form.valid) {
+                        return;
+                    }
+                    this._busy = true;
+                    this.error = '';
+                    this._invoiceService.add(this.model).subscribe(function (data) {
+                        _this.closeModal();
+                        _this.onInvoiceAdd();
+                        _this._busy = false;
+                    }, function (err) {
+                        _this.error = 'Unexpected error. Try again later.';
+                        try {
+                            _this.error = err.json().error || _this.error;
+                        }
+                        catch (e) { }
+                        _this._busy = false;
+                    });
+                };
                 InvoiceAddComponent.prototype.closeModal = function () {
                     this._modalComponent && this._modalComponent.close();
                 };
@@ -94,86 +128,53 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         this.model.rating = el.value;
                     }
                 };
-                InvoiceAddComponent.prototype.unhold = function (invoiceId) {
+                InvoiceAddComponent.prototype.payInvoice = function (invoiceId, $agree) {
                     var _this = this;
-                    if (!this.model.agree || !confirm('Are you sure?')) {
+                    if (!$agree.checked) {
+                        $agree.focus();
                         return;
                     }
-                    this.errorInvoice = '';
-                    this._busyInvoice = true;
-                    this._invoiceService.unhold(invoiceId).subscribe(function (data) {
-                        _this.closeModal();
-                        _this.onInvoiceAdd();
-                    }, function (err) {
-                        _this.errorInvoice = 'Unexpected error. Try again later.';
-                        try {
-                            _this.errorInvoice = err.json().error || _this.errorInvoice;
-                        }
-                        catch (e) { }
-                        _this._busyInvoice = false;
-                    });
-                };
-                InvoiceAddComponent.prototype.refund = function (invoiceId) {
-                    var _this = this;
-                    if (!this.model.agree || !confirm('Are you sure?')) {
-                        return;
-                    }
-                    this.errorInvoice = '';
-                    this._busyInvoice = true;
-                    this._invoiceService.refund(invoiceId).subscribe(function (data) {
-                        _this.closeModal();
-                        _this.onInvoiceAdd();
-                    }, function (err) {
-                        _this.errorInvoice = 'Unexpected error. Try again later.';
-                        try {
-                            _this.errorInvoice = err.json().error || _this.errorInvoice;
-                        }
-                        catch (e) { }
-                        _this._busyInvoice = false;
-                    });
-                };
-                InvoiceAddComponent.prototype.payInvoice = function (invoiceId) {
-                    var _this = this;
-                    this.errorInvoice = '';
-                    this._busyInvoice = true;
+                    this.errorInvoice[invoiceId] = '';
+                    this._busyInvoice[invoiceId] = true;
                     this._invoiceService.pay(invoiceId).subscribe(function (data) {
                         if (data.redirectUrl) {
                             window.location = data.redirectUrl;
                         }
                         else {
-                            _this._busyInvoice = false;
-                            _this.errorInvoice = 'Unexpected error. Try again later.';
+                            _this._busyInvoice[invoiceId] = false;
+                            _this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
                         }
                     }, function (err) {
-                        _this.errorInvoice = 'Unexpected error. Try again later.';
+                        _this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
                         try {
-                            _this.errorInvoice = err.json().error || _this.errorInvoice;
+                            _this.errorInvoice[invoiceId] = err.json().error || _this.errorInvoice[invoiceId];
                         }
                         catch (e) { }
-                        _this._busyInvoice = false;
+                        _this._busyInvoice[invoiceId] = false;
                     });
                 };
-                InvoiceAddComponent.prototype.onSubmit = function (elComment) {
+                InvoiceAddComponent.prototype.invoiceAct = function (act, invoiceId, $agree) {
                     var _this = this;
-                    if (!this.form.valid) {
-                        elComment.focus();
+                    if (!$agree.checked) {
+                        $agree.focus();
+                        return;
                     }
-                    if (this.form.valid && !this._busy) {
-                        this._busy = true;
-                        this.error = '';
-                        this._invoiceService.add(this.model).subscribe(function (data) {
-                            _this.closeModal();
-                            _this.onInvoiceAdd();
-                            _this._busy = false;
-                        }, function (err) {
-                            _this.error = 'Unexpected error. Try again later.';
-                            try {
-                                _this.error = err.json().error || _this.error;
-                            }
-                            catch (e) { }
-                            _this._busy = false;
-                        });
+                    if (!confirm('Are you sure?')) {
+                        return;
                     }
+                    this.errorInvoice[invoiceId] = '';
+                    this._busyInvoice[invoiceId] = true;
+                    this._invoiceService[act](invoiceId).subscribe(function (data) {
+                        _this.closeModal();
+                        _this.onInvoiceAdd();
+                    }, function (err) {
+                        _this.errorInvoice[invoiceId] = 'Unexpected error. Try again later.';
+                        try {
+                            _this.errorInvoice[invoiceId] = err.json().error || _this.errorInvoice;
+                        }
+                        catch (e) { }
+                        _this._busyInvoice[invoiceId] = false;
+                    });
                 };
                 InvoiceAddComponent = __decorate([
                     core_1.Component({

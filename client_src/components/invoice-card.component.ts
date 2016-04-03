@@ -2,9 +2,12 @@ import {Component, Input, OnInit, OnChange, SimpleChange, Inject} from 'angular2
 
 import {InvoiceService}  from '../services/invoice/invoice.service';
 
+import {ToDatePipe} from '../pipes/to-date.pipe';
+
 @Component({
 	selector: 'invoice-card',
-	templateUrl: '/client_src/tmpls/invoice-card.html'
+	templateUrl: '/client_src/tmpls/invoice-card.html',
+	pipes: [ToDatePipe]
 })
 
 export class InvoiceCardComponent implements
@@ -20,7 +23,8 @@ export class InvoiceCardComponent implements
 	constructor(
 		private _invoiceService : InvoiceService,
 		@Inject('config.user') public configUser,
-		@Inject('config.invoiceStatus') public invoiceStatus
+		@Inject('config.invoiceStatus') public invoiceStatus,
+		@Inject('config.invoiceStatusConst') public sts
 	) {
 		
 	}
@@ -28,6 +32,37 @@ export class InvoiceCardComponent implements
 	public ngOnInit() : void {
 		//this.fees = this._invoiceService.getFees(this.amount, this.currency);
 		
+		
+	}
+	
+	
+	public error : string = '';
+	
+	private _busy : boolean = false;
+		
+	public checkStatus($event) : void {
+		$event.preventDefault();
+		
+		this._busy = true;
+		this.error = '';
+
+		this._invoiceService.check(this.invoice._id).subscribe(data => {
+			if (data && data.status) {
+				this.invoice.status = data.status;
+			} else {
+				this.error = 'Unexpected error. Try again later.';
+			}
+			
+			this._busy = false;
+		}, err => {
+			this.error = 'Unexpected error. Try again later.';
+
+			try {
+				this.error = err.json().error || this.error;
+			} catch(e) {}
+			
+			this._busy = false;
+		});
 		
 	}
 	
