@@ -1,5 +1,6 @@
-System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loader', 'angular2/common'], function(exports_1) {
+System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loader', 'angular2/common'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -84,7 +85,7 @@ System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loa
                 ], GmAutocompliteComponent.prototype, "placeholder", void 0);
                 __decorate([
                     core_1.Input(), 
-                    __metadata('design:type', (typeof (_a = typeof common_1.ControlGroup !== 'undefined' && common_1.ControlGroup) === 'function' && _a) || Object)
+                    __metadata('design:type', common_1.ControlGroup)
                 ], GmAutocompliteComponent.prototype, "form", void 0);
                 __decorate([
                     core_1.Input(), 
@@ -95,10 +96,9 @@ System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loa
                         selector: 'gm-autocomplite',
                         templateUrl: '/client_src/tmpls/gm-autocomplite.html'
                     }), 
-                    __metadata('design:paramtypes', [(typeof (_b = typeof lazy_maps_api_loader_1.LazyMapsAPILoader !== 'undefined' && lazy_maps_api_loader_1.LazyMapsAPILoader) === 'function' && _b) || Object, (typeof (_c = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _c) || Object, (typeof (_d = typeof core_1.NgZone !== 'undefined' && core_1.NgZone) === 'function' && _d) || Object])
+                    __metadata('design:paramtypes', [lazy_maps_api_loader_1.LazyMapsAPILoader, core_1.ElementRef, core_1.NgZone])
                 ], GmAutocompliteComponent);
                 return GmAutocompliteComponent;
-                var _a, _b, _c, _d;
             }());
             exports_1("GmAutocompliteComponent", GmAutocompliteComponent);
         }

@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/common', 'angular2/router', './captcha.component', '../services/user/user.service'], function(exports_1) {
+System.register(['angular2/core', 'angular2/common', 'angular2/router', './captcha.component', '../services/user/user.service'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -35,6 +36,7 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', './captc
                     this._userService = _userService;
                     this.model = {};
                     this._busy = false;
+                    this.needReloadCaptcha = false;
                     this.submitted = false;
                     this.success = false;
                     this.error = '';
@@ -83,7 +85,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', './captc
                             _this.success = true;
                             _this._busy = false;
                         }, function (err) {
+                            console.log(_this.needReloadCaptcha);
                             _this.error = 'Unexpected error. Try again later.';
+                            _this.needReloadCaptcha = true;
                             try {
                                 _this.error = err.json().error || _this.error;
                             }
@@ -99,10 +103,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', './captc
                         directives: [router_1.ROUTER_DIRECTIVES, captcha_component_1.CaptchaComponent],
                         pipes: []
                     }), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof user_service_1.UserService !== 'undefined' && user_service_1.UserService) === 'function' && _b) || Object])
+                    __metadata('design:paramtypes', [common_1.FormBuilder, user_service_1.UserService])
                 ], JoinComponent);
                 return JoinComponent;
-                var _a, _b;
             }());
             exports_1("JoinComponent", JoinComponent);
         }

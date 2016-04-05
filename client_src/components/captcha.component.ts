@@ -13,7 +13,9 @@ declare var window: any;
 export class CaptchaComponent {
 	@Input() ctrl : Control;
 	@Input() model;
+	@Input() needReloadCaptcha;
 	
+	@Output() public needReloadCaptchaChange : EventEmitter<any> = new EventEmitter(); 
 	@Output('modelChange') public modelChange : EventEmitter<any> = new EventEmitter();
 
 	private _interval : number;
@@ -47,6 +49,18 @@ export class CaptchaComponent {
 
 			this.init();
 		}
+	}
+	
+	public ngOnChanges(changes: {[propName: string]: SimpleChange}) : void {
+		if ( changes.needReloadCaptcha && !changes.needReloadCaptcha.isFirstChange() ) {
+			this.reset();
+		}		
+	}
+	
+	public reset() : void {
+		window.grecaptcha.reset(this.captchaId);
+		this.needReloadCaptcha = false;
+		this.needReloadCaptchaChange.emit(this.needReloadCaptcha);
 	}
 	
 	public init() : void {

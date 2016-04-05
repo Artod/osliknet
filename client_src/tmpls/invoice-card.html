@@ -30,7 +30,7 @@
 					
 				Status:
 					<b>
-						{{ invoiceStatus[invoice.status] }}
+						{{ _busy ? '.........' : invoiceStatus[invoice.status] }}
 						
 						<a *ngIf="invoice.status === sts.UNCLEARED" (click)="_busy ? false : checkStatus($event)" href="#">{{ _busy ? 'Wait...' : 'Check'}}</a>
 					</b>

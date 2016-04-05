@@ -1,6 +1,6 @@
 {
-  "name": "OSLiKi.Net",
-  "version": "1.0.0",
+  "name": "Osliki.Net",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "tsc": "tsc",
@@ -10,7 +10,7 @@
     "postinstall": "typings install"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.11",
+    "angular2": "2.0.0-beta.13",
     "async": "1.5.2",
     "body-parser": "~1.13.2",
     "bootstrap": "3.3.6",
@@ -34,20 +34,20 @@
     "rxjs": "5.0.0-beta.2",
     "sendgrid": "2.0.0",
     "serve-favicon": "~2.3.0",
-    "systemjs": "0.19.24",
+    "systemjs": "0.19.25",
     "winston": "2.2.0",
-    "zone.js": "0.6.5"
+    "zone.js": "0.6.6"
   },
   "devDependencies": {
     "gulp-clean-css": "2.0.3",
     "gulp-concat": "2.6.0",
-    "gulp-inline-ng2-template": "1.1.2",
+    "gulp-inline-ng2-template": "1.1.3",
     "gulp-livereload": "3.8.1",
     "gulp-nodemon": "2.0.6",
     "gulp-sourcemaps": "1.6.0",
     "gulp-typescript": "2.12.1",
     "gulp-uglify": "1.5.3",
-    "typescript": "1.8.0",
-	"typings":"0.7.9"
+    "typescript": "1.8.9",
+	"typings":"0.7.11"
   }
 }

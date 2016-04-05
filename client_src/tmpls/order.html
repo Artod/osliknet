@@ -18,9 +18,11 @@
 					<span *ngSwitchWhen="sts.NEGOTIATION">
 						<button class="btn btn-default" (click)="changeStatus(sts.CANCELLED)">Cancel request</button>
 					</span>
+					
 					<span *ngSwitchWhen="sts.PROCESSING">
 						<button *ngIf="isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.FINISHED)">Finish</button>
 					</span>
+					
 					<span *ngSwitchWhen="sts.CANCELLED">
 						<button *ngIf="!isTripPassed" class="btn btn-warning" (click)="changeStatus(sts.NEGOTIATION)">Restore</button>
 					</span>

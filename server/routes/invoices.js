@@ -417,7 +417,7 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 			var redirectUrl = config.host + "messages/order/" + invoice.order._id;
 			
 			if (err) {
-				logger.error(err, {line: 258});
+				logger.error(err, {line: 420});
 				res.type('html').send('Something went wrong. <a href="' + redirectUrl + '">Return to the order.</a>');
 			} else {
 				//debug('execute Get Payment Response:');

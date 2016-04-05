@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/common'], function(exports_1) {
+System.register(['angular2/core', 'angular2/common'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -27,6 +28,7 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                 function CaptchaComponent(configCaptcha, _el) {
                     this.configCaptcha = configCaptcha;
                     this._el = _el;
+                    this.needReloadCaptchaChange = new core_1.EventEmitter();
                     this.modelChange = new core_1.EventEmitter();
                 }
                 CaptchaComponent.prototype.ngOnInit = function () {
@@ -47,6 +49,16 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                         this.interval = null;
                         this.init();
                     }
+                };
+                CaptchaComponent.prototype.ngOnChanges = function (changes) {
+                    if (changes.needReloadCaptcha && !changes.needReloadCaptcha.isFirstChange()) {
+                        this.reset();
+                    }
+                };
+                CaptchaComponent.prototype.reset = function () {
+                    window.grecaptcha.reset(this.captchaId);
+                    this.needReloadCaptcha = false;
+                    this.needReloadCaptchaChange.emit(this.needReloadCaptcha);
                 };
                 CaptchaComponent.prototype.init = function () {
                     var _this = this;
@@ -69,15 +81,23 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                 };
                 __decorate([
                     core_1.Input(), 
-                    __metadata('design:type', (typeof (_a = typeof common_1.Control !== 'undefined' && common_1.Control) === 'function' && _a) || Object)
+                    __metadata('design:type', common_1.Control)
                 ], CaptchaComponent.prototype, "ctrl", void 0);
                 __decorate([
                     core_1.Input(), 
                     __metadata('design:type', Object)
                 ], CaptchaComponent.prototype, "model", void 0);
                 __decorate([
+                    core_1.Input(), 
+                    __metadata('design:type', Object)
+                ], CaptchaComponent.prototype, "needReloadCaptcha", void 0);
+                __decorate([
+                    core_1.Output(), 
+                    __metadata('design:type', core_1.EventEmitter)
+                ], CaptchaComponent.prototype, "needReloadCaptchaChange", void 0);
+                __decorate([
                     core_1.Output('modelChange'), 
-                    __metadata('design:type', (typeof (_b = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _b) || Object)
+                    __metadata('design:type', core_1.EventEmitter)
                 ], CaptchaComponent.prototype, "modelChange", void 0);
                 CaptchaComponent = __decorate([
                     core_1.Component({
@@ -85,10 +105,9 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1) {
                         template: "\n\t\t<input name=\"recaptcha\" type=\"hidden\" [(ngModel)]=\"model\" [ngFormControl]=\"ctrl\" value=\"\" />\n\t\t<div class=\"g-recaptcha\">Loading captcha...</div>\n\t"
                     }),
                     __param(0, core_1.Inject('config.captcha')), 
-                    __metadata('design:paramtypes', [Object, (typeof (_c = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _c) || Object])
+                    __metadata('design:paramtypes', [Object, core_1.ElementRef])
                 ], CaptchaComponent);
                 return CaptchaComponent;
-                var _a, _b, _c;
             }());
             exports_1("CaptchaComponent", CaptchaComponent);
         }

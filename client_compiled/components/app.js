@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/common', './trip.component', './trips.component', './trip-add.component', './trips-my.component', './orders.component', './order.component', './user.component', './notifications.component', './messages.component', './dialogs.component', './login.component', './join.component', './user-card.component', '../services/trip/trip.service', '../services/order/order.service', '../services/modal/modal.service', '../services/message/message.service', '../services/review/review.service', '../services/invoice/invoice.service', '../services/user/user.service', '../services/notification/notification.service', '../services/subscribe/subscribe.service'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/common', './trip.component', './trips.component', './trip-add.component', './trips-my.component', './orders.component', './order.component', './user.component', './notifications.component', './messages.component', './dialogs.component', './login.component', './join.component', './user-card.component', '../services/trip/trip.service', '../services/order/order.service', '../services/modal/modal.service', '../services/message/message.service', '../services/review/review.service', '../services/invoice/invoice.service', '../services/user/user.service', '../services/notification/notification.service', '../services/subscribe/subscribe.service'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -100,6 +101,7 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
                     var _this = this;
                     this._location = _location;
                     this.configUser = configUser;
+                    this.adminUid = '5702b5d213e381b973f9a9f8';
                     this._location.subscribe(function () {
                         _this.isVisible = false;
                     });
@@ -127,10 +129,9 @@ System.register(['angular2/core', 'angular2/router', 'angular2/http', 'angular2/
                         { path: '/messages', name: 'Dialogs', component: dialogs_component_1.DialogsComponent }
                     ]),
                     __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _a) || Object, Object])
+                    __metadata('design:paramtypes', [router_1.Location, Object])
                 ], AppComponent);
                 return AppComponent;
-                var _a;
             }());
             exports_1("AppComponent", AppComponent);
         }

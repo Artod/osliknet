@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/router', '../services/order/order.service', '../services/modal/modal.service', '../services/review/review.service', '../services/invoice/invoice.service', '../pipes/to-date.pipe', './trip-card.component', './order-card.component', './review-add.component', './invoice-add.component', './chat.component'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', '../services/order/order.service', '../services/modal/modal.service', '../services/review/review.service', '../services/invoice/invoice.service', '../pipes/to-date.pipe', './trip-card.component', './order-card.component', './review-add.component', './invoice-add.component', './chat.component'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -130,10 +131,9 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     __param(6, core_1.Inject('config.orderStatus')),
                     __param(7, core_1.Inject('config.orderStatusConst')),
                     __param(8, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _d) || Object, (typeof (_e = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _e) || Object, (typeof (_f = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _f) || Object, Object, Object, Object])
+                    __metadata('design:paramtypes', [order_service_1.OrderService, modal_service_1.ModalService, review_service_1.ReviewService, invoice_service_1.InvoiceService, router_1.RouteParams, core_1.ApplicationRef, Object, Object, Object])
                 ], OrderComponent);
                 return OrderComponent;
-                var _a, _b, _c, _d, _e, _f;
             }());
             exports_1("OrderComponent", OrderComponent);
         }

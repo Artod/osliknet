@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/common', '../services/review/review.service'], function(exports_1) {
+System.register(['angular2/core', 'angular2/common', '../services/review/review.service'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -90,10 +91,9 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
                     }),
                     __param(2, core_1.Inject('orderId')),
                     __param(3, core_1.Inject('onReviewAdd')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _b) || Object, String, Object])
+                    __metadata('design:paramtypes', [common_1.FormBuilder, review_service_1.ReviewService, String, Function])
                 ], ReviewAddComponent);
                 return ReviewAddComponent;
-                var _a, _b;
             }());
             exports_1("ReviewAddComponent", ReviewAddComponent);
         }

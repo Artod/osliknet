@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', './user-card.component', './chat.component'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', './user-card.component', './chat.component'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -48,10 +49,9 @@ System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', '.
                         directives: [router_1.ROUTER_DIRECTIVES, chat_component_1.ChatComponent, user_card_component_1.UserCardComponent]
                     }),
                     __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _a) || Object, Object])
+                    __metadata('design:paramtypes', [router_1.RouteParams, Object])
                 ], MessagesComponent);
                 return MessagesComponent;
-                var _a;
             }());
             exports_1("MessagesComponent", MessagesComponent);
         }

@@ -54,6 +54,8 @@ import {SubscribeService} from '../services/subscribe/subscribe.service';
 ])
 
 export class AppComponent {
+	public adminUid : string = '5702b5d213e381b973f9a9f8';
+	
 	constructor(
 		private _location : Location,
 		@Inject('config.user') public configUser

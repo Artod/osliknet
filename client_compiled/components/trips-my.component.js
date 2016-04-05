@@ -1,5 +1,6 @@
-System.register(['angular2/core', 'angular2/router', '../services/trip/trip.service', '../services/notification/notification.service', './trip-card.component', './order-card.component', './goto-card.component', '../pipes/to-date.pipe'], function(exports_1) {
+System.register(['angular2/core', 'angular2/router', '../services/trip/trip.service', '../services/notification/notification.service', './trip-card.component', './order-card.component', './goto-card.component', '../pipes/to-date.pipe'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -103,10 +104,9 @@ System.register(['angular2/core', 'angular2/router', '../services/trip/trip.serv
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(3, core_1.Inject('config.orderStatus')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof trip_service_1.TripService !== 'undefined' && trip_service_1.TripService) === 'function' && _a) || Object, (typeof (_b = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _b) || Object, (typeof (_c = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _c) || Object, Object])
+                    __metadata('design:paramtypes', [trip_service_1.TripService, notification_service_1.NotificationService, core_1.ApplicationRef, Object])
                 ], TripsMyComponent);
                 return TripsMyComponent;
-                var _a, _b, _c;
             }());
             exports_1("TripsMyComponent", TripsMyComponent);
         }

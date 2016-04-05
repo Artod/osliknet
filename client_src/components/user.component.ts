@@ -16,6 +16,7 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 
 export class UserComponent {
 	public uid : string = '';
+	public adminUid : string = '5702b5d213e381b973f9a9f8';
 	
 	public user : any = {};
 	public reviews : any[] = [];

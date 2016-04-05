@@ -15,17 +15,13 @@ import {UserService} from '../services/user/user.service';
 })
 
 export class JoinComponent {
-	public model = {
-		/*email: 'mcattendlg@gmail.com',
-		name: 'mcattendlg'
-		*/
-	}
+	public model : any = {}
 	
-	public form: ControlGroup;
+	public form : ControlGroup;
 	
 	constructor(
-		private _fb: FormBuilder,
-		private _userService: UserService
+		private _fb : FormBuilder,
+		private _userService : UserService
 	) {
 		this.form = _fb.group({ 
 			name: ['', Validators.compose([
@@ -61,6 +57,7 @@ export class JoinComponent {
 	}
 	
 	private _busy : boolean = false;
+	public needReloadCaptcha : boolean = false;
 	public submitted : boolean = false;
 	public success : boolean = false;
 	public error : string = '';
@@ -89,7 +86,9 @@ export class JoinComponent {
 
 				this._busy = false;
 			}, err => {
+console.log(this.needReloadCaptcha)
 				this.error = 'Unexpected error. Try again later.';
+				this.needReloadCaptcha = true;
 
 				try {
 					this.error = err.json().error || this.error;
@@ -100,27 +99,3 @@ export class JoinComponent {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

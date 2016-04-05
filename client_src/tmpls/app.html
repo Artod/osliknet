@@ -31,6 +31,7 @@
 			<li *ngIf="!configUser || !configUser.id"><a [routerLink]="['Join']">Add a Trip</a></li> 
 			<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripsMy']">My Trips</a></li>
 			<li *ngIf="configUser && configUser.id"><a [routerLink]="['Orders']">Requests</a></li>
+			<li *ngIf="configUser && configUser.id"><a [routerLink]="['Messages', {id: adminUid}]">Help</a></li>
 		</ul>
 	</nav>
 </div>
@@ -41,6 +42,7 @@
 	<li *ngIf="!configUser || !configUser.id"><a [routerLink]="['Join']">Add a Trip</a></li> 
 	<li *ngIf="configUser && configUser.id"><a [routerLink]="['TripsMy']">My Trips</a></li>
 	<li *ngIf="configUser && configUser.id"><a [routerLink]="['Orders']">Requests</a></li>
+	<li *ngIf="configUser && configUser.id"><a [routerLink]="['Messages', {id: adminUid}]">Help</a></li>
 	<li *ngIf="configUser && configUser.id">
 		<a href="/users/logout" (click)="$event.stopPropagation()"><span class="glyphicon glyphicon-log-out"></span> Log out</a>
 	</li>

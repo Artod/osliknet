@@ -1,5 +1,6 @@
-System.register(['./components/app', 'angular2/platform/browser', 'angular2/router', 'angular2/core', 'angular2/http', 'rxjs/Rx', './services/maps-api-loader/lazy-maps-api-loader'], function(exports_1) {
+System.register(['./components/app', 'angular2/platform/browser', 'angular2/router', 'angular2/core', 'angular2/http', 'rxjs/Rx', './services/maps-api-loader/lazy-maps-api-loader'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var app_1, browser_1, router_1, core_1, http_1, lazy_maps_api_loader_1;
     return {
         setters:[

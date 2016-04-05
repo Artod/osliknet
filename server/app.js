@@ -98,6 +98,9 @@ TODO:
 	\/- credit cards
 	
 	
+\/- reload captcha on error
+
+	
 - help baloons
 
 - support link
