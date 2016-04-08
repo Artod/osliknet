@@ -32,11 +32,13 @@ var logger = new (winston.Logger)({
 var sts = Invoice.sts;
 
 var invoicesRequests = function(req, res, next, msg) {
-	Invoice.findOne({
+	/*Invoice.findOne({
 		_id: req.body.invoiceId,
 		corr: req.session.uid,
 		status: sts.PAID
-	}).populate('order').exec(function(err, invoice) {
+	}).populate('order').exec(function(err, invoice) {*/
+		
+	Invoice.findById(req.body.invoiceId).populate('order').exec(function(err, invoice) {
 		if (err) {
 			logger.error(err, {line: 39});
 			
@@ -52,7 +54,13 @@ var invoicesRequests = function(req, res, next, msg) {
 				
 			return;
 		}
-		
+
+		if (invoice.corr.toString() !== req.session.uid || invoice.status !== sts.PAID) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
+				
+			return;
+		}
+
 		msg = msg.replace('#', '#' + invoice._id);
 		
 		var email = new sendgrid.Email();
@@ -116,13 +124,15 @@ router.post('/refund', mdlwares.restricted, function(req, res, next) {
 
 router.post('/pay', mdlwares.restricted, function(req, res, next) {
 
-	Invoice.findOne({
+/* 	Invoice.findOne({
 		_id: req.body.invoiceId,
 		corr: req.session.uid,
 		status: sts.UNPAID
-	}).populate('user').exec(function(err, invoice) {
+	}).populate('user').exec(function(err, invoice) { */
+	
+	Invoice.findById(req.body.invoiceId).populate('user').exec(function(err, invoice) {
 		if (err) {
-			logger.error(err, {line: 36});
+			logger.error(err, {line: 135});
 			
 			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
@@ -137,6 +147,11 @@ router.post('/pay', mdlwares.restricted, function(req, res, next) {
 			return;
 		}
 		
+		if (invoice.corr.toString() !== req.session.uid || invoice.status !== sts.UNPAID) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
+				
+			return;
+		}
 		
 		var fees = getFees(invoice.amount, invoice.currency);
 			
@@ -384,10 +399,12 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 	
 	// var orderId = req.query.orderId;
 	
-	Invoice.findOne({
+	/*Invoice.findOne({
 		_id: req.query.invoiceId,
 		corr: req.session.uid
-	}).populate('order').exec(function(err, invoice) {
+	}).populate('order').exec(function(err, invoice) {*/
+
+	Invoice.findById(req.query.invoiceId).populate('order').exec(function(err, invoice) {
 		if (err) {
 			logger.error(err, {line: 232});
 			
@@ -400,6 +417,12 @@ router.get('/paypal/execute', mdlwares.restricted, function(req, res, next) {
 		if (!invoice) {
 			res.status(400).type('json')
 				.json({error: 'Invoice not found.'});
+				
+			return;
+		}
+		
+		if (invoice.corr.toString() !== req.session.uid) {
+			res.status(401).type('json').json({error: 'Unauthorized'});
 				
 			return;
 		}

@@ -29,6 +29,7 @@ export class ChatComponent implements
 	@Output('user') public userOutput : EventEmitter<any> = new EventEmitter();
 	@Output('order') public orderOutput : EventEmitter<any> = new EventEmitter();
 	@Output('orderStatus') public orderStatusOutput : EventEmitter<any> = new EventEmitter();
+	@Output('error') public errorOutput : EventEmitter<any> = new EventEmitter();
 
 	public messages : any[] = [];
 	public lastId : string = '0';
@@ -55,8 +56,6 @@ export class ChatComponent implements
 	}
 	
 	public ngOnInit() : void {
-// console.dir(this._el.nativeElement)
-		
 		this.elChatList = this._el.nativeElement.querySelector('.chat-list');
 		
 		this._notifSub = this._notificationService.start(3000).subscribe(data => {
@@ -86,8 +85,10 @@ export class ChatComponent implements
 	}
 	
 	public ngOnDestroy() : void {
-		this._notificationService.changeTimeout();
-		this._notifSub.unsubscribe();
+		if (this._notifSub) {
+			this._notificationService.changeTimeout();
+			this._notifSub.unsubscribe();
+		}
 	}
 	
 	private _chatHeight : number = 0;
@@ -107,8 +108,6 @@ export class ChatComponent implements
 		}
 	}
 	
-
-	
 	public scrollDown() : void {
 		this.elChatList.scrollTop = this.elChatList.scrollHeight;	
 	}
@@ -127,6 +126,8 @@ export class ChatComponent implements
 		this.expand();
 	}
 	
+	private _inited : boolean = false;
+	
 	public getMessages() : void {
 		this._messageService.getAll(this.orderId, this.corrId).subscribe(res => {
 			
@@ -144,15 +145,18 @@ export class ChatComponent implements
 			this.isChatActual = true;
 			this.isChatActualChange.emit(this.isChatActual);
 
-			this._busy = false;
-			
-			// setTimeout(() => this.scrollDown(), 0);			
-		}, error => {
-			this._busy = false;
+			this._inited = true;
+		
+		}, err => {
+			this.errorOutput.emit(err);
 		});
 	}
 	
 	public getLastMessages() : void {
+		if (!this._inited) {
+			return;
+		}
+		
 		this._messageService.getLastMessages(this.lastId, this.orderId, this.corrId).subscribe(res => {	
 			if (res.messages && res.messages.length) {
 				this.lastId = res.messages[res.messages.length - 1]._id;
@@ -167,19 +171,19 @@ export class ChatComponent implements
 			this.isChatActualChange.emit(this.isChatActual);
 			
 			this._appRef.tick();
-		}, error => {
-
+		}, err => {
+			
 		});
 	}	
 	
-	private _busy : boolean = true;
+	private _busy : boolean = false;
 	
 	public onSubmit(elComment) : void {
 		if (!this.form.valid) {
 			elComment.focus();
 		}
 		
-		if (this.form.valid && !this._busy) {
+		if (this.form.valid) {
 			this._busy = true;
 
 			this._messageService.add(this.formModel).subscribe(message => {				

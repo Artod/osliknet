@@ -19,11 +19,31 @@ export class MessagesComponent {
 
 	public user : any = {};//trip: {}, user: {}	
 	
+	public error : string = '';	
+	
 	constructor (
 		private _routeParams : RouteParams,
 		@Inject('config.user') public configUser
 	) {
 		this.corrId = this._routeParams.get('id');
+	}
+	
+	private _loaded : boolean = false;
+	
+	public onUser(user) : void {
+		this._loaded = true;
+		
+		this.user = user;
+	}
+	
+	public onChatError(err) : void {
+		this._loaded = true;
+		
+		this.error = 'Unexpected error. Try again later.';
+
+		try {
+			this.error = err.json().error || this.error;
+		} catch(e) {}
 	}
 }
 

@@ -17,6 +17,7 @@ var logger = new (winston.Logger)({
 var schema = mongoose.Schema({
 	order: {
 		type: Schema.Types.ObjectId,
+		required: true,
 		ref: 'Order'
 	},
 	user: {
@@ -40,6 +41,8 @@ var schema = mongoose.Schema({
 		default: Date.now
 	}
 });
+
+schema.index({ order: 1, _id: 1 });
 
 /*orderSchema.pre('save', function(next) {
 	var now = new Date();
@@ -97,3 +100,10 @@ schema.statics.addToOrder = function(order, data, cb) {
 var Message = mongoose.model('Message', schema);
 
 module.exports = Message;
+
+
+
+
+
+
+

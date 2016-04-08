@@ -28,6 +28,8 @@ export class OrderComponent {
 
 	public order : any = {};//trip: {}, user: {}	
 	
+	public error : string = '';	
+	
 	constructor (
 		private _orderService : OrderService,
 		private _modalService : ModalService,
@@ -56,7 +58,6 @@ export class OrderComponent {
 			this.isChatActual = false;
 			this._changeStatusBusy = false;
 		}, err => {
-			console.dir(err);
 			this._changeStatusBusy = false;
 		});
 	}
@@ -89,7 +90,11 @@ export class OrderComponent {
 		]) );
 	}
 	
+	private _loaded : boolean = false;
+	
 	public onOrder(order) : void {
+		this._loaded = true;
+		
 		this.order = order;
 		
 		if (this.order && this.order.trip) {
@@ -98,10 +103,28 @@ export class OrderComponent {
 		}
 	}
 	
+	public onChatError(err) : void {
+		this._loaded = true;
+		
+		if (!err) {
+			this.error = '';
+			
+			return;
+		}
+		
+		this.error = 'Unexpected error. Try again later.';
+
+		try {
+			this.error = err.json().error || this.error;
+		} catch(e) {}
+	}	
+	
 	public onOrderStatus(status) : void {
 		this.order.status = status;
 		this._appRef.tick();
 	}
+
+	
 }
 
 

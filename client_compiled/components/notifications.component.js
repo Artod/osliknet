@@ -73,9 +73,10 @@ System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', '.
                         directives: [router_1.ROUTER_DIRECTIVES],
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }), 
-                    __metadata('design:paramtypes', [notification_service_1.NotificationService, core_1.ApplicationRef])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _a) || Object, (typeof (_b = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _b) || Object])
                 ], NotificationsComponent);
                 return NotificationsComponent;
+                var _a, _b;
             }());
             exports_1("NotificationsComponent", NotificationsComponent);
         }

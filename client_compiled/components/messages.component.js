@@ -39,8 +39,22 @@ System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', '.
                     this.configUser = configUser;
                     this.isChatActual = false;
                     this.user = {};
+                    this.error = '';
+                    this._loaded = false;
                     this.corrId = this._routeParams.get('id');
                 }
+                MessagesComponent.prototype.onUser = function (user) {
+                    this._loaded = true;
+                    this.user = user;
+                };
+                MessagesComponent.prototype.onChatError = function (err) {
+                    this._loaded = true;
+                    this.error = 'Unexpected error. Try again later.';
+                    try {
+                        this.error = err.json().error || this.error;
+                    }
+                    catch (e) { }
+                };
                 MessagesComponent = __decorate([
                     core_1.Component({
                         selector: 'messages',
@@ -49,9 +63,10 @@ System.register(['angular2/core', 'angular2/router', '../pipes/to-date.pipe', '.
                         directives: [router_1.ROUTER_DIRECTIVES, chat_component_1.ChatComponent, user_card_component_1.UserCardComponent]
                     }),
                     __param(1, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [router_1.RouteParams, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _a) || Object, Object])
                 ], MessagesComponent);
                 return MessagesComponent;
+                var _a;
             }());
             exports_1("MessagesComponent", MessagesComponent);
         }

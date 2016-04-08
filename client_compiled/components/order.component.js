@@ -68,7 +68,9 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     this.isChatActual = false;
                     this.isTripPassed = false;
                     this.order = {};
+                    this.error = '';
                     this._changeStatusBusy = false;
+                    this._loaded = false;
                     this.orderId = this._routeParams.get('id');
                 }
                 OrderComponent.prototype.changeStatus = function (status) {
@@ -81,7 +83,6 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                         _this.isChatActual = false;
                         _this._changeStatusBusy = false;
                     }, function (err) {
-                        console.dir(err);
                         _this._changeStatusBusy = false;
                     });
                 };
@@ -111,11 +112,24 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     ]));
                 };
                 OrderComponent.prototype.onOrder = function (order) {
+                    this._loaded = true;
                     this.order = order;
                     if (this.order && this.order.trip) {
                         var now = (new Date()).getTime() - 1000 * 60 * 60 * 24;
                         this.isTripPassed = (new Date(this.order.trip.when)) < now;
                     }
+                };
+                OrderComponent.prototype.onChatError = function (err) {
+                    this._loaded = true;
+                    if (!err) {
+                        this.error = '';
+                        return;
+                    }
+                    this.error = 'Unexpected error. Try again later.';
+                    try {
+                        this.error = err.json().error || this.error;
+                    }
+                    catch (e) { }
                 };
                 OrderComponent.prototype.onOrderStatus = function (status) {
                     this.order.status = status;
@@ -131,9 +145,10 @@ System.register(['angular2/core', 'angular2/router', '../services/order/order.se
                     __param(6, core_1.Inject('config.orderStatus')),
                     __param(7, core_1.Inject('config.orderStatusConst')),
                     __param(8, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [order_service_1.OrderService, modal_service_1.ModalService, review_service_1.ReviewService, invoice_service_1.InvoiceService, router_1.RouteParams, core_1.ApplicationRef, Object, Object, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _d) || Object, (typeof (_e = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _e) || Object, (typeof (_f = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _f) || Object, Object, Object, Object])
                 ], OrderComponent);
                 return OrderComponent;
+                var _a, _b, _c, _d, _e, _f;
             }());
             exports_1("OrderComponent", OrderComponent);
         }

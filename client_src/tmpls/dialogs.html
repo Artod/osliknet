@@ -3,17 +3,29 @@
 		<h2>Dialogs</h2>
 	</div>
 
-	<p *ngIf="users && !users.length">No dialogs</p>
+	<div *ngIf="!_loaded">Loading...</div>
+	
+	<p *ngIf="dialogs && !dialogs.length"><i>No dialogs</i></p>
 
 	<table class="table">
-		<tr *ngFor="#user of users">
-			<td [hidden]="configUser.id === user._id">
-				<user-card [user]="user" *ngIf="user && user._id"></user-card>
-			
+		<tr *ngFor="#dialog of dialogs">
+			<td>
+				<user-card *ngIf="dialog.corr && dialog.corr._id" [user]="dialog.corr"></user-card>
+				
+				
+				
+				<p>
+					<small class="text-muted">{{ dialog.lastMsgCreatedAt | toDate | date: 'mm:HH d MMM y' }}</small>
+					<br />
+					{{ dialog.lastMsg.message.length > 200 ? dialog.lastMsg.message.substring(0, 200) + '...' :  dialog.lastMsg.message }}
+				</p>
+				
 				<p class="text-right">
-					<a [routerLink]="['Messages', {id: user._id}]" >
+					<a [routerLink]="['Messages', {id: dialog.corr._id}]">
 						Go to the dialog 
-						<span class="badge" *ngIf="newPrivMessages[user._id] && newPrivMessages[user._id][0]">{{newPrivMessages[user._id][0]}}</span>
+						<span class="badge" *ngIf="newPrivMessages[dialog.corr._id] && newPrivMessages[dialog.corr._id][0]">
+							{{newPrivMessages[dialog.corr._id][0]}}
+						</span>
 					</a>
 				</p>	
 			</td>

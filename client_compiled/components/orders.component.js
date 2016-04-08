@@ -95,9 +95,10 @@ System.register(['angular2/core', 'angular2/router', './trip-card.component', '.
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(4, core_1.Inject('config.orderStatus')), 
-                    __metadata('design:paramtypes', [order_service_1.OrderService, router_1.RouteParams, notification_service_1.NotificationService, core_1.ApplicationRef, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _b) || Object, (typeof (_c = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _c) || Object, (typeof (_d = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _d) || Object, Object])
                 ], OrdersComponent);
                 return OrdersComponent;
+                var _a, _b, _c, _d;
             }());
             exports_1("OrdersComponent", OrdersComponent);
         }

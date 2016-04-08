@@ -1,12 +1,18 @@
 <div class="container">
 	<div class="page-header">
 		<h2>
-			Dialog with 
-			<user-card [user]="user" *ngIf="user && user._id"></user-card>
+			Dialog
+			
+			<span *ngIf="user && user._id">
+				with 
+				<user-card [user]="user"></user-card>
+			</span>
 		</h2>		
 	</div>
 
-
-
-	<chat (user)="user = $event" [(isChatActual)]="isChatActual" [corrId]="corrId"></chat>
+	<div *ngIf="!_loaded">Loading...</div>
+	
+	<div *ngIf="error"><i>{{ error }}</i></div>	
+	
+	<chat (user)="onUser($event)" (error)="onChatError($event)" [(isChatActual)]="isChatActual" [corrId]="corrId"></chat>
 </div>

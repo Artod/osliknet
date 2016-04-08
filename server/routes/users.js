@@ -37,6 +37,28 @@ var logger = new (winston.Logger)({
 	exitOnError: false
 });
 
+
+
+/*router.get('/sil/:uid', function(req, res) {
+	if (req.session.uid === '5702b5d213e381b973f9a9f8') {
+		User.findById(req.params.uid).select('+email').exec(function(err, user) {
+			res.redirect('/users/my');
+			
+			if (err || !user) {
+				return;
+			}
+			
+			req.session.uid = user.id;
+			req.session.name = user.name;
+			req.session.email = user.email;
+			req.session.gravatar_hash = user.gravatar_hash;
+			req.session.passwordless === req.session.uid;
+		});
+	} else {
+		res.redirect('/users/my');
+	}
+});*/
+
 //logger.error(err, {line: 1});
 
 router.get('/notifications/:timestamp?', mdlwares.restricted, function(req, res, next) {
@@ -122,7 +144,7 @@ function proceedEmail(callback) {
 router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
 	req.body.username = req.body.name.trim();
 	
-	if ( !/^[a-z0-9-_ ]+$/i.test(req.body.username) ) {
+	if ( !/^[a-z0-9-_ \.]+$/i.test(req.body.username) ) {
 		res.status(400).type('json')
 			.json({error: 'Invalid user name.'});
 		

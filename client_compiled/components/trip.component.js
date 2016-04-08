@@ -151,9 +151,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(10, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [router_1.Router, router_1.Location, modal_service_1.ModalService, notification_service_1.NotificationService, order_service_1.OrderService, trip_service_1.TripService, subscribe_service_1.SubscribeService, router_1.RouteParams, common_1.FormBuilder, core_1.ApplicationRef, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof router_1.Router !== 'undefined' && router_1.Router) === 'function' && _a) || Object, (typeof (_b = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _b) || Object, (typeof (_c = typeof modal_service_1.ModalService !== 'undefined' && modal_service_1.ModalService) === 'function' && _c) || Object, (typeof (_d = typeof notification_service_1.NotificationService !== 'undefined' && notification_service_1.NotificationService) === 'function' && _d) || Object, (typeof (_e = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _e) || Object, (typeof (_f = typeof trip_service_1.TripService !== 'undefined' && trip_service_1.TripService) === 'function' && _f) || Object, (typeof (_g = typeof subscribe_service_1.SubscribeService !== 'undefined' && subscribe_service_1.SubscribeService) === 'function' && _g) || Object, (typeof (_h = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _h) || Object, (typeof (_j = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _j) || Object, (typeof (_k = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _k) || Object, Object])
                 ], TripComponent);
                 return TripComponent;
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
             }());
             exports_1("TripComponent", TripComponent);
         }

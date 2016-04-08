@@ -1,7 +1,10 @@
 var mongoose = require('mongoose');
 
 var tokenSchema = mongoose.Schema({
-	uid: String,
+	uid: {
+		type: String,
+		index: true
+	},
 	ttl: Date
 }, {collection: 'token'} );
 

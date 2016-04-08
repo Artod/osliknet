@@ -99,12 +99,20 @@ TODO:
 	
 	
 \/- reload captcha on error
+\/- support link
 
+- http://osliki.net/messages (admin)
+- donsk invoice
+- browser back on invoice modal
+\/- double messgaes in dialogs
+	- check add msg to order
+	- check /last/:lastId/order/:id
+	- check new status
+	- check pay
 	
 - help baloons
 
-- support link
-- определение мобильных браузеров
+- mobile browser detect
 - indexes db
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
 
@@ -151,7 +159,7 @@ winston.handleExceptions(new winston.transports.File({
 var express = require('express');
 var favicon = require('serve-favicon');
 var morgan = require('morgan');
-var mongoose = require('mongoose');  
+var mongoose = require('mongoose');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var MongoStoreSession = require('connect-mongo')(session);
@@ -199,7 +207,10 @@ var mongoParams = {
 	},
 	auth: {
 		authdb: 'admin'
-	}	
+	},
+	config: {
+		autoIndex: true
+	}
 };
 
 mongoose.connect(mongoPath, mongoParams, function(err) {
@@ -331,20 +342,26 @@ app.use(passwordless.sessionSupport());
 var Order = require('./models/order');
 var Invoice = require('./models/invoice');
 
-app.use(function (req, res, next) {
-	res.locals = {
-		user: {
-			id: req.session.uid,
-			name: req.session.name,
-			gravatar_hash: req.session.gravatar_hash
-		},
-		orderStatus: JSON.stringify(Order.stsInv),
-		orderStatusConst: JSON.stringify(Order.sts),
-		invoiceStatus: JSON.stringify(Invoice.stsInv),
-		invoiceStatusConst: JSON.stringify(Invoice.sts),
-		recaptcha: config.recaptcha,
-		fees: JSON.stringify(config.fees)
+var locals = {
+	orderStatus: JSON.stringify(Order.stsInv),
+	orderStatusConst: JSON.stringify(Order.sts),
+	invoiceStatus: JSON.stringify(Invoice.stsInv),
+	invoiceStatusConst: JSON.stringify(Invoice.sts),
+	recaptcha: config.recaptcha,
+	fees: JSON.stringify(config.fees)
+}
+
+app.use(function(req, res, next) {
+	res.locals = locals;
+	res.locals.user = {
+		id: req.session.uid,
+		name: req.session.name,
+		gravatar_hash: req.session.gravatar_hash
 	};
+
+	if (req.session.uid) {
+		req.session._uid = mongoose.Types.ObjectId(req.session.uid);
+	}
 
 	next();
 });

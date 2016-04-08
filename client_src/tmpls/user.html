@@ -11,10 +11,11 @@
 	
 <div *ngIf="(configUser && configUser.id)" class="container">
 	<div class="page-header">
-		<h2>Profile of <span *ngIf="user && user._id">{{ user.name }}</span></h2>
+		<h2 *ngIf="user && user._id">Profile of <span>{{ user.name }}</span></h2>
 	</div>
 	
 	<p *ngIf="!_inited">Loading...</p>
+	<p *ngIf="_inited && !(user && user._id)"><i>User not found.</i></p>
 
 	<div *ngIf="user && user._id" class="row">
 		<div class="col-sm-3 col-xs-12">	

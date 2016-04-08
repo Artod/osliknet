@@ -34,7 +34,7 @@ export class JoinComponent {
 				},
 				Validators.required,
 				(ctrl) => {
-					if ( ctrl.value && !/^[a-z0-9-_ ]+$/i.test(ctrl.value) ) {
+					if ( ctrl.value && !/^[a-z0-9-_ \.]+$/i.test(ctrl.value) ) {
 						return {invalidName: true};
 					}
 					

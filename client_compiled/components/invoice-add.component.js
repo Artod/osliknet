@@ -187,9 +187,10 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                     __param(3, core_1.Inject('onInvoiceAdd')),
                     __param(4, core_1.Inject('config.user')),
                     __param(5, core_1.Inject('config.invoiceStatusConst')), 
-                    __metadata('design:paramtypes', [common_1.FormBuilder, invoice_service_1.InvoiceService, Object, Function, Object, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, Object, Object, Object, Object])
                 ], InvoiceAddComponent);
                 return InvoiceAddComponent;
+                var _a, _b;
             }());
             exports_1("InvoiceAddComponent", InvoiceAddComponent);
         }

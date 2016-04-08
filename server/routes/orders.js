@@ -151,152 +151,130 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 
 });
 
-router.post('/status', mdlwares.restricted, function(req, res, next) {
-	var newStatus = Number(req.body.status);
+router.post('/status', mdlwares.restricted, mdlwares.checkOrderAccess, function(req, res, next) {
+	var order = res.order;
 	
-	Order.findById(req.body.order).populate('trip').exec(function(err, order) {
-		if (err) {
-			logger.error(err, {line: 158});
+	var orderUser = order.user.toString(),
+		tripUser = order.trip.user.toString();
+
+	var newStatus = Number(req.body.status);
+
+	if (order.status === newStatus) {
+		res.type('json')
+			.json({order: order});
 			
-			res.status(500).type('json')
-				.json({error: 'Unexpected server error.'});
-				
-			return;
-		}
+		return;
+	}
 
-		if (!order) {
-			res.status(400).type('json')
-				.json({error: 'Order not found'});
-				
-			return;
-		}
+	var checkAndSave = function(canAfterCurrent) {
+		var now = (new Date()).getTime() - 1000*60*60*24;
+		var isTripPassed = ( new Date(order.trip.when) ) < now;
 		
-		if (order.status === newStatus) {
-			res.type('json')
-				.json({order: order});
-				
-			return;
-		}
-		
-		var orderUser = order.user.toString(),
-			tripUser = order.trip.user.toString();
-
-		if (req.session.uid !== orderUser && req.session.uid !== tripUser) {
+		if (
+			order.status !== canAfterCurrent || 
+			( newStatus === sts.FINISHED && !isTripPassed ) || // finish before trip
+			( isTripPassed && [sts.REFUSED, sts.CANCELLED, sts.FINISHED].indexOf(newStatus) === -1 ) //  can refus cancel and finish always
+		) {
 			res.status(401).type('json').json({error: 'Unauthorized'});
 
 			return;
-		}		
-		
-		var checkAndSave = function(canAfterCurrent) {
-			var now = (new Date()).getTime() - 1000*60*60*24;
-			var isTripPassed = ( new Date(order.trip.when) ) < now;
-			
-			if (
-				order.status !== canAfterCurrent || 
-				( newStatus === sts.FINISHED && !isTripPassed ) || // finish before trip
-				( isTripPassed && [sts.REFUSED, sts.CANCELLED, sts.FINISHED].indexOf(newStatus) === -1 ) //  can refus cancel and finish always
-			) {
-				res.status(401).type('json').json({error: 'Unauthorized'});
+		}
 
+		var oldStatus = order.status;
+		order.status = newStatus;
+		order.save(function(err, order) {
+			if (err) {
+				logger.error(err, {line: 207});
+				
+				res.status(500).type('json')
+					.json({error: 'Unexpected server error.'});
+					
 				return;
 			}
 
-			var oldStatus = order.status;
-			order.status = newStatus;
-			order.save(function(err, order) {
+			var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
+			
+			Message.addToOrder(order, {
+				order: order.id,
+				user: req.session.uid,
+				corr: corr,
+				message: 'I changed the order status from ' + Order.stsInv[oldStatus] + ' to ' + Order.stsInv[newStatus] + '.'
+			}, function(err, message) {
 				if (err) {
-					logger.error(err, {line: 207});
+					logger.error(err, {line: 224});
 					
-					res.status(500).type('json')
-						.json({error: 'Unexpected server error.'});
-						
 					return;
 				}
+			});
 
-				var corr = (req.session.uid !== orderUser ? orderUser : tripUser);
-				
-				Message.addToOrder(order, {
-					order: order.id,
-					user: req.session.uid,
-					corr: corr,
-					message: 'I changed the order status from ' + Order.stsInv[oldStatus] + ' to ' + Order.stsInv[newStatus] + '.'
-				}, function(err, message) {
+			if (newStatus === sts.FINISHED) {					
+				Order.find({
+					user: orderUser,
+					status: sts.FINISHED
+				}).count().exec(function(err, count) {
 					if (err) {
-						logger.error(err, {line: 224});
+						logger.error(err, {line: 236});
 						
 						return;
 					}
+					
+					User.stats(orderUser, 'r_proc', count);
 				});
-
-				if (newStatus === sts.FINISHED) {					
-					Order.find({
-						user: orderUser,
-						status: sts.FINISHED
-					}).count().exec(function(err, count) {
-						if (err) {
-							logger.error(err, {line: 236});
-							
-							return;
-						}
+				
+				Order.find({
+					tripUser: tripUser,
+					status: sts.FINISHED
+				}).count().exec(function(err, count) {
+					if (err) {
+						logger.error(err, {line: 249});
 						
-						User.stats(orderUser, 'r_proc', count);
-					});
+						return;
+					}
 					
-					Order.find({
-						tripUser: tripUser,
-						status: sts.FINISHED
-					}).count().exec(function(err, count) {
-						if (err) {
-							logger.error(err, {line: 249});
-							
-							return;
-						}
-						
-						User.stats(tripUser, 't_proc', count);
-					});
-				}
-				
-				res.type('json')
-					.json({order: order});
-			});
-		};
-		
-		var sts = Order.sts;
-		
-		if (req.session.uid === orderUser) {
-			switch(newStatus) {
-				case sts.NEGOTIATION:
-					checkAndSave(sts.CANCELLED);
-					
-					return;
-				case sts.CANCELLED:
-					checkAndSave(sts.NEGOTIATION);
-				
-					return;
-			}			
-		} else if (req.session.uid === tripUser) {
-			switch(newStatus) {
-				case sts.NEGOTIATION:
-					checkAndSave(sts.REFUSED);
-					
-					return;
-				case sts.PROCESSING:
-					checkAndSave(sts.NEGOTIATION);
-					
-					return;
-				case sts.REFUSED:
-					checkAndSave(sts.NEGOTIATION);
-					
-					return;
-				case sts.FINISHED:
-					checkAndSave(sts.PROCESSING);
-				
-					return;
+					User.stats(tripUser, 't_proc', count);
+				});
 			}
+			
+			res.type('json')
+				.json({order: order});
+		});
+	};
+	
+	var sts = Order.sts;
+	
+	if (req.session.uid === orderUser) {
+		switch(newStatus) {
+			case sts.NEGOTIATION:
+				checkAndSave(sts.CANCELLED);
+				
+				return;
+			case sts.CANCELLED:
+				checkAndSave(sts.NEGOTIATION);
+			
+				return;
+		}			
+	} else if (req.session.uid === tripUser) {
+		switch(newStatus) {
+			case sts.NEGOTIATION:
+				checkAndSave(sts.REFUSED);
+				
+				return;
+			case sts.PROCESSING:
+				checkAndSave(sts.NEGOTIATION);
+				
+				return;
+			case sts.REFUSED:
+				checkAndSave(sts.NEGOTIATION);
+				
+				return;
+			case sts.FINISHED:
+				checkAndSave(sts.PROCESSING);
+			
+				return;
 		}
-		
-		res.status(401).type('json').json({error: 'Unauthorized'});
-	});
+	}
+	
+	res.status(401).type('json').json({error: 'Unauthorized'});
 });
 
 router.get('/trip/:id', mdlwares.restricted, function(req, res, next) {
@@ -461,7 +439,7 @@ module.exports = router;
 			$or: [{
 				trip: {$in: tids}
 			}, {
-				user: ObjectId(req.session.uid)
+				user: req.session._uid
 			}]			
 		}).sort({
 			status: 1,
@@ -537,7 +515,7 @@ module.exports = router;
 	async.parallel({
 		orders: function(callback) {	
 			Trip.find({
-				user: ObjectId(req.session.uid),
+				user: req.session._uid,
 				is_removed: false
 			}).select({ _id: 1}).exec(function(err, trips) {
 				if (err) {
@@ -569,7 +547,7 @@ module.exports = router;
 		},
 		myOrders: function(callback){
 			Order.find({
-				user: ObjectId(req.session.uid)
+				user: req.session._uid
 			}, function (err, orders) {
 				if (err) {
 					callback(err, orders);
@@ -774,7 +752,7 @@ router.get('/my', function(req, res, next) {
 
 	// 
 	// .find({
-		// 'orders.uid': mongoose.Types.ObjectId(req.session.uid)
+		// 'orders.uid': req.session._uid
 	// }).select({'orders.$': 1}).populate('uid')
 	// 
 
@@ -782,7 +760,7 @@ router.get('/my', function(req, res, next) {
 	// aggregate([
 	// {
 		// $match: {
-            // 'orders.uid': mongoose.Types.ObjectId(req.session.uid)/*;
+            // 'orders.uid': req.session._uid/*;
 			// 'orders': { 
                // '$elemMatch': { 
                    // "uid": req.session.uid
@@ -800,13 +778,13 @@ router.get('/my', function(req, res, next) {
 
 	Trip.aggregate([{
 		$match: {
-            'orders.user': ObjectId(req.session.uid)
+            'orders.user': req.session._uid
         }
 	}, {
 		$unwind: "$orders"
 	}, {
 		$match: {
-            'orders.user': ObjectId(req.session.uid)
+            'orders.user': req.session._uid
         }
 	}, {
 		$sort : {

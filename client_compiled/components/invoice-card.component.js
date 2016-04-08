@@ -79,9 +79,10 @@ System.register(['angular2/core', '../services/invoice/invoice.service', '../pip
                     __param(1, core_1.Inject('config.user')),
                     __param(2, core_1.Inject('config.invoiceStatus')),
                     __param(3, core_1.Inject('config.invoiceStatusConst')), 
-                    __metadata('design:paramtypes', [invoice_service_1.InvoiceService, Object, Object, Object])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _a) || Object, Object, Object, Object])
                 ], InvoiceCardComponent);
                 return InvoiceCardComponent;
+                var _a;
             }());
             exports_1("InvoiceCardComponent", InvoiceCardComponent);
         }

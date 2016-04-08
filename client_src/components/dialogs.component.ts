@@ -15,9 +15,10 @@ import {ToDatePipe} from '../pipes/to-date.pipe';
 })
 
 export class DialogsComponent implements OnDestroy {
-	public users : any[];
+	public dialogs : any[];
 	public newPrivMessages : any;
 	private _notifSub;
+	private _loaded : boolean = false;
 	
 	constructor(
 		private _messageService : MessageService,
@@ -26,9 +27,20 @@ export class DialogsComponent implements OnDestroy {
 		@Inject('config.user') public configUser
 	) {		
 		this._messageService.getDialogs().subscribe(res => {			
-			this.users = res.users;
-		}, error => {
+			this.dialogs = res.dialogs || [];
 			
+			this.dialogs.forEach(function(dialog, i) {
+				if (dialog.corr._id === configUser.id) {
+					let corr = dialog.corr;
+					
+					dialog.corr = dialog.user;
+					dialog.user = corr;
+				}
+			});
+			
+			this._loaded = true;
+		}, error => {
+			this._loaded = true;
 		});
 		
 		this.newPrivMessages = this._notificationService.data.newPrivMessages || {};

@@ -25,15 +25,17 @@ var schema = mongoose.Schema({
 		type: String,
 		trim: true,
 		required: true,
-		validate: [function(val) { return /^[a-z0-9-_ ]+$/i.test(val) }, 'Invalid name'],
-		unique: true
+		validate: [function(val) { return /^[a-z0-9-_ \.]+$/i.test(val) }, 'Invalid name'],
+		unique: true,
+		index: true
 	},
     email: {
 		type: String,		
+		trim: true,
 		required: true,
 		validate: [emailValidator, 'Invalid email'],
 		unique: true,
-		trim: true,
+        index: true,
 		select: false/*,
 		set: function(v) { return v.toLowerCase(); }*/
 	},
@@ -118,6 +120,9 @@ var schema = mongoose.Schema({
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
+
+
+schema.index({ needEmailNotification: 1, updated_at: 1});
 
 schema.pre('save', function(next) {
 	var now = new Date();
@@ -431,65 +436,6 @@ setInterval(function() {
 }, config.emailNotifyInterval);
 
 module.exports = User;
-
-
-
-/*
-// var paypal = require('../libs/paypal');
-var paypal = require('paypal-rest-sdk');
-
-var fs = require('fs');
-
-try {
-  var configJSON = fs.readFileSync(__dirname + "/../config.json");
-  var config = JSON.parse(configJSON.toString());
-} catch (e) {
-  console.error("File config.json not found or is invalid: " + e.message);
-  process.exit(1);
-}
-
-// paypal.init(config);
-paypal.configure(config.api);
-
-var invoice = {
-  "intent": "sale",
-  "payer": {
-    "payment_method": "paypal"
-  },
-  "redirect_urls": {
-    "return_url": "http://yoururl.com/execute",
-    "cancel_url": "http://yoururl.com/cancel"
-  },
-  "transactions": [{
-    "amount": {
-      "total": "5.00",
-      "currency": "USD"
-    },
-    "description": "My awesome payment"
-  }]
-};
-
-
-paypal.payment.create(invoice, function (error, payment) {
-	
-console.dir(payment)
-  if (error) {
-    console.log(error);
-  } else {
-    if(payment.payer.payment_method === 'paypal') {
-      req.session.paymentId = payment.id;
-      var redirectUrl;
-      for(var i=0; i < payment.links.length; i++) {
-        var link = payment.links[i];
-        if (link.method === 'REDIRECT') {
-          redirectUrl = link.href;
-        }
-      }
-      res.redirect(redirectUrl);
-    }
-  }
-});
-*/
 
 /*
 User.find().exec(function(err, users) {	

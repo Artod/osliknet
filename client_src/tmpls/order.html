@@ -1,7 +1,13 @@
 <div class="container" (window:keydown)="$event.keyCode == 27 ? closeModal() : true">
-	<h2>Request</h2>
-
-	<div *ngIf="!order || !order.trip">Loading...</div>
+	
+	<div class="page-header">
+		<h2>Request</h2>		
+	</div>
+		
+	<!-- <div *ngIf="!error && (!order || !order.trip)">Loading...</div> -->
+	<div *ngIf="!_loaded">Loading...</div>
+	
+	<div *ngIf="error"><i>{{ error }}</i></div>
 
 	<div *ngIf="order && order.trip" class="row">
 		<div class="col-xs-6">
@@ -56,6 +62,6 @@
 	</div>
 
 	<!-- (orderStatus)="onOrderStatus($event)"  -->
-	<chat [hidden]="!order || !order.trip" (order)="onOrder($event)" (orderStatus)="onOrderStatus($event)" [(isChatActual)]="isChatActual" [orderId]="orderId"></chat>
+	<chat [hidden]="!order || !order.trip" (order)="onOrder($event)" (orderStatus)="onOrderStatus($event)" (error)="onChatError($event)" [(isChatActual)]="isChatActual" [orderId]="orderId"></chat>
 
 </div>

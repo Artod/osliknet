@@ -10,7 +10,8 @@ var schema = mongoose.Schema({
 	order: {
 		type: Schema.Types.ObjectId,
 		required: true,
-		ref: 'Order'
+		ref: 'Order'/*,
+		index: true*/
 	},
 	user: {
 		type: Schema.Types.ObjectId,
@@ -57,6 +58,8 @@ var schema = mongoose.Schema({
 	created_at: { type: Date },
 	updated_at: { type: Date }
 });
+
+schema.index({ order: 1, _id: -1 });
 
 schema.statics.sts = {
 	UNPAID: 5,

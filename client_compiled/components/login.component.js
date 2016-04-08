@@ -74,9 +74,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         directives: [router_1.ROUTER_DIRECTIVES],
                         pipes: []
                     }), 
-                    __metadata('design:paramtypes', [common_1.FormBuilder, user_service_1.UserService])
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof user_service_1.UserService !== 'undefined' && user_service_1.UserService) === 'function' && _b) || Object])
                 ], LoginComponent);
                 return LoginComponent;
+                var _a, _b;
             }());
             exports_1("LoginComponent", LoginComponent);
         }
