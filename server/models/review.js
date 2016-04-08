@@ -38,6 +38,10 @@ var schema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
+schema.index({ order: 1, user: 1 }, {unique: true});
+schema.index({ user: 1, _id: -1 });
+schema.index({ corr: 1, _id: -1 });
+
 schema.pre('save', function(next) {
 	var now = new Date();
 	

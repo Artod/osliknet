@@ -36,6 +36,10 @@ var schema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
+schema.index({ trip: 1, user: 1 }, {unique: true}); // duplicates on localhost
+schema.index({ user: 1, status: 1 });
+schema.index({ tripUser: 1, status: 1 });
+ 
 schema.pre('save', function(next) {
 	var now = new Date();
 	

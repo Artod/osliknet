@@ -29,14 +29,14 @@ export class DialogsComponent implements OnDestroy {
 		this._messageService.getDialogs().subscribe(res => {			
 			this.dialogs = res.dialogs || [];
 			
-			this.dialogs.forEach(function(dialog, i) {
+			/*this.dialogs.forEach(function(dialog, i) {
 				if (dialog.corr._id === configUser.id) {
 					let corr = dialog.corr;
 					
 					dialog.corr = dialog.user;
 					dialog.user = corr;
 				}
-			});
+			});*/
 			
 			this._loaded = true;
 		}, error => {

@@ -46,6 +46,9 @@ var schema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
+schema.index({user: 1});
+schema.index({email: 1});
+
 schema.pre('save', function(next) {
 	var now = new Date();
 	

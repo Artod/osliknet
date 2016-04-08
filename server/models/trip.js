@@ -34,7 +34,7 @@ var dateFormat = function(when, needTime) {
 var schema = mongoose.Schema({
 	user: {
 		type: Schema.Types.ObjectId,
-		required: true,
+		required: true,		
 		ref: 'User'
 	},
     when: {
@@ -80,8 +80,10 @@ var schema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
+schema.index({user: 1});
+schema.index({when: 1, _id: -1});
+ 
 schema.method('dateFormat', dateFormat);
-
 
 schema.pre('save', function(next) {
 	var now = new Date();

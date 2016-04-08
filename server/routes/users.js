@@ -42,7 +42,7 @@ var logger = new (winston.Logger)({
 /*router.get('/sil/:uid', function(req, res) {
 	if (req.session.uid === '5702b5d213e381b973f9a9f8') {
 		User.findById(req.params.uid).select('+email').exec(function(err, user) {
-			res.redirect('/users/my');
+			
 			
 			if (err || !user) {
 				return;
@@ -53,6 +53,12 @@ var logger = new (winston.Logger)({
 			req.session.email = user.email;
 			req.session.gravatar_hash = user.gravatar_hash;
 			req.session.passwordless === req.session.uid;
+			
+			req.session.save(function(err) {
+				console.log('loggedin as ' + user.name);
+				res.redirect('/users/my');
+			})
+
 		});
 	} else {
 		res.redirect('/users/my');

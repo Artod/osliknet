@@ -46,13 +46,6 @@ System.register(['angular2/core', 'angular2/router', '../services/message/messag
                     this._loaded = false;
                     this._messageService.getDialogs().subscribe(function (res) {
                         _this.dialogs = res.dialogs || [];
-                        _this.dialogs.forEach(function (dialog, i) {
-                            if (dialog.corr._id === configUser.id) {
-                                var corr = dialog.corr;
-                                dialog.corr = dialog.user;
-                                dialog.user = corr;
-                            }
-                        });
                         _this._loaded = true;
                     }, function (error) {
                         _this._loaded = true;

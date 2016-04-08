@@ -78,6 +78,8 @@ var indexCompiled = (function() {
 })();
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
+console.log('req.xhr = ', req.xhr);
+	
 	if (req.xhr) {
 		next();
 		
@@ -85,7 +87,9 @@ module.exports.renderIndexUnlessXhr = function(req, res, next) {
 	}
 	
 	// res.render('index');
+	// content-type:text/html; charset=utf-8
 	
-    res.write( indexCompiled(res.locals) );
+	
+    res.type('html').write( indexCompiled(res.locals) );
     res.end();
 };

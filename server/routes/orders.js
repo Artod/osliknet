@@ -33,7 +33,7 @@ router.get('/', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(req
 		}, {
 			tripUser: req.session.uid
 		}]			
-	}).sort('status -created_at').skip(page * limit).limit(limit).populate('user tripUser trip').exec(function(err, orders) {
+	}).sort('status -_id').skip(page * limit).limit(limit).populate('user tripUser trip').exec(function(err, orders) {
 		if (err) {
 			logger.error(err, {line: 37});
 			

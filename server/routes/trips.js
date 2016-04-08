@@ -124,7 +124,7 @@ router.get('/my', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, function(r
 		
 		Order.find({
 			trip: {$in: tids}
-		}).sort('status -created_at').populate('user').exec(function(err, orders) {
+		}).sort('status -_id').populate('user').exec(function(err, orders) {
 			if (err) {
 				logger.error(err, {line: 129});
 				
@@ -290,9 +290,8 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 		
 		if (trip.user.id === req.session.uid) { // my trip
 			Order.find({
-				trip: trip._id,
-				tripUser: req.session.uid
-			}).sort('status -created_at').populate('user').exec(function(err, orders) {
+				trip: trip._id
+			}).sort('status -_id').populate('user').exec(function(err, orders) {
 				if (err) {
 					logger.error(err, {line: 297});
 					
@@ -301,8 +300,8 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 						
 					return
 				}
-				
-				res.type('json').json({
+console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+				res.json({
 					trip: trip,
 					orders: orders
 				});

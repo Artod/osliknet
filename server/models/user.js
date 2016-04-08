@@ -25,17 +25,13 @@ var schema = mongoose.Schema({
 		type: String,
 		trim: true,
 		required: true,
-		validate: [function(val) { return /^[a-z0-9-_ \.]+$/i.test(val) }, 'Invalid name'],
-		unique: true,
-		index: true
+		validate: [function(val) { return /^[a-z0-9-_ \.]+$/i.test(val) }, 'Invalid name']
 	},
     email: {
 		type: String,		
 		trim: true,
 		required: true,
 		validate: [emailValidator, 'Invalid email'],
-		unique: true,
-        index: true,
 		select: false/*,
 		set: function(v) { return v.toLowerCase(); }*/
 	},
@@ -121,8 +117,9 @@ var schema = mongoose.Schema({
 	updated_at: { type: Date }
 });
 
-
-schema.index({ needEmailNotification: 1, updated_at: 1});
+schema.index({ name: 1 }, { unique: true });
+schema.index({ email: 1 }, { unique: true });
+schema.index({ needEmailNotification: 1 }); //??????????????
 
 schema.pre('save', function(next) {
 	var now = new Date();

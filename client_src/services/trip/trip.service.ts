@@ -54,7 +54,8 @@ export class TripService {
 	public getById(id) {	
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
-	
+		// headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
 		return this.http.get('/trips/' + id, {
 			headers: headers
 		}).map( res => <any[]> res.json() );

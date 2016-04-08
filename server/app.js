@@ -101,14 +101,15 @@ TODO:
 \/- reload captcha on error
 \/- support link
 
-- http://osliki.net/messages (admin)
-- donsk invoice
+\/- http://osliki.net/messages (admin)
+??- donsk invoice
 - browser back on invoice modal
 \/- double messgaes in dialogs
 	- check add msg to order
 	- check /last/:lastId/order/:id
 	- check new status
 	- check pay
+	- check unique indexes on product server db.orders.find({ trip: ObjectId('56d42a6ab2be09ac1c32f372'), user: ObjectId('56afbf3fad0a5d4416d152b7') }).explain('executionStats');
 	
 - help baloons
 
@@ -175,7 +176,6 @@ var messages = require('./routes/messages');
 var reviews = require('./routes/reviews');
 var subscribes = require('./routes/subscribes');
 var invoices = require('./routes/invoices');
-
 
 var app = express();
 
