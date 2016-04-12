@@ -103,12 +103,12 @@ TODO:
 
 \/- http://osliki.net/messages (admin)
 ??- donsk invoice
-- browser back on invoice modal
+\/- browser back on invoice modal
 \/- double messgaes in dialogs
-	- check add msg to order
-	- check /last/:lastId/order/:id
-	- check new status
-	- check pay
+	\/- check add msg to order
+	\/- check /last/:lastId/order/:id
+	\/- check new status
+	\/- check pay
 	- check unique indexes on product server db.orders.find({ trip: ObjectId('56d42a6ab2be09ac1c32f372'), user: ObjectId('56afbf3fad0a5d4416d152b7') }).explain('executionStats');
 	
 - help baloons
@@ -179,12 +179,10 @@ var invoices = require('./routes/invoices');
 
 var app = express();
 
-app.set( 'env', (process.env.NODE_ENV === 'development' ? 'development' : 'production') );
-app.set( 'isDev', app.get('env') === 'development' );
+app.set( 'env', process.env.NODE_ENV );
+app.set( 'isProd', app.get('env') === 'production' );
 
-console.log('NODE_ENV = ', process.env.NODE_ENV );
-console.log('env = ', app.get('env') );
-console.log('isDev = ', app.get('isDev') );
+console.log('!!!NODE_ENV = ', process.env.NODE_ENV );
 
 var logger = new (winston.Logger)({
     transports: [
@@ -195,7 +193,6 @@ var logger = new (winston.Logger)({
 	exitOnError: false
 });
 
-// var mongoPath = (app.get('isDev') ? config.mongo.pathDev : config.mongo.path);
 var mongoPath = config.mongo.path;
 
 var mongoParams = {
@@ -235,7 +232,8 @@ db.once('open', function(callback) {
 
 var passwordless = require('passwordless');
 // var MongoStorePasswordless = require('passwordless-mongostore-bcrypt-node');
-var MongoStorePasswordless = require(app.get('isDev') ? 'passwordless-mongostore-bcrypt-node' : 'passwordless-mongostore');
+
+var MongoStorePasswordless = require(app.get('isProd') ? 'passwordless-mongostore' : 'passwordless-mongostore-bcrypt-node');
 
 mongoParams.mongostore = {
 	collection: config.passwordless.collection
@@ -273,7 +271,7 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
-if ( app.get('isDev') ) {
+if ( !app.get('isProd') ) {
 	app.use( morgan('dev') );
 }
 
@@ -296,7 +294,7 @@ var sessionParam = {
 	resave: false
 }
 
-if ( !app.get('isDev') ) {
+if ( app.get('isProd') ) {
 	// app.set('trust proxy', 1) // trust first proxy
 	// sessionParam.cookie.secure = true // serve secure cookies
 }
@@ -305,7 +303,7 @@ app.use( session(sessionParam) );
 /* Session ***/
 
 
-if ( app.get('isDev') ) {
+if ( !app.get('isProd') ) {
 	app.use( express.static( path.join(__dirname, '../public') ) );
 	// app.use( express.static( path.join(__dirname, '../node_modules') ) );
 	app.use('/node_modules',      express.static(path.join(__dirname, '../node_modules')));
@@ -384,7 +382,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if ( app.get('isDev') ) {
+if ( !app.get('isProd') ) {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {

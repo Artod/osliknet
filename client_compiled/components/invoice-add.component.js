@@ -1,4 +1,4 @@
-System.register(['angular2/core', 'angular2/common', '../components/invoice-card.component', '../services/invoice/invoice.service'], function(exports_1, context_1) {
+System.register(['angular2/core', 'angular2/common', 'angular2/router', '../components/invoice-card.component', '../services/invoice/invoice.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -13,7 +13,7 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
     var __param = (this && this.__param) || function (paramIndex, decorator) {
         return function (target, key) { decorator(target, key, paramIndex); }
     };
-    var core_1, common_1, invoice_card_component_1, invoice_service_1;
+    var core_1, common_1, router_1, invoice_card_component_1, invoice_service_1;
     var InvoiceAddComponent;
     return {
         setters:[
@@ -23,6 +23,9 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
             function (common_1_1) {
                 common_1 = common_1_1;
             },
+            function (router_1_1) {
+                router_1 = router_1_1;
+            },
             function (invoice_card_component_1_1) {
                 invoice_card_component_1 = invoice_card_component_1_1;
             },
@@ -31,10 +34,11 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
             }],
         execute: function() {
             InvoiceAddComponent = (function () {
-                function InvoiceAddComponent(_fb, _invoiceService, order, onInvoiceAdd, configUser, sts) {
+                function InvoiceAddComponent(_fb, _invoiceService, _location, order, onInvoiceAdd, configUser, sts) {
                     var _this = this;
                     this._fb = _fb;
                     this._invoiceService = _invoiceService;
+                    this._location = _location;
                     this.order = order;
                     this.onInvoiceAdd = onInvoiceAdd;
                     this.configUser = configUser;
@@ -88,6 +92,9 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                     }, function (err) {
                         _this._loaded = true;
                     });
+                    this._locationSubscribe = this._location.subscribe(function () {
+                        _this.closeModal();
+                    });
                 }
                 InvoiceAddComponent.prototype.onSubmit = function ($dest_id, $amount, $agree) {
                     var _this = this;
@@ -120,6 +127,9 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         catch (e) { }
                         _this._busy = false;
                     });
+                };
+                InvoiceAddComponent.prototype.ngOnDestroy = function () {
+                    this._locationSubscribe.unsubscribe();
                 };
                 InvoiceAddComponent.prototype.closeModal = function () {
                     this._modalComponent && this._modalComponent.close();
@@ -183,14 +193,14 @@ System.register(['angular2/core', 'angular2/common', '../components/invoice-card
                         providers: [common_1.FormBuilder],
                         directives: [invoice_card_component_1.InvoiceCardComponent]
                     }),
-                    __param(2, core_1.Inject('order')),
-                    __param(3, core_1.Inject('onInvoiceAdd')),
-                    __param(4, core_1.Inject('config.user')),
-                    __param(5, core_1.Inject('config.invoiceStatusConst')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, Object, Object, Object, Object])
+                    __param(3, core_1.Inject('order')),
+                    __param(4, core_1.Inject('onInvoiceAdd')),
+                    __param(5, core_1.Inject('config.user')),
+                    __param(6, core_1.Inject('config.invoiceStatusConst')), 
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, (typeof (_c = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _c) || Object, Object, Object, Object, Object])
                 ], InvoiceAddComponent);
                 return InvoiceAddComponent;
-                var _a, _b;
+                var _a, _b, _c;
             }());
             exports_1("InvoiceAddComponent", InvoiceAddComponent);
         }

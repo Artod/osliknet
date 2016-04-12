@@ -29,14 +29,14 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/subscribes/add', JSON.stringify(data), {
+                    return this.http.post('/subscribes/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 SubscribeService.prototype.cancel = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/subscribes/cancel/' + id, {
+                    return this.http.get('/subscribes/cancel/' + id + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };

@@ -1,5 +1,6 @@
 import {Component, Inject} from 'angular2/core';
-import {/*FORM_DIRECTIVES, CORE_DIRECTIVES, */FormBuilder, ControlGroup, Validators} from 'angular2/common';
+import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
+import {Location} from 'angular2/router';
 
 import {ModalComponent} from '../services/modal/modal.component';
 
@@ -26,6 +27,7 @@ export class ReviewAddComponent {
 	constructor(
 		private _fb : FormBuilder,		
 		private _reviewService : ReviewService,
+		private _location : Location,
 		@Inject('orderId') public orderId : string,
 		@Inject('onReviewAdd') public onReviewAdd : Function
 	) {
@@ -49,6 +51,14 @@ export class ReviewAddComponent {
 		}, err => {
 			this._busy = false;
 		});
+		
+		this._locationSubscribe = this._location.subscribe(() => {
+			this.closeModal();
+		});
+	}
+	
+	public ngOnDestroy() : void {
+		this._locationSubscribe.unsubscribe();
 	}
 	
 	public closeModal() : void {

@@ -1,8 +1,10 @@
 import {Component, Inject} from 'angular2/core';
-import {/*FORM_DIRECTIVES, CORE_DIRECTIVES, */FormBuilder, ControlGroup, Validators} from 'angular2/common';
+import {FormBuilder, ControlGroup, Validators} from 'angular2/common';
+import {Location} from 'angular2/router';
 
 import {ModalComponent} from '../services/modal/modal.component';
 import {InvoiceCardComponent} from '../components/invoice-card.component';
+
 import {InvoiceService}  from '../services/invoice/invoice.service';
 
 @Component({
@@ -30,6 +32,7 @@ export class InvoiceAddComponent {
 	constructor(
 		private _fb : FormBuilder,		
 		private _invoiceService : InvoiceService,
+		private _location : Location,
 		@Inject('order') public order : {},
 		@Inject('onInvoiceAdd') public onInvoiceAdd : Function,
 		@Inject('config.user') public configUser,
@@ -87,6 +90,10 @@ export class InvoiceAddComponent {
 		}, err => {
 			this._loaded = true;
 		});
+		
+		this._locationSubscribe = this._location.subscribe(() => {
+			this.closeModal();
+		});
 	}
 	
 	public error : string = '';
@@ -135,6 +142,10 @@ export class InvoiceAddComponent {
 			this._busy = false;
 		});
 		
+	}
+	
+	public ngOnDestroy() : void {
+		this._locationSubscribe.unsubscribe();
 	}
 	
 	public closeModal() : void {

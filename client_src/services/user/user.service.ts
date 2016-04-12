@@ -10,7 +10,7 @@ export class UserService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/users/' + (id || 'my'), {
+		return this.http.get('/users/' + (id || 'my') + '?xhr', {
 			headers: headers
 		}).map(res => <any[]> res.json());
 	}
@@ -20,7 +20,7 @@ export class UserService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.post('/users/update', JSON.stringify(data), {			
+		return this.http.post('/users/update?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -30,7 +30,7 @@ export class UserService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.post('/users/login', JSON.stringify(data), {			
+		return this.http.post('/users/login?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -40,7 +40,7 @@ export class UserService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.post('/users/signup', JSON.stringify(data), {			
+		return this.http.post('/users/signup?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}

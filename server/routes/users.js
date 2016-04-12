@@ -9,7 +9,8 @@ var mdlwares = require('../libs/mdlwares');
 var passwordless = require('passwordless');
 var crypto = require('crypto');
 var config = require('../config');
-var sendgrid  = require('sendgrid')(config.sendgrid.key);
+// var sendgrid  = require('sendgrid')(config.sendgrid.key);
+var sendgrid  = require('../libs/sendgrid');
 
 var User = require('../models/user');
 var Token = require('../models/token');
@@ -116,7 +117,7 @@ router.get('/logout', mdlwares.restricted, passwordless.logout(), function(req, 
 	  // cannot access session here
 	});
 	
-	res.redirect('/trips');
+	res.redirect('/login');
 });
 
 function proceedEmail(callback) {
@@ -125,7 +126,7 @@ function proceedEmail(callback) {
 
 		if ( !re.test(req.body.email) ) {
 			res.status(400).type('json')
-				.json({error: 'Invalide email'});
+				.json({error: 'Invalid email.'});
 				
 			return;
 		}
@@ -148,7 +149,7 @@ function proceedEmail(callback) {
 }
 
 router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
-	req.body.username = req.body.name.trim();
+	req.body.username = (req.body.name ? req.body.name.trim() : '');
 	
 	if ( !/^[a-z0-9-_ \.]+$/i.test(req.body.username) ) {
 		res.status(400).type('json')
@@ -162,8 +163,7 @@ router.post('/signup', mdlwares.checkCaptcha, function(req, res, next) {
 	}).select('name').exec(function(err, user) {
 		if (err) {
 			res.status(500).type('json')
-				.json({error: 'Username is occupied.'});
-				// .json({error: err});
+				.json({error: 'Unexpected server error.'});
 				
 			return
 		}
@@ -226,10 +226,10 @@ function deliveryToken(req, res, next) {
 	
 	email.addTo(req.passwordless.recipient);
 	email.setFromName(config.name);
-	email.subject = 'Token for ' + config.name;
-	email.from = config.email;
-	email.text = 'Hello! \n You can now access your account here: ' + link + '\n Team ' + config.name;
-	email.html = '<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team ' + config.name + '</p>';
+	email.setSubject('Token for ' + config.name);
+	email.setFrom(config.email);
+	email.setText('Hello! \n You can now access your account here: ' + link + '\n Team ' + config.name);
+	email.setHtml('<h2>Hello!</h2> <p>You can now access your account here: <a href="' + link + '">' + link + '</a></p><p>Team ' + config.name + '</p>');
 
 	sendgrid.send(email, function(err, json) {
 		if (err) {

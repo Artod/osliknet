@@ -14,7 +14,7 @@ export class InvoiceService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/invoices/add', JSON.stringify(data), {			
+		return this.http.post('/invoices/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -24,7 +24,7 @@ export class InvoiceService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/invoices/pay', JSON.stringify({invoiceId: invoiceId}), {			
+		return this.http.post('/invoices/pay?xhr', JSON.stringify({invoiceId: invoiceId}), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -34,7 +34,7 @@ export class InvoiceService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/invoices/unhold', JSON.stringify({invoiceId: invoiceId}), {			
+		return this.http.post('/invoices/unhold?xhr', JSON.stringify({invoiceId: invoiceId}), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -44,7 +44,7 @@ export class InvoiceService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/invoices/refund', JSON.stringify({invoiceId: invoiceId}), {			
+		return this.http.post('/invoices/refund?xhr', JSON.stringify({invoiceId: invoiceId}), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -53,7 +53,7 @@ export class InvoiceService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/invoices/order/' + id, {
+		return this.http.get('/invoices/order/' + id + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -62,7 +62,7 @@ export class InvoiceService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/invoices/check/' + id, {
+		return this.http.get('/invoices/check/' + id + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}

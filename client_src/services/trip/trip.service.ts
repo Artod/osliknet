@@ -26,7 +26,7 @@ export class TripService {
 			search.set('lastId', lastId);
 
 
-		return this.http.get('/trips', {
+		return this.http.get('/trips?xhr', {
 			headers: headers,
 			search: search			
 		}).map( res => <any[]> res.json() );
@@ -45,7 +45,7 @@ export class TripService {
 			search.set('page', page);
 
 		
-		return this.http.get('/trips/my', {			
+		return this.http.get('/trips/my?xhr', {			
 			headers: headers,
 			search: search
 		}).map( res => <any[]> res.json() );
@@ -56,7 +56,7 @@ export class TripService {
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		// headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
-		return this.http.get('/trips/' + id, {
+		return this.http.get('/trips/' + id + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -81,7 +81,7 @@ export class TripService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/trips/add', JSON.stringify(data), {			
+		return this.http.post('/trips/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -91,7 +91,7 @@ export class TripService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.post('/trips/update', JSON.stringify(data), {			
+		return this.http.post('/trips/update?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}

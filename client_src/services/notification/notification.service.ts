@@ -15,7 +15,7 @@ export class NotificationService {
 	public currentTimeout : number;
 	 
 	constructor(
-		private _http:Http
+		public http:Http
 	) {	
 		this._headers = new Headers();
 		this._headers.append('X-Requested-With', 'XMLHttpRequest');
@@ -39,14 +39,14 @@ export class NotificationService {
 		this.stop();
 		
 		this._pollSub = Observable.timer(0, this.currentTimeout).switchMap( () => {
-			return this._http.get('/users/notifications/' + this.updated, {
+			return this.http.get('/users/notifications/' + this.updated, {
 				headers: this._headers
 			});
 		} ).map( res => res.json() )./*catch(this._handleError).*/subscribe(res => {
 			var serverUpdated = new Date(res.updated_at).getTime();
 			
 			if (serverUpdated !== this.updated) {
-console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
+console.log('New notification!');
 				this.updated = serverUpdated;
 				this.data = res || {};
 				

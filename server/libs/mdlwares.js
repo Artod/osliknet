@@ -47,7 +47,7 @@ module.exports.checkCaptcha = function(req, res, next) {
 			next();
 		} else {
 			res.status(400).type('json')
-				.json({error: 'Invalid captcha'});
+				.json({error: 'Invalid captcha.'});
 		}
 	});
 };
@@ -67,19 +67,18 @@ module.exports.restricted = function(req, res, next) {
 };
 
 var indexCompiled = (function() {
-	if (process.env.NODE_ENV === 'development') {
+	if (process.env.NODE_ENV === 'production') {
+		return jade.compileFile( require.resolve('../views/index.jade', {cache: true}) );		
+	} else {
 		return function(data) {
 			var indexCompiled = jade.compileFile( require.resolve('../views/dev_index.jade', {cache: true}) );
 			return indexCompiled(data);
 		}
-	} else {
-		return jade.compileFile( require.resolve('../views/index.jade', {cache: true}) );		
 	}
 })();
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
-console.log('req.xhr = ', req.xhr);
-	
+
 	if (req.xhr) {
 		next();
 		

@@ -11,7 +11,7 @@ export class ReviewService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/reviews/add', JSON.stringify(data), {			
+		return this.http.post('/reviews/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -20,7 +20,7 @@ export class ReviewService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/reviews/order/' + id, {
+		return this.http.get('/reviews/order/' + id + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -37,7 +37,7 @@ export class ReviewService {
 		if (page)
 			search.set('page', page);
 		
-		return this.http.get('/reviews', {
+		return this.http.get('/reviews?xhr', {
 			search: search,
 			headers: headers
 		}).map( res => <any[]> res.json() );

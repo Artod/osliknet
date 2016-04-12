@@ -28,8 +28,8 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable', 'rxjs/Subj
             }],
         execute: function() {
             NotificationService = (function () {
-                function NotificationService(_http) {
-                    this._http = _http;
+                function NotificationService(http) {
+                    this.http = http;
                     this.data = {};
                     this.updated = 0;
                     this._defaultTimeout = 10000;
@@ -49,13 +49,13 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable', 'rxjs/Subj
                     this.currentTimeout = timeout;
                     this.stop();
                     this._pollSub = Observable_1.Observable.timer(0, this.currentTimeout).switchMap(function () {
-                        return _this._http.get('/users/notifications/' + _this.updated, {
+                        return _this.http.get('/users/notifications/' + _this.updated, {
                             headers: _this._headers
                         });
                     }).map(function (res) { return res.json(); }).subscribe(function (res) {
                         var serverUpdated = new Date(res.updated_at).getTime();
                         if (serverUpdated !== _this.updated) {
-                            console.log('!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==!==');
+                            console.log('New notification!');
                             _this.updated = serverUpdated;
                             _this.data = res || {};
                             _this.subject.next(_this.data);

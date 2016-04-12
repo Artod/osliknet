@@ -33,7 +33,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                         search.set('limit', limit);
                     if (page)
                         search.set('page', page);
-                    return this.http.get('/orders', {
+                    return this.http.get('/orders?xhr', {
                         headers: headers,
                         search: search
                     }).map(function (res) { return res.json(); });
@@ -41,7 +41,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                 OrderService.prototype.getByTripId = function (tripId) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/orders/trip/' + tripId, {
+                    return this.http.get('/orders/trip/' + tripId + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -49,7 +49,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
                     headers.append('Content-Type', 'application/json');
-                    return this.http.post('/orders/add', JSON.stringify(data), {
+                    return this.http.post('/orders/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -61,7 +61,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                         status: status,
                         order: order
                     };
-                    return this.http.post('/orders/status', JSON.stringify(data), {
+                    return this.http.post('/orders/status?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };

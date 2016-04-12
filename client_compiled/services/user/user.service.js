@@ -28,7 +28,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                 UserService.prototype.getById = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/users/' + (id || 'my'), {
+                    return this.http.get('/users/' + (id || 'my') + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -36,7 +36,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/users/update', JSON.stringify(data), {
+                    return this.http.post('/users/update?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -44,7 +44,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/users/login', JSON.stringify(data), {
+                    return this.http.post('/users/login?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -52,7 +52,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/users/signup', JSON.stringify(data), {
+                    return this.http.post('/users/signup?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };

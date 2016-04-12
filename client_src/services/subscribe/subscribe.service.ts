@@ -11,7 +11,7 @@ export class SubscribeService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/subscribes/add', JSON.stringify(data), {			
+		return this.http.post('/subscribes/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -20,7 +20,7 @@ export class SubscribeService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.get('/subscribes/cancel/' + id, {			
+		return this.http.get('/subscribes/cancel/' + id + '?xhr', {			
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}

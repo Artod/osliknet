@@ -20,7 +20,7 @@ export class OrderService {
 		if (page)
 			search.set('page', page);
 		
-		return this.http.get('/orders', {
+		return this.http.get('/orders?xhr', {
 			headers: headers,
 			search: search
 		}).map( res => <any> res.json() );
@@ -31,7 +31,7 @@ export class OrderService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/orders/trip/' + tripId, {
+		return this.http.get('/orders/trip/' + tripId + '?xhr', {
 			headers: headers
 		// }).map(res => <Order[]> res.json().orders)
 		}).map( res => <any> res.json() );
@@ -52,7 +52,7 @@ export class OrderService {
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		headers.append('Content-Type', 'application/json');
 	
-		return this.http.post('/orders/add', JSON.stringify(data), {			
+		return this.http.post('/orders/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any> res.json() );
 	}
@@ -67,7 +67,7 @@ export class OrderService {
 			order: order
 		};
 	
-		return this.http.post('/orders/status', JSON.stringify(data), {			
+		return this.http.post('/orders/status?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map( res => <any> res.json() );
 	}

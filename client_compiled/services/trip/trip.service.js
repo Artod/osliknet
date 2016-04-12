@@ -37,7 +37,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                         search.set('limit', limit);
                     if (lastId)
                         search.set('lastId', lastId);
-                    return this.http.get('/trips', {
+                    return this.http.get('/trips?xhr', {
                         headers: headers,
                         search: search
                     }).map(function (res) { return res.json(); });
@@ -50,7 +50,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                         search.set('limit', limit);
                     if (page)
                         search.set('page', page);
-                    return this.http.get('/trips/my', {
+                    return this.http.get('/trips/my?xhr', {
                         headers: headers,
                         search: search
                     }).map(function (res) { return res.json(); });
@@ -58,7 +58,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                 TripService.prototype.getById = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/trips/' + id, {
+                    return this.http.get('/trips/' + id + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -66,7 +66,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/trips/add', JSON.stringify(data), {
+                    return this.http.post('/trips/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -74,7 +74,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/trips/update', JSON.stringify(data), {
+                    return this.http.post('/trips/update?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };

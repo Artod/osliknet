@@ -11,7 +11,7 @@ export class MessageService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/messages', {
+		return this.http.get('/messages?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -20,7 +20,7 @@ export class MessageService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 		
-		return this.http.get('/messages/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+		return this.http.get('/messages/' + (orderId ? 'order/' + orderId : 'user/' + corrId) + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}
@@ -29,7 +29,7 @@ export class MessageService {
 		let headers = new Headers();
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 
-		return this.http.get('/messages/last/' + lastId + '/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+		return this.http.get('/messages/last/' + lastId + '/' + (orderId ? 'order/' + orderId : 'user/' + corrId) + '?xhr', {
 			headers: headers
 		}).map( res => <any[]> res.json() );
 	}	
@@ -44,7 +44,7 @@ export class MessageService {
 		headers.append('Content-Type', 'application/json');
 		headers.append('X-Requested-With', 'XMLHttpRequest');
 	
-		return this.http.post('/messages/add', JSON.stringify(data), {			
+		return this.http.post('/messages/add?xhr', JSON.stringify(data), {			
 			headers: headers
 		}).map(res => <any[]> res.json().message);
 	}

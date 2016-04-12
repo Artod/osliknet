@@ -2,7 +2,6 @@ var https = require('https');
 var config = require('../config');
 
 function verify(response, callback) {
-console.log('https://www.google.com/recaptcha/api/siteverify?secret=' + config.recaptcha.secret + '&response=' + response)
     https.get('https://www.google.com/recaptcha/api/siteverify?secret=' + config.recaptcha.secret + '&response=' + response, function(res) {
         var data = '';
 		
@@ -13,7 +12,6 @@ console.log('https://www.google.com/recaptcha/api/siteverify?secret=' + config.r
         res.on('end', function() {
             try {
                 var parsedData = JSON.parse(data);
-console.log('parsedDataCaptcha = ', parsedData);
                 callback(parsedData.success);
             } catch (e) {
                 callback(false);

@@ -84,6 +84,10 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         this._orderService.add(this.model).subscribe(function (data) {
                             _this.error = '';
                             _this.order = data.order || {};
+                            if (_this.order && _this.order._id) {
+                                _this._router.navigate(['Order', { id: _this.order._id }]);
+                                _this.closeModal();
+                            }
                             _this._busy = false;
                         }, function (err) {
                             _this.error = 'Unexpected error. Try again later.';

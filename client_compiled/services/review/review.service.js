@@ -29,14 +29,14 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/reviews/add', JSON.stringify(data), {
+                    return this.http.post('/reviews/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 ReviewService.prototype.getByOrderId = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/reviews/order/' + id, {
+                    return this.http.get('/reviews/order/' + id + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -48,7 +48,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                         search.set('limit', limit);
                     if (page)
                         search.set('page', page);
-                    return this.http.get('/reviews', {
+                    return this.http.get('/reviews?xhr', {
                         search: search,
                         headers: headers
                     }).map(function (res) { return res.json(); });

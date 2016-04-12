@@ -33,7 +33,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/invoices/add', JSON.stringify(data), {
+                    return this.http.post('/invoices/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -41,7 +41,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/invoices/pay', JSON.stringify({ invoiceId: invoiceId }), {
+                    return this.http.post('/invoices/pay?xhr', JSON.stringify({ invoiceId: invoiceId }), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -49,7 +49,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/invoices/unhold', JSON.stringify({ invoiceId: invoiceId }), {
+                    return this.http.post('/invoices/unhold?xhr', JSON.stringify({ invoiceId: invoiceId }), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -57,21 +57,21 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/invoices/refund', JSON.stringify({ invoiceId: invoiceId }), {
+                    return this.http.post('/invoices/refund?xhr', JSON.stringify({ invoiceId: invoiceId }), {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 InvoiceService.prototype.getByOrderId = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/invoices/order/' + id, {
+                    return this.http.get('/invoices/order/' + id + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 InvoiceService.prototype.check = function (id) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/invoices/check/' + id, {
+                    return this.http.get('/invoices/check/' + id + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };

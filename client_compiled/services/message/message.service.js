@@ -28,21 +28,21 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                 MessageService.prototype.getDialogs = function () {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/messages', {
+                    return this.http.get('/messages?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 MessageService.prototype.getAll = function (orderId, corrId) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/messages/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+                    return this.http.get('/messages/' + (orderId ? 'order/' + orderId : 'user/' + corrId) + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
                 MessageService.prototype.getLastMessages = function (lastId, orderId, corrId) {
                     var headers = new http_1.Headers();
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.get('/messages/last/' + lastId + '/' + (orderId ? 'order/' + orderId : 'user/' + corrId), {
+                    return this.http.get('/messages/last/' + lastId + '/' + (orderId ? 'order/' + orderId : 'user/' + corrId) + '?xhr', {
                         headers: headers
                     }).map(function (res) { return res.json(); });
                 };
@@ -50,7 +50,7 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                     var headers = new http_1.Headers();
                     headers.append('Content-Type', 'application/json');
                     headers.append('X-Requested-With', 'XMLHttpRequest');
-                    return this.http.post('/messages/add', JSON.stringify(data), {
+                    return this.http.post('/messages/add?xhr', JSON.stringify(data), {
                         headers: headers
                     }).map(function (res) { return res.json().message; });
                 };

@@ -3,9 +3,9 @@ var config = require('../config');
 
 paypal.configure(config.paypal.api);
 
-exports.paypal = paypal;
+module.exports.paypal = paypal;
 
-exports.getFees = function(amount, currency) {
+module.exports.getFees = function(amount, currency) {
 	var confPayment = config.fees;
 		
 	var safe = 1 * ( Number( amount ) || 0 ).toFixed(2);

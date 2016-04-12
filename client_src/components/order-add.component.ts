@@ -1,5 +1,5 @@
 import {Component, Inject, OnDestroy} from 'angular2/core';
-import {/*FORM_DIRECTIVES, CORE_DIRECTIVES, */FormBuilder, ControlGroup, Validators} from 'angular2/common';//, FORM_BINDINGS
+import {FormBuilder, ControlGroup, Validators} from 'angular2/common';//, FORM_BINDINGS
 import {ROUTER_DIRECTIVES, Router, Location} from 'angular2/router';
 
 // import {OrderCardComponent} from './order-card.component';
@@ -93,9 +93,13 @@ export class OrderAddComponent implements
 			this.error = '';
 			
 			this._orderService.add(this.model).subscribe(data => {					
-				//this.closeModal();
 				this.error = '';
 				this.order = data.order || {};
+				
+				if (this.order && this.order._id) {
+					this._router.navigate(['Order', {id: this.order._id}]);
+					this.closeModal();
+				}				
 				
 				this._busy = false;				
 			}, err => {

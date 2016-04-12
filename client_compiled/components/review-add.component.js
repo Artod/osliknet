@@ -1,4 +1,4 @@
-System.register(['angular2/core', 'angular2/common', '../services/review/review.service'], function(exports_1, context_1) {
+System.register(['angular2/core', 'angular2/common', 'angular2/router', '../services/review/review.service'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -13,7 +13,7 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
     var __param = (this && this.__param) || function (paramIndex, decorator) {
         return function (target, key) { decorator(target, key, paramIndex); }
     };
-    var core_1, common_1, review_service_1;
+    var core_1, common_1, router_1, review_service_1;
     var ReviewAddComponent;
     return {
         setters:[
@@ -23,15 +23,19 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
             function (common_1_1) {
                 common_1 = common_1_1;
             },
+            function (router_1_1) {
+                router_1 = router_1_1;
+            },
             function (review_service_1_1) {
                 review_service_1 = review_service_1_1;
             }],
         execute: function() {
             ReviewAddComponent = (function () {
-                function ReviewAddComponent(_fb, _reviewService, orderId, onReviewAdd) {
+                function ReviewAddComponent(_fb, _reviewService, _location, orderId, onReviewAdd) {
                     var _this = this;
                     this._fb = _fb;
                     this._reviewService = _reviewService;
+                    this._location = _location;
                     this.orderId = orderId;
                     this.onReviewAdd = onReviewAdd;
                     this.formModel = {};
@@ -53,7 +57,13 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
                     }, function (err) {
                         _this._busy = false;
                     });
+                    this._locationSubscribe = this._location.subscribe(function () {
+                        _this.closeModal();
+                    });
                 }
+                ReviewAddComponent.prototype.ngOnDestroy = function () {
+                    this._locationSubscribe.unsubscribe();
+                };
                 ReviewAddComponent.prototype.closeModal = function () {
                     this._modalComponent && this._modalComponent.close();
                 };
@@ -89,12 +99,12 @@ System.register(['angular2/core', 'angular2/common', '../services/review/review.
                         templateUrl: '/client_src/tmpls/review-add.html',
                         providers: [common_1.FormBuilder]
                     }),
-                    __param(2, core_1.Inject('orderId')),
-                    __param(3, core_1.Inject('onReviewAdd')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _b) || Object, String, Object])
+                    __param(3, core_1.Inject('orderId')),
+                    __param(4, core_1.Inject('onReviewAdd')), 
+                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _b) || Object, (typeof (_c = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _c) || Object, String, Object])
                 ], ReviewAddComponent);
                 return ReviewAddComponent;
-                var _a, _b;
+                var _a, _b, _c;
             }());
             exports_1("ReviewAddComponent", ReviewAddComponent);
         }
