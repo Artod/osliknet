@@ -1,6 +1,8 @@
 /*
 - trips get('/:id' unauth
 - check all methods auth unauth 
+- search old trips
+- all stats in the end
 */
 
 
@@ -16,16 +18,112 @@ var moment = require('moment')
 process.env.NODE_ENV = 'test' 
 process.env.DEBUG = 'osliknet:*' 
 
-
 var config = require('../server/config') 
 var sendgrid = require('../server/libs/sendgrid') 
-var captcha = require('../server/libs/captcha') 
+var captcha = require('../server/libs/captcha')
+var payments = require('../server/libs/payments');
 
 var Subscribes = require('../server/models/subscribe') 
 var User = require('../server/models/user') 
 var Token = require('../server/models/token') 
 var Subscribe = require('../server/models/subscribe') 
 var Trip = require('../server/models/trip') 
+var Order = require('../server/models/order') 
+var Review = require('../server/models/review') 
+var Message = require('../server/models/message') 
+var Invoice = require('../server/models/invoice') 
+var Private = require('../server/models/private') 
+
+
+var captchaStub = sinon.stub(captcha, 'verify') 
+captchaStub.yields(true) 
+
+var sendgridStub = sinon.stub(sendgrid, 'send') 
+sendgridStub.yields(null, {}) 
+
+var paypalCreateSpy = sinon.spy(payments.paypal.payment, 'create') 
+var paypalGetSpy = sinon.spy(payments.paypal.payment, 'get') 
+
+var paypalExecuteStub = sinon.stub(payments.paypal.payment, 'execute')
+var paypalExecuteRes = {
+	transactions: [{
+		related_resources: [{
+			sale: {
+				state: 'completed'
+			}
+		}]
+	}]
+}
+
+paypalExecuteStub.yields(null, paypalExecuteRes)
+
+
+// var clock = sinon.useFakeTimers()
+
+/* console.dir(payments.getFees(100, 'USD'))
+console.dir(payments.getFees(1000, 'CAD'))
+console.dir(payments.getFees(0.001, 'EUR'))
+console.dir(payments.getFees(0, 'USD'))
+console.dir(payments.getFees(undefined, 'USD'))
+console.dir(payments.getFees(100, 'TUG'))
+console.dir( payments.getFees() )
+console.dir(payments.getFees(37, 'RUB'))
+
+return; */
+
+
+var app = require('../bin/www')
+
+var agent = supertest.agent(app) 
+var agent2 = supertest.agent(app)
+var agent3 = supertest.agent(app)
+var agent4 = supertest.agent(app)
+
+var clearDbTbls = function() {
+	User.remove({}, function(err) { 
+	   console.log('Users removed') 
+	})
+	
+	Token.remove({}, function(err) { 
+	   console.log('Tokens removed') 
+	})	
+	
+	Subscribes.remove({}, function(err) { 
+	   console.log('Subscribes removed') 
+	})
+	
+	Trip.remove({}, function(err) { 
+	   console.log('Trips removed') 
+	})
+	
+	Order.remove({}, function(err) { 
+	   console.log('Orders removed') 
+	})
+	
+	Review.remove({}, function(err) { 
+	   console.log('Reviews removed') 
+	})
+	
+	Message.remove({}, function(err) { 
+	   console.log('Messages removed') 
+	})
+	
+	Private.remove({}, function(err) { 
+	   console.log('Privates removed') 
+	})
+	
+	Invoice.remove({}, function(err) { 
+	   console.log('Invoices removed') 
+	})	
+}
+
+var getLinks = function(text) {
+	return text.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g)
+}
+
+var getLastEmail = function() {
+	return sendgridStub.args[sendgridStub.args.length - 1][0].text
+}
 
 var getUid = (function() {
 	var id = 0 
@@ -59,51 +157,22 @@ var mock = {
 		from_id: 'ChIJDbdkHFQayUwR7-8fITgxTmU',
 		to: 'Moscow, Russia',
 		to_id: 'ChIJybDUc_xKtUYRTM9XV8zWRD0'
-	} 
+	},
+	trip2: { // old trip
+		from: 'New York, NY, United States',
+		from_id: 'ChIJOwg_06VPwokRYv534QaPC8g',
+		to: 'Vancouver, BC, Canada',
+		to_id: 'ChIJs0-pQ_FzhlQRi_OBm-qWkbs'
+	},
+	order: {
+		
+	},
+	order2: { // for passed trip
+		
+	}
 }
 
 
-var captchaStub = sinon.stub(captcha, 'verify') 
-captchaStub.yields(true) 
-
-var sendgridStub = sinon.stub(sendgrid, 'send') 
-sendgridStub.yields(null, {}) 
-
-// var clock = sinon.useFakeTimers()
-
-
-var app = require('../bin/www')
-
-var agent = supertest.agent(app) 
-var agent2 = supertest.agent(app)
-var agent3 = supertest.agent(app)
-var agent4 = supertest.agent(app)
-
-var clearDbTbls = function() {
-	User.remove({}, function(err) { 
-	   console.log('Users removed') 
-	})
-	
-	Token.remove({}, function(err) { 
-	   console.log('Tokens removed') 
-	})	
-	
-	Subscribes.remove({}, function(err) { 
-	   console.log('Subscribes removed') 
-	})
-	
-	Trip.remove({}, function(err) { 
-	   console.log('Trips removed') 
-	})
-}
-
-var getLinks = function(text) {
-	return text.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)|((mailto:)?[_.\w-]+@([\w][\w\-]+\.)+[a-zA-Z]{2,3})/g)
-}
-
-var getLastEmail = function() {
-	return sendgridStub.args[sendgridStub.args.length - 1][0].text
-}
 
 var subscrId1
 var subscrId3
@@ -1062,7 +1131,52 @@ describe('Trips', function() {
 				done() 
 			}) 
 	})
-}) 
+
+	it('should create a new trip2', function(done) {
+		agent
+			.post('/trips/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				from: mock.trip2.from,
+				from_id: mock.trip2.from_id,
+				to: mock.trip2.to,
+				to_id: mock.trip2.to_id,
+				when: moment().format('YYYY.MM.DD'),
+				description: 'test descr 2'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				mock.trip2.id = res.body.trip._id
+				done()
+			})
+	});
+})
+
+var changeTripOld = function(trip, isOld) {
+	it('should make trip from ' + trip.from + ' to get ' + (isOld ? 'old' : 'new'), function(done) {
+		var newDate = isOld ? moment().subtract(2, 'days').format('YYYY.MM.DD') : moment().format('YYYY.MM.DD')
+		
+		Trip.findById(trip.id).exec(function(err, trip) {
+			trip.when = newDate
+			trip.save(function(err, trip) {
+				if (err) return done(err)
+					
+				//expect( new Date(trip.when).getTime() ).to.be.equal( new Date(newDate).getTime() )
+				
+				Trip.findById(trip.id).exec(function(err, trip) {
+					expect( new Date(trip.when).getTime() ).to.be.equal( new Date(newDate).getTime() )
+console.log('new date fir trip id = ' + trip.id + ' !!!!!!!!!!!!!!!!!!!!!')
+console.log(trip.when)
+					done()
+				})
+			})
+		})
+	})
+}
 
 describe('Orders', function() {
 	it('should get empty array of orders for user1', function(done) {
@@ -1117,6 +1231,8 @@ describe('Orders', function() {
 				
 				expect(res.body.order.message).to.be.equal('123123123')
 				
+				mock.order = res.body.order
+				
 				setTimeout(function() {
 					async.parallel({
 						tripperStats: function(cb) {
@@ -1168,6 +1284,28 @@ describe('Orders', function() {
 				if (err) return done(err) 				
 				
 				expect(res.body).to.be.eql({error: 'Only one order allowed.'})
+				
+				done()
+			}) 
+	})
+	
+	changeTripOld(mock.trip2, true)
+	
+	it('should not create order2 for user2 cos old trip', function(done) {
+		agent2
+			.post('/orders/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				trip: mock.trip2.id,
+				message: '3333'
+			})
+			.expect('Content-type', /json/)
+			.expect(400)
+			.end(function(err, res) {
+				if (err) return done(err) 				
+				
+				expect(res.body).to.be.eql({error: 'Trip is passed.'})
 				
 				done()
 			}) 
@@ -1257,6 +1395,7 @@ describe('Orders', function() {
 			.end(function(err, res) {
 				if (err) return done(err) 				
 				
+				expect(res.body.order.status).to.be.equal(5)
 				expect(res.body.order.trip).to.be.a('string')
 				expect(res.body.order.user).to.be.a('string')
 				expect(res.body.order.tripUser).to.be.a('string')
@@ -1264,12 +1403,555 @@ describe('Orders', function() {
 				done()
 			})
 	})
+	
+	changeTripOld(mock.trip2, false)
+	
+	it('should create order2 for user2', function(done) {
+		agent2
+			.post('/orders/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				trip: mock.trip2.id,
+				message: '3333'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				mock.order2 = res.body.order
+console.dir(mock.order2)
+				done()
+			}) 
+	})
+	
+	changeTripOld(mock.trip2, true)
+	
+	describe('status and reviews', function() {
+	
+		var changeStatusWithError = function(agent, status, user, ind) {
+			it('should not allow ' + user + ' set status ' + status, function(done) {
+				agent
+					.post('/orders/status')
+					.set('Content-Type', 'application/json')
+					.set('X-Requested-With', 'XMLHttpRequest')
+					.send({
+						order: (ind === 2 ? mock.order2._id : mock.order._id),
+						status: status
+					})
+					.expect('Content-type', /json/)
+					.expect(401)
+					.end(function(err, res) {
+						if (err) return done(err) 				
+						
+						expect(res.body).to.be.eql({error: 'Unauthorized'})
+						
+						done()
+					})
+			})			
+		}
+		
+		var changeStatusWithSuccess = function(agent, status, user, ind) {
+			it('should allow ' + user + ' set status ' + status, function(done) {
+
+				agent
+					.post('/orders/status')
+					.set('Content-Type', 'application/json')
+					.set('X-Requested-With', 'XMLHttpRequest')
+					.send({
+						order: (ind === 2 ? mock.order2._id : mock.order._id),
+						status: status
+					})
+					.expect('Content-type', /json/)
+					.expect(200)
+					.end(function(err, res) {
+						if (err) return done(err) 				
+						
+						expect(res.body.order.status).to.be.equal(status)
+						
+						done()
+					})
+			})			
+		}
+
+		;[20, 25].forEach(function(status) {
+			changeStatusWithError(agent, status, 'user1')
+		})
+		
+		;[10, 15, 25].forEach(function(status) {
+			changeStatusWithError(agent2, status, 'user2')
+		})
+		
+		;[5, 10, 15, 20, 25].forEach(function(status) {
+			changeStatusWithError(agent3, status, 'user3')
+		})
+		
+		changeStatusWithSuccess(agent, 15, 'user1');
+		
+		;[10, 20, 25].forEach(function(status) {
+			changeStatusWithError(agent, status, 'user1')
+		})
+		
+		;[5, 10, 20, 25].forEach(function(status) {
+			changeStatusWithError(agent2, status, 'user2')
+		})
+		
+		changeStatusWithSuccess(agent, 5, 'user1')
+		
+		changeStatusWithSuccess(agent2, 20, 'user2')
+		
+		;[5, 10, 15, 25].forEach(function(status) {
+			changeStatusWithError(agent, status, 'user1')
+		})
+		
+		;[10, 15, 25].forEach(function(status) {
+			changeStatusWithError(agent2, status, 'user2')
+		})
+		
+		changeStatusWithSuccess(agent2, 5, 'user2')
+		
+		changeStatusWithSuccess(agent, 10, 'user1')
+		
+		;[5, 15, 20, 25].forEach(function(status) {
+			changeStatusWithError(agent, status, 'user1')
+		})
+		
+		;[5, 15, 20, 25].forEach(function(status) {
+			changeStatusWithError(agent2, status, 'user2')
+		})
+		
+		it('should return 401 on new review', function(done) {
+			agent2
+				.post('/reviews/add')
+				.set('Content-Type', 'application/json')
+				.set('X-Requested-With', 'XMLHttpRequest')
+				.send({
+					order: mock.order._id,
+					rating: 3,
+					comment: 'sdsdsd'
+				})
+				.expect('Content-type', /json/)
+				.expect(401)
+				.end(function(err, res) {
+					if (err) return done(err) 				
+					
+					expect(res.body).to.be.eql({error: 'Unauthorized'})
+					
+					done()
+				})
+		})
+		
+		changeTripOld(mock.trip2, false)		
+		changeStatusWithSuccess(agent, 10, 'user1', 2)
+		
+		changeTripOld(mock.trip2, true)
+		changeStatusWithSuccess(agent, 25, 'user1', 2)
+	})
+})
+
+describe('Reviews', function() {
+	it('should return 200 on new user2 review for order2', function(done) {
+		agent2
+			.post('/reviews/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order2._id,
+				rating: 3,
+				comment: 'Not bad'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				expect(res.body.review.isUserTripper).to.be.false
+				expect(res.body.review.order).to.be.equal(mock.order2._id)
+				expect(res.body.review.user).to.be.equal(mock.user2.id)
+				expect(res.body.review.corr).to.be.equal(mock.user.id)
+				
+				done()
+			})
+	})
+	
+	var reviewId
+	
+	it('should return 200 on new user1 review for order2', function(done) {
+		agent
+			.post('/reviews/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order2._id,
+				rating: 5,
+				comment: 'Excellent'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+					
+				reviewId = res.body.review._id
+			
+				expect(res.body.review.isUserTripper).to.be.true
+				expect(res.body.review.order).to.be.equal(mock.order2._id)
+				expect(res.body.review.user).to.be.equal(mock.user.id)
+				expect(res.body.review.corr).to.be.equal(mock.user2.id)
+				
+				done()
+			})
+	})
+	
+	it('should not create new review just update', function(done) {
+		agent
+			.post('/reviews/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order2._id,
+				rating: 4,
+				comment: 'Excellent'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				expect(res.body.review._id).to.be.equal(reviewId)
+				
+				done()
+			})
+	})
+
+	it('should get review by orderid', function(done) {
+		agent
+			.get('/reviews/order/' + mock.order2._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.review._id).to.be.equal(reviewId)
+				
+				done() 
+			}) 
+	})
+
+	it('should get reviews for user1', function(done) {
+		agent
+			.get('/reviews')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.reviews.length).to.be.equal(2)
+				expect(res.body.reviews[0].user).to.not.have.property('email')
+				expect(res.body.reviews[0].corr).to.not.have.property('email')
+				
+				expect(res.body.reviews[0].user._id).to.be.equal(mock.user.id)
+				expect(res.body.reviews[0].corr._id).to.be.equal(mock.user2.id)
+				
+				done() 
+			}) 
+	})
 }) 
 
 describe('Invoices', function() {
+	// this.timeout(5000);
+	
+	it('should return fees', function(done) {
+		expect( payments.getFees(100, 'USD') ).to.be.eql({
+			safe: '100.00',
+			oslikiFee: '5.50',
+			total: '110.09',
+			paypalFee: '4.59',
+			nonRefundable: '0.83',
+			refundable: '109.26',
+			nonRefundableOsliki: '0.50',
+			nonRefundablePaypal: '0.33'
+		})
+		
+		expect( payments.getFees(1000, 'CAD') ).to.be.eql({
+			safe: '1000.00',
+			oslikiFee: '50.50',
+			total: '1093.44',
+			paypalFee: '42.94',
+			nonRefundable: '0.83',
+			refundable: '1092.61',
+			nonRefundableOsliki: '0.50',
+			nonRefundablePaypal: '0.33'
+		})
+		
+		expect( payments.getFees(0.001, 'EUR') ).to.be.false
+		expect( payments.getFees(0, 'USD') ).to.be.false
+		expect( payments.getFees(undefined, 'USD') ).to.be.false
+		expect( payments.getFees(100, 'TUG') ).to.be.false
+		expect( payments.getFees() ).to.be.false
+		
+		expect( payments.getFees(37, 'RUB') ).to.be.eql({
+			safe: '37.00',
+			oslikiFee: '11.85',
+			total: '61.24',
+			paypalFee: '12.39',
+			nonRefundable: '20.78',
+			refundable: '40.46',
+			nonRefundableOsliki: '10.00',
+			nonRefundablePaypal: '10.78'
+		})
+		
+// console.dir(payments.getFees(100, 'USD'))
+// console.dir(payments.getFees(1000, 'CAD'))
+// console.dir(payments.getFees(0.001, 'EUR'))
+// console.dir(payments.getFees(0, 'USD'))
+// console.dir(payments.getFees(undefined, 'USD'))
+// console.dir(payments.getFees(100, 'TUG'))
+// console.dir( payments.getFees() )
+// console.dir(payments.getFees(37, 'RUB'))
 
-}) 
+		done();
+	})
+	
+	it('should get empty invoices for user1', function(done) {
+		agent
+			.get('/invoices/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
 
+				expect(res.body.invoices.length).to.be.equal(0)
+				
+				done() 
+			}) 
+	})
+	
+	it('should not create new invoice for order1 by user2', function(done) {
+		agent2
+			.post('/invoices/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order._id,
+				amount: 100,
+				currency: 'USD',
+				dest_id: mock.user2.email
+			})
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {
+	
+				if (err) return done(err)	
+				done()
+			})
+	})
+	
+	it('should create new invoice for order1 by user1', function(done) {
+		agent
+			.post('/invoices/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order._id,
+				amount: 100,
+				currency: 'USD',
+				dest_id: mock.user.email
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {			
+				if (err) return done(err)
+					
+				expect(res.body.invoice.status).to.be.equal(Invoice.sts.UNPAID)
+				expect(res.body.invoice.order).to.be.equal(mock.order._id)
+				expect(res.body.invoice.user).to.be.equal(mock.user.id)
+				expect(res.body.invoice.corr).to.be.equal(mock.user2.id)	
+				expect(res.body.invoice).to.have.property('fees')
+				
+				done()
+			})
+	})
+	
+	var invoiceId 
+
+	it('should get invoices for user1', function(done) {
+		agent
+			.get('/invoices/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				invoiceId = res.body.invoices[0]._id
+				
+				expect(res.body.invoices.length).to.be.equal(1)
+				expect(res.body.invoices[0].dest_id).to.be.equal(mock.user.email)
+				done() 
+			}) 
+	})
+
+	it('should get invoices for user2', function(done) {
+		agent2
+			.get('/invoices/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.invoices.length).to.be.equal(1)
+				expect(res.body.invoices[0]).to.not.have.property('dest_id')
+				
+				done() 
+			}) 
+	})
+	
+	it('should return 401 for user3', function(done) {
+		agent3
+			.get('/invoices/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+	
+
+	var return_url
+	var cancel_url
+	
+	it('should get a link for pay the invoice by user2', function(done) {
+		agent2
+			.post('/invoices/pay')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				invoiceId: invoiceId
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {			
+				if (err) return done(err)
+
+				var payment = paypalCreateSpy.args[paypalCreateSpy.args.length - 1][0]
+				return_url = payment.redirect_urls.return_url.replace(config.host, '/')				
+				cancel_url = payment.redirect_urls.cancel_url.replace(config.host, '/')
+				
+				// payment.transactions = paypalExecuteRes.transactions
+				// paypalExecuteRes = payment
+				
+				expect(res.body).to.have.property('redirectUrl')
+				
+				done()
+			})
+	})
+	
+	it('should execute payment with status PAID', function(done) {	
+		agent2
+			.get(return_url)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Location', config.host + "messages/order/" + mock.order._id)
+			.expect(302)
+			.end(function(err, res) {
+	
+				if (err) return done(err)
+				
+				Invoice.findById(invoiceId).select('+payment').exec(function(err, invoice) {
+					if (err) return done(err)
+
+					expect(invoice.status).to.be.equal(Invoice.sts.PAID)
+					
+					done()
+				})
+			}) 
+	})
+	
+	it('should return 400 cos undefined payment.id', function(done) {
+		agent
+			.get('/invoices/check/' + invoiceId)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(400)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+	
+	it('should get html msg about cancelation of payment', function(done) {
+		agent
+			.get(cancel_url)
+			.expect('Content-type', /html/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+	
+	it('should return 401 for user1', function(done) {
+		agent
+			.post('/invoices/unhold')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				invoiceId: invoiceId
+			})
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {			
+				if (err) return done(err)
+				
+				done()
+			})
+	})
+	
+	it('should return send email to admin', function(done) {
+		agent2
+			.post('/invoices/unhold')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				invoiceId: invoiceId
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {			
+				if (err) return done(err)
+
+				expect( getLastEmail().match(/#([a-z0-9]+)\)/i)[1] ).to.be.equal(invoiceId)
+			
+				done()
+			})
+	})
+	
+	it('should return 401 for user2 cos status PENDING', function(done) {
+		agent2
+			.post('/invoices/refund')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				invoiceId: invoiceId
+			})
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {			
+				if (err) return done(err)
+			
+				done()
+			})
+	})
+})
 
 after(function() {
 	clearDbTbls() 

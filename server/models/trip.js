@@ -2,17 +2,20 @@ var mongoose = require('mongoose'),
 	Schema = mongoose.Schema,
 	orderSchema = require('./orderSchema');
 
+var getNow = function() {
+	return ( new Date() ).getTime() - 1000*60*60*24;
+}
+
 var whenValidator = function(value) {
   // `this` is the mongoose document
-  console.log('whenValidator', value)
   
 	if (!this.isNew) {
 		return true;
 	}
 	
-	var now = (new Date()).getTime() - 1000*60*60*24;
+	//var now = (new Date()).getTime() - 1000*60*60*24;
 
-	return now < value.getTime();
+	return getNow() < value.getTime();
 };
 
 var dateFormat = function(when, needTime) {	
@@ -84,6 +87,14 @@ schema.index({user: 1});
 schema.index({when: 1, _id: -1});
  
 schema.method('dateFormat', dateFormat);
+
+schema.statics.getNow = function() {
+	return getNow();
+}
+
+schema.methods.isPassed = function() {	
+	return this.when < getNow();
+}
 
 schema.pre('save', function(next) {
 	var now = new Date();

@@ -41,7 +41,8 @@ router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 		return;
 	}
 	
-	var now = (new Date()).getTime() - 1000*60*60*24;
+	// var now = (new Date()).getTime() - 1000*60*60*24;
+	var now = Trip.getNow();
 	
 	query.when = { $gt: now };
 	

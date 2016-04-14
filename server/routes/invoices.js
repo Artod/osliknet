@@ -16,7 +16,8 @@ var getFees = payments.getFees;
 var debug = require('debug')('osliknet:server');
 var config = require('../config');
 
-var sendgrid  = require('sendgrid')(config.sendgrid.key);
+// var sendgrid  = require('sendgrid')(config.sendgrid.key);
+var sendgrid  = require('../libs/sendgrid');
 
 var winston = require('winston');
 var path = require('path');
@@ -233,8 +234,6 @@ router.post('/pay', mdlwares.restricted, function(req, res, next) {
 					res.type('json')
 						.json({redirectUrl: redirectUrl});
 						
-						
-						
 					return;
 				}
 			}
@@ -248,8 +247,21 @@ router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req
 	var orderUser = order.user.toString(),
 		tripUser = order.trip.user.toString(); //order.tripUser
 	
-	var fees = getFees(req.body.amount, req.body.currency);
+	if (tripUser !== req.session.uid) {
+		res.status(401).type('json').json({error: 'Unauthorized'});
 		
+		return;
+	}
+
+	if (order.status !== Order.sts.PROCESSING && order.status !== Order.sts.FINISHED) {
+		res.status(400).type('json')
+			.json({error: 'Bad order status.'});
+		
+		return;
+	}
+	
+	var fees = getFees(req.body.amount, req.body.currency);
+
 	if (!fees) {
 		res.status(400).type('json')
 			.json({error: 'Unexpected server error.'});
@@ -270,7 +282,7 @@ router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req
 		if (err) {
 			logger.error(err, {line: 105});
 			
-			res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
 			return;
@@ -351,7 +363,7 @@ router.get('/check/:id', mdlwares.restricted, function(req, res, next) {
 					
 				return;
 			} else {
-				var newStatus = sts.UNCLEARED;
+				var newStatus = invoice.status;
 				
 				try {
 					if ( payment.transactions[0].related_resources[0].sale.state === 'completed' ) {

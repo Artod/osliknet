@@ -87,6 +87,13 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 			return;
 		}
 		
+		if ( asyncRes.trip.isPassed() ) {
+			res.status(400).type('json')
+				.json({error: 'Trip is passed.'});
+				
+			return;
+		}
+		
 		if (asyncRes.trip.user.toString() === req.session.uid) {
 			res.status(400).type('json')
 				.json({error: 'Order to the own trip.'});
@@ -167,9 +174,10 @@ router.post('/status', mdlwares.restricted, mdlwares.checkOrderAccess, function(
 	}
 
 	var checkAndSave = function(canAfterCurrent) {
-		var now = (new Date()).getTime() - 1000*60*60*24;
-		var isTripPassed = ( new Date(order.trip.when) ) < now;
-		
+		// var now = (new Date()).getTime() - 1000*60*60*24;
+		// var isTripPassed = ( new Date(order.trip.when) ) < now;
+		var isTripPassed = order.trip.isPassed();
+
 		if (
 			order.status !== canAfterCurrent || 
 			( newStatus === sts.FINISHED && !isTripPassed ) || // finish before trip

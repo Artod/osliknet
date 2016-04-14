@@ -2,7 +2,8 @@ var mongoose = require('mongoose');
 // var sendgrid_api_key = 'v ftp';
 // var sendgrid  = require('sendgrid')(sendgrid_api_key);
 var config = require('../config');
-var sendgrid  = require('sendgrid')(config.sendgrid.key);
+// var sendgrid  = require('sendgrid')(config.sendgrid.key);
+var sendgrid  = require('../libs/sendgrid');
 
 var winston = require('winston');
 var path = require('path');

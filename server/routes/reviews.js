@@ -52,6 +52,12 @@ router.post('/add', mdlwares.restricted, mdlwares.checkOrderAccess, function(req
 	
 	var orderUser = order.user.toString(),
 		tripUser = order.trip.user.toString(); //order.tripUser
+
+	if ( !( (order.status === Order.sts.PROCESSING || order.status === Order.sts.FINISHED) && order.trip.isPassed() ) ) {
+		res.status(401).type('json').json({error: 'Unauthorized'});
+			
+		return;
+	}
 	
 	Review.findOne({
 		order: order._id,
