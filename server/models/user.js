@@ -177,6 +177,7 @@ schema.statics.setUnreaded = function(field, uid, id) {
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
+
 			if (err) {
 				logger.error(err, field, uid, id, {line: 172});
 			}

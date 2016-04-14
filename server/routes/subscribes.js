@@ -51,6 +51,13 @@ router.get('/cancel/:id', function(req, res, next) {
 router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 	req.body.email = req.session.email || req.body.email;
 	req.body.is_unsubed = false;
+
+	if (!req.body.from_id || !req.body.to_id) {
+		res.status(400).type('json')
+			.json({error: 'Direction is not indicated.'});
+			
+		return;
+	}
 	
 	Subscribe.findOne({
 		from_id: req.body.from_id,
@@ -102,7 +109,7 @@ router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 				if (err) {
 					logger.error(err, {line: 102});
 					
-					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+					res.status(500).type('json')
 						.json({error: 'Unexpected server error.'});
 						
 					return;

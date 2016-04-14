@@ -9,7 +9,8 @@ var User = require('../models/user');
 var Subscribe = require('../models/subscribe');
 
 var config = require('../config');
-var sendgrid  = require('sendgrid')(config.sendgrid.key);
+// var sendgrid = require('sendgrid')(config.sendgrid.key);
+var sendgrid = require('../libs/sendgrid');
 
 var winston = require('winston');
 var path = require('path');
@@ -163,7 +164,8 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		if (err) {
 			logger.error(err, {line: 164});
 			
-			res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+			// res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+			res.status(500).type('json')
 				.json({error: 'Unexpected server error.'});
 				
 			return;
@@ -189,7 +191,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					
 				return;
 			}
-			
+
 			subscribes.forEach(function(subscribe) {
 				if (subscribe.email === req.session.email) {					
 					return;
@@ -206,7 +208,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					email.from = config.email;
 					
 					email.text += 'Hello!\n\r\n\r';
-					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' ' + config.host + 'trips/' + trip.id + '.\n\r';
+					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' ' + config.host + 'trips/' + trip.id + ' .\n\r';
 					email.text += 'Unsubscribe: ' + config.host + 'subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
 					email.text += 'Team ' + config.host;
 
@@ -217,7 +219,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					});
 				}
 			});
-		});		
+		});
 		
 		res.type('json').json({trip: trip});
 	});  
@@ -300,7 +302,7 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 						
 					return
 				}
-console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+
 				res.json({
 					trip: trip,
 					orders: orders

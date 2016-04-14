@@ -6,6 +6,7 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "start": "node ./bin/www",
+    "test": "mocha",
     "typings": "typings",
     "postinstall": "typings install"
   },
@@ -23,7 +24,7 @@
     "express": "~4.13.1",
     "express-session": "1.12.1",
     "jade": "~1.11.0",
-    "moment": "2.11.1",
+    "moment": "^2.11.1",
     "mongoose": "4.4.7",
     "morgan": "~1.6.1",
     "passwordless": "1.1.1",
