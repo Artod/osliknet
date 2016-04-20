@@ -1,11 +1,12 @@
 /*
-- trips get('/:id' unauth
+
+// - search old trips
+// - msg 
+// - notific
+// - all stats in the end
 - check all methods auth unauth 
-- search old trips
-- all stats in the end
+
 */
-
-
 
 var chai = require('chai') 
 var expect = chai.expect 
@@ -159,8 +160,8 @@ var mock = {
 		to_id: 'ChIJybDUc_xKtUYRTM9XV8zWRD0'
 	},
 	trip2: { // old trip
-		from: 'New York, NY, United States',
-		from_id: 'ChIJOwg_06VPwokRYv534QaPC8g',
+		from: 'Montreal, QC, Canada',
+		from_id: 'ChIJDbdkHFQayUwR7-8fITgxTmU',
 		to: 'Vancouver, BC, Canada',
 		to_id: 'ChIJs0-pQ_FzhlQRi_OBm-qWkbs'
 	},
@@ -176,7 +177,6 @@ var mock = {
 
 var subscrId1
 var subscrId3
-
 
 before(function() {
 	clearDbTbls() 
@@ -199,13 +199,32 @@ describe('Unauth Trips and Subscribes', function() {
 			}) 
 	})
 
-	it('should not create a new subscribe cos empty to_id', function(done) {
+	it('should create a new subscribe without to_id', function(done) {
 		agent
 			.post('/subscribes/add')
 			.set('Content-Type', 'application/json')
 			.set('X-Requested-With', 'XMLHttpRequest')
 			.send({
+				from: mock.trip.from,
 				from_id: mock.trip.from_id,
+				email: mock.user.email,
+				recaptcha: getUid()
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 
+				
+				done() 
+			}) 
+	}) 
+
+	it('should not create a new subscribe cos empty direction', function(done) {
+		agent
+			.post('/subscribes/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
 				email: mock.user.email,
 				recaptcha: getUid()
 			})
@@ -216,7 +235,7 @@ describe('Unauth Trips and Subscribes', function() {
 				
 				done() 
 			}) 
-	}) 
+	})
 	
 	it('should not create a new subscribe cos empty email', function(done) {
 		agent
@@ -224,7 +243,9 @@ describe('Unauth Trips and Subscribes', function() {
 			.set('Content-Type', 'application/json')
 			.set('X-Requested-With', 'XMLHttpRequest')
 			.send({
+				from: mock.trip.from,
 				from_id: mock.trip.from_id,
+				to: mock.trip.to,
 				to_id: mock.trip.to_id,
 				email: '',
 				recaptcha: getUid()
@@ -318,6 +339,24 @@ describe('Unauth Trips and Subscribes', function() {
 			}) 
 	}) 
 	
+	it('should unsubscribe unauth user1 via direct link', function(done) {
+		agent
+			.get('/subscribes/cancel/' + subscrId1)
+			.expect('Content-type', /html/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				Subscribe.findById(subscrId1).select('is_unsubed').exec(function(err, subscribe) {
+					if (err) return done(err)
+					
+					expect(subscribe.is_unsubed).to.be.true
+					
+					done() 
+				})
+			}) 
+	})
+	
 	it('should unsubscribe unauth user1', function(done) {
 		agent
 			.get('/subscribes/cancel/' + subscrId1)
@@ -343,7 +382,9 @@ describe('Unauth Trips and Subscribes', function() {
 			.set('Content-Type', 'application/json')
 			.set('X-Requested-With', 'XMLHttpRequest')
 			.send({
+				from: mock.trip.from,
 				from_id: mock.trip.from_id,
+				to: mock.trip.to,
 				to_id: mock.trip.to_id,
 				email: mock.user.email,
 				recaptcha: getUid()
@@ -374,7 +415,6 @@ describe('Unauth Trips and Subscribes', function() {
 			}) 
 	}) 	
 
-	
 })
 
 describe('Users', function() {
@@ -656,7 +696,7 @@ describe('Users', function() {
 		it('should logout', function(done) {
 			agent
 				.get('/users/logout')
-				.expect('Location', '/login')
+				.expect('Location', '/users/login')
 				.expect(302)
 				.end(function(err, res) {
 					if (err) return done(err) 
@@ -667,12 +707,12 @@ describe('Users', function() {
 		it('should return text about expired token', function(done) {
 			agent
 				.get(loginLink1)
-				.expect('Content-type', /text/)
+				.expect('Content-type', /html/)
 				.expect(200)
 				.end(function(err, res) {
 					if (err) return done(err) 
 
-					expect(res.text).to.equal('The request token is invalid. It may have already been used, or expired because it is too old.') 
+					// expect(res.text).to.equal('The request token is invalid. It may have already been used, or expired because it is too old.')
 					
 					done() 
 				}) 
@@ -873,8 +913,10 @@ describe('Auth Trips and Subscribes', function() {
 			.set('Content-Type', 'application/json')
 			.set('X-Requested-With', 'XMLHttpRequest')
 			.send({
+				from: mock.trip.from,
 				from_id: mock.trip.from_id,
-				to_id: mock.trip.to_id
+				to: mock.trip.to,
+				to_id: mock.trip.to_id,
 			})
 			.expect('Content-type', /json/)
 			.expect(200)
@@ -891,6 +933,22 @@ describe('Auth Trips and Subscribes', function() {
 			}) 
 	})
 });
+
+function checkNotifications(agent, prop, eql) {
+	it('should get notifications', function(done) {
+		agent
+			.get('/users/notifications')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+				expect(typeof(prop) === 'function' ? prop(res.body) : res.body[prop]).to.be.eql(eql())
+			
+				done() 
+			}) 
+	})
+}
 
 describe('Trips', function() {
 	it('should render index on get /trips/add', function(done) {
@@ -983,9 +1041,12 @@ describe('Trips', function() {
 					})				
 
 					
-				}, 500)	
+				}, 100)	
 			})
 	});
+	
+	checkNotifications(agent, 'newTrips', function() {return []})
+	checkNotifications(agent2, 'newTrips', function() {return [mock.trip.id]})
 
 	it('should get my trips for user1', function(done) {
 		agent
@@ -1074,6 +1135,8 @@ describe('Trips', function() {
 			})
 	})
 	
+	checkNotifications(agent2, 'newTrips', function() {return []})
+	
 	it('should get trip for user3', function(done) {
 		agent3
 			.get('/trips/' + mock.trip.id)
@@ -1154,9 +1217,10 @@ describe('Trips', function() {
 				done()
 			})
 	});
+	
 })
 
-var changeTripOld = function(trip, isOld) {
+function changeTripOld(trip, isOld) {
 	it('should make trip from ' + trip.from + ' to get ' + (isOld ? 'old' : 'new'), function(done) {
 		var newDate = isOld ? moment().subtract(2, 'days').format('YYYY.MM.DD') : moment().format('YYYY.MM.DD')
 		
@@ -1195,7 +1259,7 @@ describe('Orders', function() {
 			})
 	})
 	
-	it('should not create order for user1', function(done) {
+	it('should not create order by user1', function(done) {
 		agent
 			.post('/orders/add')
 			.set('Content-Type', 'application/json')
@@ -1215,7 +1279,7 @@ describe('Orders', function() {
 			}) 
 	})
 	
-	it('should create order for user2', function(done) {
+	it('should create order by user2', function(done) {
 		agent2
 			.post('/orders/add')
 			.set('Content-Type', 'application/json')
@@ -1265,11 +1329,11 @@ describe('Orders', function() {
 							
 						done()	
 					})	
-				}, 500)
+				}, 100)
 			}) 
 	})
 	
-	it('should not create second order for user2', function(done) {
+	it('should not create second order by user2', function(done) {
 		agent2
 			.post('/orders/add')
 			.set('Content-Type', 'application/json')
@@ -1311,6 +1375,8 @@ describe('Orders', function() {
 			}) 
 	})
 	
+	checkNotifications(agent, 'newOrders', function() {return [mock.order._id]})
+	
 	it('should return array of orders for user1', function(done) {
 		agent
 			.get('/orders')
@@ -1329,6 +1395,7 @@ describe('Orders', function() {
 				expect(res.body.orders[0].user).to.not.have.property('email')
 				
 				setTimeout(function() {
+
 					User.findById(mock.user._id).select('newOrders needEmailNotification').exec(function(err, user) {
 						if (err) return done(err) 
 							
@@ -1337,9 +1404,12 @@ describe('Orders', function() {
 						
 						done()
 					})	
-				}, 500)
+				}, 100)
 			})
 	})
+	
+	checkNotifications(agent, 'newOrders', function() {return []})
+	checkNotifications(agent2, 'newOrders', function() {return []})
 	
 	it('should return array of orders for user2', function(done) {
 		agent2
@@ -1367,9 +1437,11 @@ describe('Orders', function() {
 						
 						done()
 					})	
-				}, 500)
+				}, 100)
 			})
 	})
+	
+	checkNotifications(agent2, 'newOrders', function() {return []})
 	
 	it('should not return order for user1', function(done) {
 		agent
@@ -1406,7 +1478,7 @@ describe('Orders', function() {
 	
 	changeTripOld(mock.trip2, false)
 	
-	it('should create order2 for user2', function(done) {
+	it('should create order2 by user2', function(done) {
 		agent2
 			.post('/orders/add')
 			.set('Content-Type', 'application/json')
@@ -1421,10 +1493,13 @@ describe('Orders', function() {
 				if (err) return done(err)
 
 				mock.order2 = res.body.order
-console.dir(mock.order2)
+
 				done()
 			}) 
 	})
+	
+	checkNotifications(agent, 'newOrders', function() {return [mock.order2._id]})
+	checkNotifications(agent2, 'newOrders', function() {return []})
 	
 	changeTripOld(mock.trip2, true)
 	
@@ -1453,14 +1528,19 @@ console.dir(mock.order2)
 		}
 		
 		var changeStatusWithSuccess = function(agent, status, user, ind) {
+			
+			var getOid = function() {
+				return (ind === 2 ? mock.order2._id : mock.order._id)
+			}
+			
 			it('should allow ' + user + ' set status ' + status, function(done) {
-
+				
 				agent
 					.post('/orders/status')
 					.set('Content-Type', 'application/json')
 					.set('X-Requested-With', 'XMLHttpRequest')
 					.send({
-						order: (ind === 2 ? mock.order2._id : mock.order._id),
+						order: getOid(),
 						status: status
 					})
 					.expect('Content-type', /json/)
@@ -1472,7 +1552,7 @@ console.dir(mock.order2)
 						
 						done()
 					})
-			})			
+			})
 		}
 
 		;[20, 25].forEach(function(status) {
@@ -1547,6 +1627,13 @@ console.dir(mock.order2)
 		
 		changeTripOld(mock.trip2, true)
 		changeStatusWithSuccess(agent, 25, 'user1', 2)
+		
+		
+		checkNotifications(agent2, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 3})
+		checkNotifications(agent2, function(obj) {return obj.newMessages[mock.order2._id][0]}, function() {return 2})
+
+		checkNotifications(agent, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 2})
+		checkNotifications(agent, function(obj) {return obj.newMessages[mock.order2._id]}, function() {return undefined})
 	})
 })
 
@@ -1575,6 +1662,8 @@ describe('Reviews', function() {
 			})
 	})
 	
+	checkNotifications(agent, function(obj) {return obj.newMessages[mock.order2._id][0]}, function() {return 1})
+	
 	var reviewId
 	
 	it('should return 200 on new user1 review for order2', function(done) {
@@ -1602,6 +1691,8 @@ describe('Reviews', function() {
 				done()
 			})
 	})
+	
+	checkNotifications(agent2, function(obj) {return obj.newMessages[mock.order2._id][0]}, function() {return 3})
 	
 	it('should not create new review just update', function(done) {
 		agent
@@ -1776,6 +1867,8 @@ describe('Invoices', function() {
 			})
 	})
 	
+	checkNotifications(agent2, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 4})
+	
 	var invoiceId 
 
 	it('should get invoices for user1', function(done) {
@@ -1874,12 +1967,14 @@ describe('Invoices', function() {
 			}) 
 	})
 	
-	it('should return 400 cos undefined payment.id', function(done) {
+	checkNotifications(agent, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 3})
+	
+	it('should return 500 cos undefined payment.id', function(done) {
 		agent
 			.get('/invoices/check/' + invoiceId)
 			.set('X-Requested-With', 'XMLHttpRequest')
 			.expect('Content-type', /json/)
-			.expect(400)
+			.expect(500)
 			.end(function(err, res) {
 				if (err) return done(err)
 				
@@ -1935,6 +2030,8 @@ describe('Invoices', function() {
 			})
 	})
 	
+	checkNotifications(agent, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 4})
+	
 	it('should return 401 for user2 cos status PENDING', function(done) {
 		agent2
 			.post('/invoices/refund')
@@ -1952,6 +2049,303 @@ describe('Invoices', function() {
 			})
 	})
 })
+
+describe('Messages', function() {
+	var lastId
+	var lastId2
+	var lastPrivId
+	
+	it('should create a new msg by user1', function(done) {
+		agent
+			.post('/messages/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order._id,
+				message: 'hi'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+					
+				lastId = res.body.message._id
+				
+				expect(res.body.message.user).to.be.equal(mock.user.id)
+				expect(res.body.message.corr).to.be.equal(mock.user2.id)
+				
+				done()				
+			}) 
+	})
+	
+	checkNotifications(agent2, function(obj) {return obj.newMessages[mock.order._id]}, function() {return [5, lastId]})
+	
+	it('should create a new msg by user2', function(done) {
+		agent2
+			.post('/messages/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order._id,
+				message: 'hey'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+					
+				lastId2 = res.body.message._id
+				
+				expect(res.body.message.user).to.be.equal(mock.user2.id)
+				expect(res.body.message.corr).to.be.equal(mock.user.id)
+				
+				done() 
+			}) 
+	})
+	
+	checkNotifications(agent, function(obj) {return obj.newMessages[mock.order._id]}, function() {return [5, lastId2]})
+	
+	it('should not create a new msg by user3', function(done) {
+		agent3
+			.post('/messages/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				order: mock.order._id,
+				message: ':D'
+			})
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+
+	it('should get msg from user2', function(done) {
+		agent
+			.get('/messages/last/' + lastId + '/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.messages.length).to.be.equal(1)
+				expect(res.body.messages[0]._id).to.be.equal(lastId2)
+				expect(res.body.messages[0].user).to.not.have.property('email')
+				expect(res.body.order._id).to.be.equal(mock.order._id)
+				
+				done() 
+			}) 
+	})
+	
+	checkNotifications(agent, function(obj) {return obj.newMessages[mock.order._id][0]}, function() {return 0})
+	
+	it('should not get msg from user2', function(done) {
+		agent3
+			.get('/messages/last/' + lastId + '/order/' + mock.order._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(401)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+
+	it('should not create a new private msg by user1 to user1', function(done) {
+		agent
+			.post('/messages/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				corr: mock.user.id,
+				message: 'hi private'
+			})
+			.expect('Content-type', /json/)
+			.expect(400)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				done() 
+			}) 
+	})
+	
+	it('should create a new private msg by user2 to user1', function(done) {
+		agent2
+			.post('/messages/add')
+			.set('Content-Type', 'application/json')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.send({
+				corr: mock.user.id,
+				message: 'hi private'
+			})
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+				
+				lastPrivId = res.body.message._id
+				
+				expect(res.body.message.user).to.be.equal(mock.user2.id)
+				expect(res.body.message.corr).to.be.equal(mock.user.id)
+				expect(res.body.message.message).to.be.equal('hi private')
+				
+				done() 
+			}) 
+	})
+	
+	it('should get priv msg', function(done) {
+		agent
+			.get('/messages/last/0/user/' + mock.user2._id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.messages.length).to.be.equal(1)
+				expect(res.body.messages[0]._id).to.be.equal(lastPrivId)
+				expect(res.body.messages[0].user).to.not.have.property('email')
+				expect(res.body.user._id).to.be.equal(mock.user2.id)
+				expect(res.body.user).to.not.have.property('email')
+				
+				done() 
+			}) 
+	})
+	
+	it('should get list of dialogs for user1', function(done) {
+		agent
+			.get('/messages')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.dialogs.length).to.be.equal(1)
+				
+				expect(res.body.dialogs[0].lastMsg._id).to.be.equal(lastPrivId)
+				
+				expect(res.body.dialogs[0].corr._id).to.be.equal(mock.user2.id)
+				
+				done() 
+			}) 
+	})
+	
+	it('should get list of dialogs for user2', function(done) {
+		agent2
+			.get('/messages')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err) 					
+
+				expect(res.body.dialogs.length).to.be.equal(1)
+				
+				expect(res.body.dialogs[0].lastMsg._id).to.be.equal(lastPrivId)
+				
+				expect(res.body.dialogs[0].corr._id).to.be.equal(mock.user.id)
+				
+				done() 
+			}) 
+	})
+
+})
+
+describe('Trips search', function() {
+	it('should get not empty array of trips with length 1 cos second trip is old', function(done) {
+		agent
+			.get('/trips?from_id=' + mock.trip.from_id)
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				expect(res.body.trips.length).to.be.equal(1)
+				expect(res.body.subscribe).to.not.be.null
+				
+				done() 
+			}) 
+	})
+})
+
+describe('User stats', function() {
+	it('should get user1 stats', function(done) {
+		agent
+			.get('/users/my')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				expect(res.body.user.stats).to.eql({
+					r_rate: [ 0, 0, 0, 0, 0 ],
+					r_proc: 0,
+					r_cnt: 0,
+					t_rate: [ 0, 0, 1, 0, 0 ],
+					t_proc: 1,
+					t_order: 2,
+					t_cnt: 2
+				})
+				
+				done() 
+			}) 
+	})
+	
+	it('should get user2 stats', function(done) {
+		agent2
+			.get('/users/my')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				expect(res.body.user.stats).to.eql({
+					r_rate: [ 0, 0, 0, 1, 0 ],
+					r_proc: 1,
+					r_cnt: 2,
+					t_rate: [ 0, 0, 0, 0, 0 ],
+					t_proc: 0,
+					t_order: 0,
+					t_cnt: 0
+				})
+				
+				done() 
+			}) 
+	})
+	
+	it('should get  user4 stats', function(done) {
+		agent4
+			.get('/users/my')
+			.set('X-Requested-With', 'XMLHttpRequest')
+			.expect('Content-type', /json/)
+			.expect(200)
+			.end(function(err, res) {
+				if (err) return done(err)
+
+				expect(res.body.user.stats).to.eql({
+					r_rate: [ 0, 0, 0, 0, 0 ],
+					r_proc: 0,
+					r_cnt: 0,
+					t_rate: [ 0, 0, 0, 0, 0 ],
+					t_proc: 0,
+					t_order: 0,
+					t_cnt: 0
+				})
+				
+				done() 
+			}) 
+	})
+})
+
 
 after(function() {
 	clearDbTbls() 

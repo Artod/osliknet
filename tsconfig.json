@@ -9,7 +9,7 @@
 		"removeComments": true,
 		"sourceMap": true,
 		"noImplicitAny": false,
-		"isolatedModules": true
+		"isolatedModules": false
 	},
 	"exclude": [
 		"node_modules",

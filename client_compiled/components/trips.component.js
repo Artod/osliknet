@@ -150,10 +150,13 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         _this._busy = false;
                     });
                 };
-                TripsComponent.prototype.onSubmit = function ($event, $form, $thanx) {
-                    this.search($event, $form, $thanx);
+                TripsComponent.prototype.onSubmit = function (isFromEvent, $form, $thanx) {
+                    if (this._busySearch) {
+                        return;
+                    }
+                    this.search(isFromEvent, $form, $thanx);
                 };
-                TripsComponent.prototype.search = function ($event, $form, $thanx) {
+                TripsComponent.prototype.search = function (isFromEvent, $form, $thanx) {
                     var _this = this;
                     if (!this.searchForm.valid) {
                         return false;
@@ -164,7 +167,7 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     if (!this.searchModel.to_id) {
                         this.searchModel.to = '';
                     }
-                    if ($event) {
+                    if (isFromEvent) {
                         if (this.isMain) {
                             setTimeout(function () { return _this._router.navigate(['Trips', _this.searchModel]); }, 10);
                             return;

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ElementRef, NgZone} from 'angular2/core';
+import {Component, Input, Output, OnInit, ElementRef, NgZone, EventEmitter} from 'angular2/core';
 import {LazyMapsAPILoader} from '../services/maps-api-loader/lazy-maps-api-loader';
 import {ControlGroup} from 'angular2/common';
 
@@ -16,6 +16,7 @@ export class GmAutocompliteComponent implements OnInit {
 	@Input() placeholder: string;
 	@Input() form: ControlGroup;
 	@Input() model;
+	@Output() public newPlace : EventEmitter<any> = new EventEmitter();
 	public isInvalid: boolean = false;
 	private _currentCity: string = '';
 	// private _place: string = '';
@@ -55,6 +56,7 @@ export class GmAutocompliteComponent implements OnInit {
 				that._currentCity = $place.value;
 				that.model[that.name_place] = that._currentCity;
 				that.model[that.name_id] = place.place_id;
+				that.newPlace.emit(place);
 			});
 		});
 	}

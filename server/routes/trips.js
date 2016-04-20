@@ -67,8 +67,8 @@ router.get('/', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 		
 		if (req.session.uid) {
 			Subscribe.findOne({
-				from_id: req.query.from_id,
-				to_id: req.query.to_id,
+				from_id: req.query.from_id || '',
+				to_id: req.query.to_id || '',
 				is_unsubed: false,
 				user: req.session.uid
 			}).select('_id').exec(function(err, subscribe) {
@@ -183,8 +183,16 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 		});		
 		
 		Subscribe.find({
-			from_id: trip.from_id,
-			to_id: trip.to_id,
+			$or: [{
+				from_id: trip.from_id,
+				to_id: trip.to_id
+			}, {
+				from_id: trip.from_id,
+				to_id: ''
+			}, {
+				from_id: '',
+				to_id: trip.to_id
+			}],
 			is_unsubed: false
 		}).select('+email').exec(function(err, subscribes) {
 			if (err) {
@@ -209,7 +217,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 					email.from = config.email;
 					
 					email.text += 'Hello!\n\r\n\r';
-					email.text += 'We have a new trip from ' + subscribe.from + ' to ' + subscribe.to + ' ' + config.host + 'trips/' + trip.id + ' .\n\r';
+					email.text += 'We have a new trip ' + (subscribe.from ? 'from «' + subscribe.from + '» ' : '') + (subscribe.to ? 'to «' + subscribe.to + '» ' : '') + config.host + 'trips/' + trip.id + ' .\n\r';
 					email.text += 'Unsubscribe: ' + config.host + 'subscribes/cancel/' + subscribe.id + ' .\n\r\n\r';
 					email.text += 'Team ' + config.host;
 

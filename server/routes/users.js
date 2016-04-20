@@ -95,13 +95,18 @@ router.get('/notifications/:timestamp?', mdlwares.restricted, function(req, res,
 			if (user.needEmailNotification) {
 				user.needEmailNotification = false;
 
-				user.save(function(err, user) {
-					//log errors without return!!!
+				user.save(function(err, user) {					
+					if (err) {// !!!!!!!log errors without return!!!
+						logger.error(err, req.session, {line: 101});
+					}
 					
-					out.updated_at = user.updated_at;
+					if (user) {
+						out.updated_at = user.updated_at;						
+					}
 					
 					res.type('json')
 						.json(out);
+
 				});
 			} else {
 				res.type('json')
@@ -117,7 +122,7 @@ router.get('/logout', mdlwares.restricted, passwordless.logout(), function(req, 
 	  // cannot access session here
 	});
 	
-	res.redirect('/login');
+	res.redirect('/users/login');
 });
 
 function proceedEmail(callback) {
@@ -246,6 +251,7 @@ function deliveryToken(req, res, next) {
 }
 
 router.post('/login', /*loggedInAlready, */proceedEmail(function(user, req, res, next) {
+
 	if (user) {
 		req.userId = user.id;
 		
@@ -367,7 +373,7 @@ router.get('/logged_in',/*loggedInAlready, */passwordless.acceptToken({
 			return;
 		});
 	} else {
-		res.type('text').send('The request token is invalid. It may have already been used, or expired because it is too old.');
+		res.type('html').send('The request token is invalid. It may have already been used, or expired because it is too old. <script type="text/javascript">setTimeout(function(){window.location = "/users/login"}, 2000)</script>');
 	}
 });
 

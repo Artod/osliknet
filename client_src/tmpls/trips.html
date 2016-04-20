@@ -23,9 +23,9 @@
 	
 	<h4 *ngIf="isMain" class="white-font">Find trips</h4>
 	
-	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="_busySearch ? false : onSubmit($event, form, thanx)">
+	<form class="trips-find-form form-inline" method="get" [ngFormModel]="searchForm" (submit)="onSubmit(true, form, thanx)" #searchFormEl>
 		<div class="form-group">
-			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" placeholder="From"></gm-autocomplite>
+			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'from'" [name_id]="'from_id'" [form]="searchForm" [(model)]="searchModel" (newPlace)="onSubmit(true, form, thanx)" placeholder="From"></gm-autocomplite>
 		</div>
 		
 		<div class="arrow-right form-group {{isMain ? 'white-font' : ''}}">
@@ -33,7 +33,7 @@
 		</div>
 
 		<div class="form-group">	
-			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" placeholder="To"></gm-autocomplite>
+			<gm-autocomplite [class]="'form-control input-lg'" [name_place]="'to'" [name_id]="'to_id'" [form]="searchForm" [(model)]="searchModel" (newPlace)="onSubmit(true, form, thanx)" placeholder="To"></gm-autocomplite>
 		</div>
 		
 		<div class="form-group">
@@ -76,15 +76,14 @@
 			<a href="#" (click)="unsubscribe(linkUnsubscribe)">Unsubscribe from notifications about new trips in the direction.</a>
 		</p>
 
-		<div *ngIf="(!subscribe || !subscribe._id) && (subModel.from_id && subModel.to_id)" class="subscribe-form">		
+		<div *ngIf="(!subscribe || !subscribe._id) && (subModel.from_id || subModel.to_id)" class="subscribe-form">		
 			<p [hidden]="!_subsFinished" #thanx>
 				<i>Subscribed. Thank you!</i> 
 			</p>
 
 			<form *ngIf="!_subsFinished" method="post" [ngFormModel]="subForm" (submit)="_subBusy ? false : onSubscribe($event, form)" novalidate #form>
 				<p>
-					<!-- <i>We'll let you know when a new trip from «<big>{{subModel.from}}</big>» to «<big>{{subModel.to}}</big>» will appear:</i>	<br />	<br /> -->
-					<i>We'll let you know when a new trip from «{{subModel.from}}» to «{{subModel.to}}» will appear:</i>
+					<i>We'll let you know when a new trip {{ subModel.from ? 'from «' + subModel.from +'»' : '' }} {{ subModel.to ? 'to «' + subModel.to + '»' : '' }} will appear:</i>
 					
 					<br />
 				</p>

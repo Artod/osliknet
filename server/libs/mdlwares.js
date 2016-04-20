@@ -51,7 +51,7 @@ module.exports.checkCaptcha = function(req, res, next) {
 		}
 	});
 };
-
+ 
 module.exports.restricted = function(req, res, next) {
 	if (req.session.uid) {
 		next();
@@ -78,7 +78,6 @@ var indexCompiled = (function() {
 })();
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
-
 	if (req.xhr) {
 		next();
 		

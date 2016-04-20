@@ -29,6 +29,7 @@ System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loa
                     this._loader = _loader;
                     this._el = _el;
                     this._zone = _zone;
+                    this.newPlace = new core_1.EventEmitter();
                     this.isInvalid = false;
                     this._currentCity = '';
                 }
@@ -51,6 +52,7 @@ System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loa
                             that._currentCity = $place.value;
                             that.model[that.name_place] = that._currentCity;
                             that.model[that.name_id] = place.place_id;
+                            that.newPlace.emit(place);
                         });
                     });
                 };
@@ -91,15 +93,19 @@ System.register(['angular2/core', '../services/maps-api-loader/lazy-maps-api-loa
                     core_1.Input(), 
                     __metadata('design:type', Object)
                 ], GmAutocompliteComponent.prototype, "model", void 0);
+                __decorate([
+                    core_1.Output(), 
+                    __metadata('design:type', (typeof (_b = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _b) || Object)
+                ], GmAutocompliteComponent.prototype, "newPlace", void 0);
                 GmAutocompliteComponent = __decorate([
                     core_1.Component({
                         selector: 'gm-autocomplite',
                         templateUrl: '/client_src/tmpls/gm-autocomplite.html'
                     }), 
-                    __metadata('design:paramtypes', [(typeof (_b = typeof lazy_maps_api_loader_1.LazyMapsAPILoader !== 'undefined' && lazy_maps_api_loader_1.LazyMapsAPILoader) === 'function' && _b) || Object, (typeof (_c = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _c) || Object, (typeof (_d = typeof core_1.NgZone !== 'undefined' && core_1.NgZone) === 'function' && _d) || Object])
+                    __metadata('design:paramtypes', [(typeof (_c = typeof lazy_maps_api_loader_1.LazyMapsAPILoader !== 'undefined' && lazy_maps_api_loader_1.LazyMapsAPILoader) === 'function' && _c) || Object, (typeof (_d = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _d) || Object, (typeof (_e = typeof core_1.NgZone !== 'undefined' && core_1.NgZone) === 'function' && _e) || Object])
                 ], GmAutocompliteComponent);
                 return GmAutocompliteComponent;
-                var _a, _b, _c, _d;
+                var _a, _b, _c, _d, _e;
             }());
             exports_1("GmAutocompliteComponent", GmAutocompliteComponent);
         }

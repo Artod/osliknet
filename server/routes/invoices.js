@@ -353,6 +353,16 @@ router.get('/check/:id', mdlwares.restricted, function(req, res, next) {
 			
 			return;
 		}
+		
+		if (!invoice.payment || !invoice.payment.id) {
+			logger.error(invoice.payment, {line: 358});
+			
+			res.status(500).type('json')
+				.json({error: 'Unexpected server error.'});
+			
+			return;
+		}
+		
 
 		paypal.payment.get(invoice.payment.id, function (err, payment) {
 			if (err) {

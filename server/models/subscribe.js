@@ -9,23 +9,19 @@ function emailValidator(email) {
 var schema = mongoose.Schema({
 	from: {
 		type: String,
-		trim: true,
-		required: true
+		trim: true
 	},
 	from_id: {
 		type: String,
-		trim: true,
-		required: true
+		trim: true
 	},
 	to: {
 		type: String,
-		trim: true,
-		required: true
+		trim: true
 	},
 	to_id: {
 		type: String,
-		trim: true,
-		required: true
+		trim: true
 	},
 	is_unsubed: {
 		type: Boolean,

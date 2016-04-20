@@ -295,7 +295,7 @@ var sessionParam = {
 }
 
 if ( app.get('isProd') ) {
-	// app.set('trust proxy', 1) // trust first proxy
+	app.set('trust proxy', 1) // trust first proxy
 	// sessionParam.cookie.secure = true // serve secure cookies
 }
 

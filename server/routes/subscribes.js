@@ -41,7 +41,7 @@ router.get('/cancel/:id', function(req, res, next) {
 			if (req.xhr) {
 				res.type('json').json({});
 			} else {
-				res.type('text').send('You have successfully unsubscribed from notifications about new trips from ' + subscribe.from + ' to ' + subscribe.to + '.');
+				res.type('html').send('You have successfully unsubscribed from notifications about new trips ' + (subscribe.from ? 'from «' + subscribe.from + '» ' : '') + (subscribe.to ? 'to «' + subscribe.to + '» ' : '') + '. <script type="text/javascript">setTimeout(function(){window.location = "/"}, 4000)</script>');
 			}
 		});
 	});
@@ -51,8 +51,15 @@ router.get('/cancel/:id', function(req, res, next) {
 router.post('/add', mdlwares.checkCaptcha, function(req, res, next) {
 	req.body.email = req.session.email || req.body.email;
 	req.body.is_unsubed = false;
+	
+	req.body.from_id = req.body.from_id || '';
+	req.body.to_id = req.body.to_id || '';
 
-	if (!req.body.from_id || !req.body.to_id) {
+	if (
+		(!req.body.from_id && !req.body.to_id)
+		|| (req.body.from_id && !req.body.from)
+		|| (req.body.to_id && !req.body.to)
+	) {
 		res.status(400).type('json')
 			.json({error: 'Direction is not indicated.'});
 			

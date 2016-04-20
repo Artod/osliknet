@@ -167,17 +167,17 @@ export class TripsComponent implements
 	
 	private _inited : boolean = false;
 	
-	public onSubmit($event, $form, $thanx) : void {
-
+	public onSubmit(isFromEvent, $form, $thanx) : void {
+		if (this._busySearch) {
+			return;
+		}
 		
-		//setTimeout( ()=> this.search($event, $form, $thanx), 1 );
-		
-		this.search($event, $form, $thanx);
+		this.search(isFromEvent, $form, $thanx);
 	}
 	
 	private _busySearch : boolean = false;
 	
-	public search($event, $form, $thanx) : void {
+	public search(isFromEvent, $form, $thanx) : void {
 		if (!this.searchForm.valid) {			
 			return false;
 		}
@@ -190,7 +190,7 @@ export class TripsComponent implements
 			this.searchModel.to = '';
 		}
 
-		if ($event) {
+		if (isFromEvent) {
 			/*let params = {
 				from: this.searchModel.from,
 				from_id: this.searchModel.from_id || '',

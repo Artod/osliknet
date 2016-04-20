@@ -173,8 +173,17 @@ schema.statics.setUnreaded = function(field, uid, id) {
 			
 			return;
 		}
-			
-		user[field].push(id);
+		
+		var indexOf = user[field].indexOf(id);
+		
+		if (indexOf !== -1 && user.needEmailNotification) {		
+			return;
+		}
+		
+		if (indexOf === -1) {
+			user[field].push(id);
+		}
+		
 		user.needEmailNotification = true;
 		
 		user.save(function(err, user) {
@@ -192,19 +201,23 @@ schema.statics.setReaded = function(field, uid, id) {
 			logger.error(err, field, uid, id, {line: 181});
 			
 			return;
-		}
-		
-		var indexOf = user[field].indexOf(id); // if length == 0 or undefined id then -1 
-		
-		if (indexOf === -1 && !user.needEmailNotification) {		
-			return;
 		}		
 		
 		if (id) {
+			var indexOf = user[field].indexOf(id); // if length == 0 or undefined id then -1
+			
+			if (indexOf === -1 && !user.needEmailNotification) {		
+				return;
+			}			
+			
 			if (indexOf > -1) {
 				user[field].splice(indexOf, 1);
 			}
 		} else {
+			if (user[field].length === 0 && !user.needEmailNotification) {		
+				return;
+			}
+			
 			user[field] = [];
 		}
 		
@@ -219,13 +232,15 @@ schema.statics.setReaded = function(field, uid, id) {
 };
 
 var changeCount = function(obj, setZero, lid) {
+
+
 	var count = -1,
 		lid = ( lid || ( obj && obj[1] ) || 0 );
 	
 	if (!setZero) {		
 		count = ( ( obj && Number(obj[0]) ) || 0 );
 	}
-	
+
 	return [++count, lid];
 };
 
@@ -236,9 +251,9 @@ schema.statics.setMessagesUnreaded = function(uid, oid, lid) {
 			
 			return;
 		}	
-		
+
 		user.newMessages[oid] = changeCount(user.newMessages[oid], false, lid);
-		
+
 		user.markModified('newMessages');
 
 		user.needEmailNotification = true;

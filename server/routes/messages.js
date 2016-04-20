@@ -280,7 +280,6 @@ router.get('/order/:id', mdlwares.restricted, mdlwares.renderIndexUnlessXhr, fun
 
 function getUserMsgs(req, res, next) {
 	User.findById(req.params.corrId).exec(function(err, user) {
-
 		if (err) {
 			logger.error(err, {line: 139});
 
@@ -467,7 +466,7 @@ router.post('/add', mdlwares.restricted, function(req, res, next) {
 				if (err) {
 					logger.error(err, {line: 328});
 
-					res.status(err.name === 'ValidationError' ? 400 : 500).type('json')
+					res.status(500).type('json')
 						.json({error: 'Unexpected server error.'});
 
 					return;
