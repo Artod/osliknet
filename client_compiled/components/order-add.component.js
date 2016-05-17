@@ -109,10 +109,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     __param(3, core_1.Inject(common_1.FormBuilder)),
                     __param(4, core_1.Inject('trip')),
                     __param(5, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof order_service_1.OrderService !== 'undefined' && order_service_1.OrderService) === 'function' && _a) || Object, (typeof (_b = typeof router_1.Router !== 'undefined' && router_1.Router) === 'function' && _b) || Object, (typeof (_c = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _c) || Object, (typeof (_d = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _d) || Object, Object, Object])
+                    __metadata('design:paramtypes', [order_service_1.OrderService, router_1.Router, router_1.Location, common_1.FormBuilder, Object, Object])
                 ], OrderAddComponent);
                 return OrderAddComponent;
-                var _a, _b, _c, _d;
             }());
             exports_1("OrderAddComponent", OrderAddComponent);
         }

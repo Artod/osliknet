@@ -1,74 +1,88 @@
 doctype html
 html
 	head
-		title Osliki.Net
+		title #{title}
 
 		meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
 		meta(http-equiv="X-UA-Compatible", content="IE=edge")
-		meta(charset="utf-8") 
-		
+		meta(charset="utf-8")
+
 		base(href="/")
 
-		link(rel='stylesheet', href='/css/style.css?6')
+		meta(name="keywords", content="#{meta.keywords}")
+		meta(name="description", content="#{meta.description}")
 
-		
+		meta(property="og:title", content="#{meta.title}")
+		meta(property="og:type", content="service")
+		meta(property="og:url", content="#{meta.url}")
+		meta(property="og:description", content="#{meta.description}")
+		meta(property="og:image", content="#{meta.image}")
+
+		meta(name="twitter:card", content="summary")
+		meta(name="twitter:site", content="@OslikiNet")
+		meta(name="twitter:domain", content="osliki.net")
+		meta(name="twitter:title", content="#{meta.title}")
+		meta(name="twitter:description", content="#{meta.description}")
+		meta(name="twitter:image", content="#{meta.image}")
+
+		link(rel='stylesheet', href='/css/style.css?6')
 
 		// script(src='/node_modules/es6-shim/es6-shim.js')
 		// script(src='/node_modules/systemjs/dist/system-polyfills.js')
 		// script(src='/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js')
-		
+
 		// script(src='/node_modules/angular2/bundles/angular2-polyfills.js')
 		// script(src='/node_modules/systemjs/dist/system.src.js')
 		// script(src='/node_modules/rxjs/bundles/Rx.js')
 		// script(src='/node_modules/angular2/bundles/angular2.dev.js')
 		// script(src='/node_modules/angular2/bundles/router.dev.js')
 		// script(src='/node_modules/angular2/bundles/http.dev.js')
-		
+
 		script(src='/js/libs.js?10')
-		script(src='/js/app.js?10')
+		script(src='/js/app.js?11')
 
 	body
 
 		app
-			block content	
-	
-		script.			
+			block content
+
+		script.
 			window.user = {
 				id: '#{user.id}',
 				name: '#{user.name}',
 				gravatar_hash: '#{user.gravatar_hash}'
 			};
-			
+
 			window.googleMaps = {
 				apiKey: 'AIzaSyBjCE2t7x2LK0YttTxEz9rN9hcuOxa9gfQ',
 				apiVersion: 3,
 				params: '&libraries=places&signed_in=true&language=en'
 			};
-			
+
 			window.googleRecaptcha = function() {
 				window.googleRecaptcha.loaded = true;
 			};
-			
+
 			window.googleRecaptcha.key = '#{recaptcha.key}';
 			window.googleRecaptcha.loaded = false;
 
 			window.orderStatus = !{orderStatus};
 			window.orderStatusConst = !{orderStatusConst};
-			
+
 			window.invoiceStatus = !{invoiceStatus};
 			window.invoiceStatusConst = !{invoiceStatusConst};
-			
+
 			window.fees = !{fees};
 
 			System.config({
-				packages: {        
+				packages: {
 					'boot': {
 						format: 'register',
 						defaultExtension: 'js'
 					}
 				}
 			});
-			
+
 			System.import('boot').then( null, console.error.bind(console) );
 
 		if !user.id

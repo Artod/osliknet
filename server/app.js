@@ -114,7 +114,7 @@ TODO:
 - help baloons
 
 - mobile browser detect
-- indexes db
+\/- indexes db
 - ssl https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-14-04
 
 - soc share
@@ -254,13 +254,7 @@ passwordless.addDelivery(function(tokenToSend, uidToSend, recipient, callback, r
 });
 
 
-
-
-
-
-
-
-app.locals.title = config.name;
+// app.locals.title = config.name;
 //app.locals.strftime = require('strftime');
 app.locals.email = config.email;
 
@@ -360,6 +354,18 @@ app.use(function(req, res, next) {
 	if (req.session.uid) {
 		req.session._uid = mongoose.Types.ObjectId(req.session.uid);
 	}
+	
+	res.locals.title = config.title;
+	
+	res.locals.meta = {
+		title: config.meta.title,
+		keywords: config.meta.keywords,
+		description: config.meta.description,
+		image: config.meta.image,
+		url: config.meta.url
+	};
+	
+	res.locals.meta.url = req.protocol + '://' + req.get('host') + req.originalUrl;	
 
 	next();
 });

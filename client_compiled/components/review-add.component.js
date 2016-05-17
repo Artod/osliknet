@@ -101,10 +101,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                     }),
                     __param(3, core_1.Inject('orderId')),
                     __param(4, core_1.Inject('onReviewAdd')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _b) || Object, (typeof (_c = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _c) || Object, String, Object])
+                    __metadata('design:paramtypes', [common_1.FormBuilder, review_service_1.ReviewService, router_1.Location, String, Function])
                 ], ReviewAddComponent);
                 return ReviewAddComponent;
-                var _a, _b, _c;
             }());
             exports_1("ReviewAddComponent", ReviewAddComponent);
         }

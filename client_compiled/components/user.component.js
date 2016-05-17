@@ -120,10 +120,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../serv
                         pipes: [to_date_pipe_1.ToDatePipe]
                     }),
                     __param(4, core_1.Inject('config.user')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof user_service_1.UserService !== 'undefined' && user_service_1.UserService) === 'function' && _b) || Object, (typeof (_c = typeof review_service_1.ReviewService !== 'undefined' && review_service_1.ReviewService) === 'function' && _c) || Object, (typeof (_d = typeof router_1.RouteParams !== 'undefined' && router_1.RouteParams) === 'function' && _d) || Object, Object])
+                    __metadata('design:paramtypes', [common_1.FormBuilder, user_service_1.UserService, review_service_1.ReviewService, router_1.RouteParams, Object])
                 ], UserComponent);
                 return UserComponent;
-                var _a, _b, _c, _d;
             }());
             exports_1("UserComponent", UserComponent);
         }

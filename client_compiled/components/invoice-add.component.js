@@ -197,10 +197,9 @@ System.register(['angular2/core', 'angular2/common', 'angular2/router', '../comp
                     __param(4, core_1.Inject('onInvoiceAdd')),
                     __param(5, core_1.Inject('config.user')),
                     __param(6, core_1.Inject('config.invoiceStatusConst')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof common_1.FormBuilder !== 'undefined' && common_1.FormBuilder) === 'function' && _a) || Object, (typeof (_b = typeof invoice_service_1.InvoiceService !== 'undefined' && invoice_service_1.InvoiceService) === 'function' && _b) || Object, (typeof (_c = typeof router_1.Location !== 'undefined' && router_1.Location) === 'function' && _c) || Object, Object, Object, Object, Object])
+                    __metadata('design:paramtypes', [common_1.FormBuilder, invoice_service_1.InvoiceService, router_1.Location, Object, Function, Object, Object])
                 ], InvoiceAddComponent);
                 return InvoiceAddComponent;
-                var _a, _b, _c;
             }());
             exports_1("InvoiceAddComponent", InvoiceAddComponent);
         }

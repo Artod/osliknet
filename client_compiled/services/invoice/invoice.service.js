@@ -103,10 +103,9 @@ System.register(['angular2/core', 'angular2/http'], function(exports_1, context_
                 InvoiceService = __decorate([
                     core_1.Injectable(),
                     __param(1, core_1.Inject('config.fees')), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof http_1.Http !== 'undefined' && http_1.Http) === 'function' && _a) || Object, Object])
+                    __metadata('design:paramtypes', [http_1.Http, Object])
                 ], InvoiceService);
                 return InvoiceService;
-                var _a;
             }());
             exports_1("InvoiceService", InvoiceService);
         }

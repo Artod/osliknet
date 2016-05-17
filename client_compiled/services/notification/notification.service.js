@@ -70,10 +70,9 @@ System.register(['angular2/core', 'angular2/http', 'rxjs/Observable', 'rxjs/Subj
                 };
                 NotificationService = __decorate([
                     core_1.Injectable(), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof http_1.Http !== 'undefined' && http_1.Http) === 'function' && _a) || Object])
+                    __metadata('design:paramtypes', [http_1.Http])
                 ], NotificationService);
                 return NotificationService;
-                var _a;
             }());
             exports_1("NotificationService", NotificationService);
         }

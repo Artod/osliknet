@@ -81,7 +81,7 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1, contex
                 };
                 __decorate([
                     core_1.Input(), 
-                    __metadata('design:type', (typeof (_a = typeof common_1.Control !== 'undefined' && common_1.Control) === 'function' && _a) || Object)
+                    __metadata('design:type', common_1.Control)
                 ], CaptchaComponent.prototype, "ctrl", void 0);
                 __decorate([
                     core_1.Input(), 
@@ -93,11 +93,11 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1, contex
                 ], CaptchaComponent.prototype, "needReloadCaptcha", void 0);
                 __decorate([
                     core_1.Output(), 
-                    __metadata('design:type', (typeof (_b = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _b) || Object)
+                    __metadata('design:type', core_1.EventEmitter)
                 ], CaptchaComponent.prototype, "needReloadCaptchaChange", void 0);
                 __decorate([
                     core_1.Output('modelChange'), 
-                    __metadata('design:type', (typeof (_c = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _c) || Object)
+                    __metadata('design:type', core_1.EventEmitter)
                 ], CaptchaComponent.prototype, "modelChange", void 0);
                 CaptchaComponent = __decorate([
                     core_1.Component({
@@ -105,10 +105,9 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1, contex
                         template: "\n\t\t<input name=\"recaptcha\" type=\"hidden\" [(ngModel)]=\"model\" [ngFormControl]=\"ctrl\" value=\"\" />\n\t\t<div class=\"g-recaptcha\">Loading captcha...</div>\n\t"
                     }),
                     __param(0, core_1.Inject('config.captcha')), 
-                    __metadata('design:paramtypes', [Object, (typeof (_d = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _d) || Object])
+                    __metadata('design:paramtypes', [Object, core_1.ElementRef])
                 ], CaptchaComponent);
                 return CaptchaComponent;
-                var _a, _b, _c, _d;
             }());
             exports_1("CaptchaComponent", CaptchaComponent);
         }

@@ -55,10 +55,9 @@ System.register(['angular2/core', './modal.component'], function(exports_1, cont
                 };
                 ModalService = __decorate([
                     core_1.Injectable(), 
-                    __metadata('design:paramtypes', [(typeof (_a = typeof core_1.DynamicComponentLoader !== 'undefined' && core_1.DynamicComponentLoader) === 'function' && _a) || Object, (typeof (_b = typeof core_1.ApplicationRef !== 'undefined' && core_1.ApplicationRef) === 'function' && _b) || Object])
+                    __metadata('design:paramtypes', [core_1.DynamicComponentLoader, core_1.ApplicationRef])
                 ], ModalService);
                 return ModalService;
-                var _a, _b;
             }());
             exports_1("ModalService", ModalService);
         }

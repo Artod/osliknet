@@ -66,16 +66,20 @@ module.exports.restricted = function(req, res, next) {
 	}
 };
 
-var indexCompiled = (function() {
+var getCompiled = function(path) {
 	if (process.env.NODE_ENV === 'production') {
-		return jade.compileFile( require.resolve('../views/index.jade', {cache: true}) );		
+		return jade.compileFile( require.resolve(path, {cache: true}) );		
 	} else {
 		return function(data) {
 			var indexCompiled = jade.compileFile( require.resolve('../views/dev_index.jade', {cache: true}) );
 			return indexCompiled(data);
 		}
 	}
-})();
+};
+
+var indexCompiled = getCompiled('../views/index.jade');
+
+module.exports.tripCompiled = getCompiled('../views/trip.jade');
 
 module.exports.renderIndexUnlessXhr = function(req, res, next) {
 	if (req.xhr) {
@@ -91,3 +95,14 @@ module.exports.renderIndexUnlessXhr = function(req, res, next) {
     res.type('html').write( indexCompiled(res.locals) );
     res.end();
 };
+
+/*module.exports.renderTripUnlessXhr = function(req, res, next) {
+	if (req.xhr) {
+		next();
+		
+		return;
+	}
+	
+    res.type('html').write( tripCompiled(res.locals) );
+    res.end();
+};*/

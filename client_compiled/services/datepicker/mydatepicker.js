@@ -271,7 +271,7 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1, contex
                 ], MyDatePicker.prototype, "selDate", void 0);
                 __decorate([
                     core_1.Output(), 
-                    __metadata('design:type', (typeof (_a = typeof core_1.EventEmitter !== 'undefined' && core_1.EventEmitter) === 'function' && _a) || Object)
+                    __metadata('design:type', core_1.EventEmitter)
                 ], MyDatePicker.prototype, "dateChanged", void 0);
                 MyDatePicker = __decorate([
                     core_1.Component({
@@ -279,10 +279,9 @@ System.register(['angular2/core', 'angular2/common'], function(exports_1, contex
                         templateUrl: '/client_src/services/datepicker/template/mydatepicker.html',
                         directives: [common_1.NgIf, common_1.NgFor, common_1.NgClass, common_1.NgStyle]
                     }), 
-                    __metadata('design:paramtypes', [(typeof (_b = typeof core_1.ElementRef !== 'undefined' && core_1.ElementRef) === 'function' && _b) || Object])
+                    __metadata('design:paramtypes', [core_1.ElementRef])
                 ], MyDatePicker);
                 return MyDatePicker;
-                var _a, _b;
             }());
             exports_1("MyDatePicker", MyDatePicker);
         }

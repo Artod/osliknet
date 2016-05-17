@@ -276,8 +276,7 @@ router.post('/update', mdlwares.restricted, function(req, res, next) {
 	});
 });
 
-router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
-	
+router.get('/:id', function(req, res, next) {
 	Trip.findById(req.params.id).populate('user').exec(function(err, trip) {
 		if (err) {
 			logger.error(err, {line: 271});
@@ -288,10 +287,22 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 			return
 		}
 		
-		if (req.session.uid) {
-			User.setReaded('newTrips', req.session.uid, trip.id);			
+		if (!req.xhr) {
+			res.locals.meta.title = 'Trip from ' + trip.from + ' to ' + trip.to + ' | ' + res.locals.meta.title;
+			res.locals.meta.keywords = trip.from + ', ' + trip.to + ', order delivery, ' + res.locals.meta.keywords;
+			res.locals.meta.description = 'Order delivery from ' + trip.from + ' to ' + trip.to + '. ' + trip.description;
+			res.locals.meta.image = 'http://gravatar.com/avatar/' + trip.user.gravatar_hash + '?d=monsterid';			
+			
+			res.type('html').write( mdlwares.tripCompiled(res.locals) );
+			res.end();
+			
+			return;
 		}
 		
+		if (req.session.uid) {
+			User.setReaded('newTrips', req.session.uid, trip.id);			
+		}		
+	
 		if (!req.session.uid || !trip) {
 			res.type('json')
 				.json({trip: trip});
@@ -312,7 +323,7 @@ router.get('/:id', mdlwares.renderIndexUnlessXhr, function(req, res, next) {
 					return
 				}
 
-				res.json({
+				res.type('json').json({
 					trip: trip,
 					orders: orders
 				});
